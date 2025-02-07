@@ -25,6 +25,6 @@ inline void PrintLogFunc(const TCHAR* fmt, ...)
 	TCHAR buffer[1024];
 	FCString::GetVarArgs(buffer, UE_ARRAY_COUNT(buffer), fmt, args);
 	PRINTLOG(TEXT("%s"), buffer);
-	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
+	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
 	va_end(args);
 }
