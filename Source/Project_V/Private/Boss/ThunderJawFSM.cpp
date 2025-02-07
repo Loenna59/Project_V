@@ -51,8 +51,15 @@ void UThunderJawFSM::ChangeState(EBossState BossState)
 {
 	CurrentState->Exit(Boss, this);
 	PrevState = CurrentState;
-	CurrentState = StatePool[BossState];
-	CurrentState->Enter(Boss, this);
+	if (StatePool.Contains(BossState))
+	{
+		CurrentState = StatePool[BossState];
+		CurrentState->Enter(Boss, this);
+	}
+	else
+	{
+		check(false);
+	}
 }
 
 
