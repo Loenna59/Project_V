@@ -3,6 +3,8 @@
 
 #include "ThunderJaw.h"
 
+#include "Project_V.h"
+
 
 // Sets default values
 AThunderJaw::AThunderJaw()
@@ -15,6 +17,7 @@ AThunderJaw::AThunderJaw()
 void AThunderJaw::BeginPlay()
 {
 	Super::BeginPlay();
+	PRINTLOGTOSCREEN(TEXT("Hello i'm ThunderJaw"));
 	
 }
 
