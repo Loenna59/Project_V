@@ -33,6 +33,25 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* cameraComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float walkSpeed = 600;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float sprintSpeed = 1200;
+
+	UFUNCTION()
+	void Move(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void Rotate(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void ActionJump(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void Sprint(const FInputActionValue& actionValue);
+
+private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
 
@@ -45,15 +64,8 @@ public:
 	UPROPERTY()
 	class UInputAction* ia_jump;
 
-	UFUNCTION()
-	void Move(const FInputActionValue& actionValue);
+	UPROPERTY()
+	class UInputAction* ia_sprint;
 
-	UFUNCTION()
-	void Rotate(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void ActionJump(const FInputActionValue& actionValue);
-
-private:
 	FVector direction;
 };

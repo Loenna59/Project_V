@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Project_V.h"
 #include "Player/PlayerAnimInstance.h"
 
 // Sets default values
@@ -71,6 +72,13 @@ APlayCharacter::APlayCharacter()
 		ia_jump = tmp_ia_jump.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_sprint(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerSprint.IA_PlayerSprint'"));
+
+	if (tmp_ia_sprint.Succeeded())
+	{
+		ia_sprint = tmp_ia_sprint.Object;
+	}
+
 	bUseControllerRotationYaw = false;
 
 	springArmComp->bUsePawnControlRotation = true;
@@ -123,6 +131,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_move, ETriggerEvent::Triggered, this, &APlayCharacter::Move);
 		pi->BindAction(ia_rotate, ETriggerEvent::Triggered, this, &APlayCharacter::Rotate);
 		pi->BindAction(ia_jump, ETriggerEvent::Started, this, &APlayCharacter::ActionJump);
+		pi->BindAction(ia_sprint, ETriggerEvent::Triggered, this, &APlayCharacter::Sprint);
+		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
 	}
 }
 
@@ -145,5 +155,11 @@ void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
 {
 	ACharacter::Jump();
+}
+
+void APlayCharacter::Sprint(const FInputActionValue& actionValue)
+{
+	bool value = actionValue.Get<bool>();
+	GetCharacterMovement()->MaxWalkSpeed = value? sprintSpeed : walkSpeed;
 }
 
