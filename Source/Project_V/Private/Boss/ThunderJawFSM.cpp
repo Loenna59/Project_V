@@ -62,5 +62,15 @@ void UThunderJawFSM::ChangeState(EBossState BossState)
 	}
 }
 
+UBossBaseState* UThunderJawFSM::GetCurrentState()
+{
+	return CurrentState;
+}
+
+UBossBaseState* UThunderJawFSM::GetPrevState()
+{
+	return PrevState;
+}
+
 
 

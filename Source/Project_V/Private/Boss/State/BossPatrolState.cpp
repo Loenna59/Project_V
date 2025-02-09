@@ -4,6 +4,7 @@
 #include "Boss/State/BossPatrolState.h"
 
 #include "Project_V.h"
+#include "Boss/ThunderJaw.h"
 
 void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
@@ -13,7 +14,8 @@ void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
 {
 	Super::Update(Boss, FSM, DeltaTime);
-	PRINTLOGTOSCREEN(TEXT("patrol state update"));
+	
+	
 }
 
 void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)

@@ -29,7 +29,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
 	void ChangeState(EBossState BossState);
-
+	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
+	UBossBaseState* GetCurrentState();
+	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
+	UBossBaseState* GetPrevState();
 	
 protected:
 	void InitStatePool();

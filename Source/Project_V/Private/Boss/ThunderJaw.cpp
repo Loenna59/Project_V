@@ -2,6 +2,7 @@
 #include "Boss/ThunderJaw.h"
 
 #include "Project_V.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 
 
@@ -10,6 +11,7 @@ AThunderJaw::AThunderJaw()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	AIControllerClass = AThunderJawAIController::StaticClass();
 	InitComponents();
 }
 
