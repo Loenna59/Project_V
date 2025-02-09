@@ -131,6 +131,7 @@ void APlayCharacter::Tick(float DeltaTime)
 	AddMovementInput(direction);
 
 	direction = FVector::ZeroVector;
+	dodge = false;
 }
 
 // Called to bind functionality to input
@@ -183,26 +184,11 @@ void APlayCharacter::Sprint(const FInputActionValue& actionValue)
 
 void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 {
-	moveAxis = actionValue.Get<FVector2D>();
+	dodgeAxis = actionValue.Get<FVector2D>();
 }
 
 void APlayCharacter::Dodge()
 {
-	if (moveAxis.X > 0)
-	{
-		PrintLogFunc(TEXT("APlayCharacter::Dodge - UP"));
-	}
-	if (moveAxis.X < 0)
-	{
-		PrintLogFunc(TEXT("APlayCharacter::Dodge - DOWN"));
-	}
-	if (moveAxis.Y > 0)
-	{
-		PrintLogFunc(TEXT("APlayCharacter::Dodge - RIGHT"));
-	}
-	if (moveAxis.Y < 0)
-	{
-		PrintLogFunc(TEXT("APlayCharacter::Dodge - LEFT"));
-	}
+	dodge = dodgeAxis != FVector2D::ZeroVector;
 }
 
