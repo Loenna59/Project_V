@@ -79,6 +79,20 @@ APlayCharacter::APlayCharacter()
 		ia_sprint = tmp_ia_sprint.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_move_pressed(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerMovePressed.IA_PlayerMovePressed'"));
+
+	if (tmp_ia_move_pressed.Succeeded())
+	{
+		ia_movePressed = tmp_ia_move_pressed.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_doubleTap(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerDoubleTap.IA_PlayerDoubleTap'"));
+
+	if (tmp_ia_doubleTap.Succeeded())
+	{
+		ia_doubleTap = tmp_ia_doubleTap.Object;
+	}
+
 	bUseControllerRotationYaw = false;
 
 	springArmComp->bUsePawnControlRotation = true;
@@ -133,6 +147,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_jump, ETriggerEvent::Started, this, &APlayCharacter::ActionJump);
 		pi->BindAction(ia_sprint, ETriggerEvent::Triggered, this, &APlayCharacter::Sprint);
 		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
+		pi->BindAction(ia_movePressed, ETriggerEvent::Triggered, this, &APlayCharacter::BeginDodge);
+		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
 	}
 }
 
@@ -163,5 +179,30 @@ void APlayCharacter::Sprint(const FInputActionValue& actionValue)
 	float speed = value? sprintSpeed : walkSpeed;
 
 	GetCharacterMovement()->MaxWalkSpeed = speed;
+}
+
+void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
+{
+	moveAxis = actionValue.Get<FVector2D>();
+}
+
+void APlayCharacter::Dodge()
+{
+	if (moveAxis.X > 0)
+	{
+		PrintLogFunc(TEXT("APlayCharacter::Dodge - UP"));
+	}
+	if (moveAxis.X < 0)
+	{
+		PrintLogFunc(TEXT("APlayCharacter::Dodge - DOWN"));
+	}
+	if (moveAxis.Y > 0)
+	{
+		PrintLogFunc(TEXT("APlayCharacter::Dodge - RIGHT"));
+	}
+	if (moveAxis.Y < 0)
+	{
+		PrintLogFunc(TEXT("APlayCharacter::Dodge - LEFT"));
+	}
 }
 

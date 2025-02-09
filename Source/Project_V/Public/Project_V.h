@@ -16,7 +16,7 @@ UE_LOG(LogTemp, Warning, TEXT("%s %s"), *CALLINFO, *FString::Printf(fmt, ##__VA_
 
 #define PRINTLOGTOSCREEN(fmt, ...) \
 PRINTLOG(fmt, ##__VA_ARGS__); \
-GEngine->AddOnScreenDebugMessage(0, 10, FColor::Cyan, *FString::Printf(fmt, ##__VA_ARGS__))
+GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, *FString::Printf(fmt, ##__VA_ARGS__))
 
 inline void PrintLogFunc(const TCHAR* fmt, ...)
 {
@@ -25,6 +25,6 @@ inline void PrintLogFunc(const TCHAR* fmt, ...)
 	TCHAR buffer[1024];
 	FCString::GetVarArgs(buffer, UE_ARRAY_COUNT(buffer), fmt, args);
 	PRINTLOG(TEXT("%s"), buffer);
-	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
 	va_end(args);
 }

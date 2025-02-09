@@ -7,6 +7,15 @@
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum EMoveKey : uint8
+{
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+};
+
 UCLASS()
 class PROJECT_V_API APlayCharacter : public ACharacter
 {
@@ -23,7 +32,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -38,9 +47,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float sprintSpeed = 1200;
-
-	// UFUNCTION()
-	// void Idle();
 	
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -54,8 +60,11 @@ public:
 	UFUNCTION()
 	void Sprint(const FInputActionValue& actionValue);
 
-	// UFUNCTION()
-	// void OnGroundLanded(const FHitResult& Hit);
+	UFUNCTION()
+	void BeginDodge(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void Dodge();
 	
 private:
 	UPROPERTY()
@@ -73,5 +82,13 @@ private:
 	UPROPERTY()
 	class UInputAction* ia_sprint;
 
+	UPROPERTY()
+	class UInputAction* ia_movePressed;
+
+	UPROPERTY()
+	class UInputAction* ia_doubleTap;
+
 	FVector direction;
+
+	FVector2D moveAxis;
 };
