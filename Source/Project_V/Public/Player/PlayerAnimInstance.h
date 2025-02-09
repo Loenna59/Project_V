@@ -13,6 +13,17 @@ UCLASS()
 class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void NativeBeginPlay() override;
+	
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY()
+	class APlayCharacter* player;
+	
+	UPROPERTY()
+	class UCharacterMovementComponent* movementComponent;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

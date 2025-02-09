@@ -39,8 +39,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float sprintSpeed = 1200;
 
-	UFUNCTION()
-	void Idle();
+	// UFUNCTION()
+	// void Idle();
 	
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -54,6 +54,9 @@ public:
 	UFUNCTION()
 	void Sprint(const FInputActionValue& actionValue);
 
+	// UFUNCTION()
+	// void OnGroundLanded(const FHitResult& Hit);
+	
 private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
@@ -69,9 +72,6 @@ private:
 
 	UPROPERTY()
 	class UInputAction* ia_sprint;
-
-	UPROPERTY()
-	class UPlayerAnimInstance* playerAnimInstance;
 
 	FVector direction;
 };
