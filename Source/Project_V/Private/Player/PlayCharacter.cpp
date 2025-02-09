@@ -106,6 +106,13 @@ void APlayCharacter::BeginPlay()
 			subSystem->AddMappingContext(imc, 0);
 		}
 	}
+	
+	playerAnimInstance = CastChecked<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
+	if (playerAnimInstance)
+	{
+		playerAnimInstance->walkSpeed = walkSpeed;
+	}
 }
 
 // Called every frame
@@ -129,10 +136,19 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	if (pi)
 	{
 		pi->BindAction(ia_move, ETriggerEvent::Triggered, this, &APlayCharacter::Move);
+		pi->BindAction(ia_move, ETriggerEvent::Completed, this, &APlayCharacter::Idle);
 		pi->BindAction(ia_rotate, ETriggerEvent::Triggered, this, &APlayCharacter::Rotate);
 		pi->BindAction(ia_jump, ETriggerEvent::Started, this, &APlayCharacter::ActionJump);
 		pi->BindAction(ia_sprint, ETriggerEvent::Triggered, this, &APlayCharacter::Sprint);
 		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
+	}
+}
+
+void APlayCharacter::Idle()
+{
+	if (playerAnimInstance)
+	{
+		playerAnimInstance->shouldMove = false;
 	}
 }
 
@@ -142,6 +158,11 @@ void APlayCharacter::Move(const FInputActionValue& actionValue)
 	
 	direction.X = value.X;
 	direction.Y = value.Y;
+
+	if (playerAnimInstance)
+	{
+		playerAnimInstance->shouldMove = true;
+	}
 }
 
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
@@ -160,6 +181,13 @@ void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
 void APlayCharacter::Sprint(const FInputActionValue& actionValue)
 {
 	bool value = actionValue.Get<bool>();
-	GetCharacterMovement()->MaxWalkSpeed = value? sprintSpeed : walkSpeed;
+	float speed = value? sprintSpeed : walkSpeed;
+
+	GetCharacterMovement()->MaxWalkSpeed = speed;
+
+	if (playerAnimInstance)
+	{
+		playerAnimInstance->walkSpeed = speed;
+	}
 }
 

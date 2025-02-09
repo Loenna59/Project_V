@@ -14,4 +14,16 @@ class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float walkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool shouldMove;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool isFalling;
 };
