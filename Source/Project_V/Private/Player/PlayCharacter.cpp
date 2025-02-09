@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Project_V.h"
+#include "Player/PlayerAnimInstance.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -21,9 +21,18 @@ APlayCharacter::APlayCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_skeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/CyberpunkSamurai/Meshes/SK_CyberpunkSamurai_WithHelmet.SK_CyberpunkSamurai_WithHelmet'"));
+
 	if (tmp_skeletalMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tmp_skeletalMesh.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimBlueprint> tmp_animInstance(TEXT("/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player"));
+
+	if (tmp_animInstance.Succeeded())
+	{
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		GetMesh()->SetAnimInstanceClass(tmp_animInstance.Object->GeneratedClass);
 	}
 
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
