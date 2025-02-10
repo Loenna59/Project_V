@@ -7,6 +7,7 @@
 #include "ThunderJawFSM.generated.h"
 
 class UBossBaseState;
+class AThunderJawAIController;
 
 UENUM(BlueprintType)
 enum class EBossState : uint8
@@ -34,12 +35,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
 	UBossBaseState* GetPrevState();
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
+	class AThunderJawAIController* BossAIController;
 protected:
+	UFUNCTION()
 	void InitStatePool();
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
 	class AThunderJaw* Boss;
 
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
 	UBossBaseState* CurrentState;
 

@@ -3,6 +3,7 @@
 #include "Boss/ThunderJawFSM.h"
 
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Boss/State/BossAttackState.h"
 #include "Boss/State/BossBaseState.h"
 #include "Boss/State/BossIdleState.h"
@@ -21,6 +22,7 @@ void UThunderJawFSM::BeginPlay()
 	Super::BeginPlay();
 
 	Boss = Cast<AThunderJaw>(GetOwner());
+	BossAIController = Cast<AThunderJawAIController>(Boss->AIControllerClass);
 	InitStatePool();
 	CurrentState = StatePool[EBossState::Patrol];
 	CurrentState->Enter(Boss,this);

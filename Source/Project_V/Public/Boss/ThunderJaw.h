@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "ThunderJaw.generated.h"
 
 UCLASS()
@@ -19,8 +20,13 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	UFUNCTION()
 	void InitComponents();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UThunderJawFSM* FSM;
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	TArray<FVector> PatrolPoints;	
 };

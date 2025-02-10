@@ -5,6 +5,7 @@
 
 #include "Project_V.h"
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 
 void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
@@ -14,7 +15,6 @@ void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
 {
 	Super::Update(Boss, FSM, DeltaTime);
-	
 	
 }
 
