@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimNodeReference.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
 {
@@ -43,4 +45,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isDodged;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isPlayingDodge;
+
+	UFUNCTION(BlueprintCallable, Category=Dodge)
+	void OnMoveDodge();
 };

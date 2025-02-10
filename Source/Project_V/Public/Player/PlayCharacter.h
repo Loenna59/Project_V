@@ -48,11 +48,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float sprintSpeed = 1200;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float dodgeSpeed = 800;
+
 	FVector2D dodgeAxis;
 
-	UPROPERTY()
 	bool dodge = false;
+
+	FVector direction;
 	
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -93,6 +96,4 @@ private:
 
 	UPROPERTY()
 	class UInputAction* ia_doubleTap;
-
-	FVector direction;
 };

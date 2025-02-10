@@ -185,6 +185,8 @@ void APlayCharacter::Sprint(const FInputActionValue& actionValue)
 void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 {
 	dodgeAxis = actionValue.Get<FVector2D>();
+
+	// PrintLogFunc(TEXT("%f %f"), dodgeAxis.X, dodgeAxis.Y);
 }
 
 void APlayCharacter::Dodge()
