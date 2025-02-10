@@ -3,6 +3,7 @@
 
 #include "Player/PlayerAnimInstance.h"
 
+#include "Project_V.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
 
@@ -28,5 +29,12 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		shouldMove = acceleration != FVector::ZeroVector && walkSpeed > 3.f;
 
 		isFalling = movementComponent->IsFalling();
+
+		dodgeDirection = FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0);
+		
+		if (player->dodge)
+		{
+			isDodged = true;
+		}
 	}
 }

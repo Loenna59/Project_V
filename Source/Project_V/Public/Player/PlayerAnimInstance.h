@@ -37,4 +37,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool isFalling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector dodgeDirection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isDodged;
 };
