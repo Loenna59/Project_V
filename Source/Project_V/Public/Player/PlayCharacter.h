@@ -32,7 +32,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -50,6 +50,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float dodgeSpeed = 800;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	FVector anchoredSpringArmLocation = FVector(180, 60, 0);
 
 	FVector2D dodgeAxis;
 
@@ -74,7 +77,13 @@ public:
 
 	UFUNCTION()
 	void Dodge();
-	
+
+	UFUNCTION()
+	void OnAnchor(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void OnAnchorRelease(const FInputActionValue& actionValue);
+
 private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
@@ -96,4 +105,7 @@ private:
 
 	UPROPERTY()
 	class UInputAction* ia_doubleTap;
+
+	UPROPERTY()
+	class UInputAction* ia_anchored;
 };

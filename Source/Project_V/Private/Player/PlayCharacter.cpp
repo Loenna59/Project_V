@@ -93,6 +93,13 @@ APlayCharacter::APlayCharacter()
 		ia_doubleTap = tmp_ia_doubleTap.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_anchored(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerAnchored.IA_PlayerAnchored'"));
+
+	if (tmp_ia_anchored.Succeeded())
+	{
+		ia_anchored = tmp_ia_anchored.Object;
+	}
+
 	bUseControllerRotationYaw = false;
 
 	springArmComp->bUsePawnControlRotation = true;
@@ -150,6 +157,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
 		pi->BindAction(ia_movePressed, ETriggerEvent::Triggered, this, &APlayCharacter::BeginDodge);
 		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
+		pi->BindAction(ia_anchored, ETriggerEvent::Triggered, this, &APlayCharacter::OnAnchor);
+		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
 	}
 }
 
@@ -192,5 +201,29 @@ void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 void APlayCharacter::Dodge()
 {
 	dodge = dodgeAxis != FVector2D::ZeroVector;
+}
+
+void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
+{
+	springArmComp->SetRelativeLocation(anchoredSpringArmLocation);
+	
+	bUseControllerRotationYaw = true;
+
+	// springArmComp->bUsePawnControlRotation = false;
+	springArmComp->bEnableCameraLag = false;
+	springArmComp->bEnableCameraRotationLag = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
+{
+	springArmComp->SetRelativeLocation(FVector::ZeroVector);
+
+	bUseControllerRotationYaw = false;
+
+	// springArmComp->bUsePawnControlRotation = true;
+	springArmComp->bEnableCameraLag = true;
+	springArmComp->bEnableCameraRotationLag = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
