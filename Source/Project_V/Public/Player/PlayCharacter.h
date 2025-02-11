@@ -42,6 +42,18 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* cameraComp;
 
+	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* anchoredSpringArmComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCameraComponent* anchoredCameraComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* transitionSpringArmComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCameraComponent* transitionCameraComp;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float walkSpeed = 600;
 	
@@ -52,14 +64,19 @@ public:
 	float dodgeSpeed = 800;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
-	FVector anchoredSpringArmLocation = FVector(180, 60, 0);
+	double minPinchDegrees = 50;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float cameraTransitionSpeedMultiplier = 5.f;
 
 	FVector2D dodgeAxis;
 
-	bool dodge = false;
+	bool bIsDodge = false;
+	
+	bool bIsAnchored = false;
 
 	FVector direction;
-	
+
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
 
@@ -84,6 +101,11 @@ public:
 	UFUNCTION()
 	void OnAnchorRelease(const FInputActionValue& actionValue);
 
+	UFUNCTION()
+	void OnPressedFire(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void OnReleasedFire(const FInputActionValue& actionValue);
 private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
@@ -108,4 +130,11 @@ private:
 
 	UPROPERTY()
 	class UInputAction* ia_anchored;
+
+	UPROPERTY()
+	class UInputAction* ia_fire;
+
+	float currentBlendCameraAlpha;
+	
+	float targetBlendCameraAlpha;
 };

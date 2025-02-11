@@ -33,7 +33,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		// dodgeDirection = FTransform(player->GetControlRotation()).TransformVector(FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0));
 		dodgeDirection = FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0);
 		
-		if (player->dodge)
+		if (player->bIsDodge)
 		{
 			isDodged = true;
 		}

@@ -11,6 +11,7 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Project_V.h"
+#include "Components/SplineComponent.h"
 #include "Player/PlayerAnimInstance.h"
 
 // Sets default values
@@ -28,14 +29,16 @@ APlayCharacter::APlayCharacter()
 		GetMesh()->SetSkeletalMesh(tmp_skeletalMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UAnimBlueprint> tmp_animInstance(TEXT("/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player"));
-
-	if (tmp_animInstance.Succeeded())
+	ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> tmp(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player_C'"));
+	if (tmp.Succeeded())
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		GetMesh()->SetAnimInstanceClass(tmp_animInstance.Object->GeneratedClass);
+		GetMesh()->SetAnimInstanceClass(tmp.Object);
 	}
-
+	
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 
@@ -43,6 +46,26 @@ APlayCharacter::APlayCharacter()
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	cameraComp->SetupAttachment(springArmComp);
+
+	springArmComp->bUsePawnControlRotation = true;
+	springArmComp->bEnableCameraLag = true;
+	springArmComp->bEnableCameraRotationLag = true;
+	springArmComp->CameraLagSpeed = 5.f;
+	springArmComp->CameraRotationLagSpeed = 5.f;
+
+	anchoredSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("AnchoredSpringArmComp"));
+	anchoredSpringArmComp->SetupAttachment(RootComponent);
+	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
+	anchoredSpringArmComp->TargetArmLength = 100;
+
+	anchoredCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("AnchoredCameraComp"));
+	anchoredCameraComp->SetupAttachment(anchoredSpringArmComp);
+
+	transitionSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("TransitionSpringArm"));
+	transitionSpringArmComp->SetupAttachment(RootComponent);
+
+	transitionCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TransitionCamera"));
+	transitionCameraComp->SetupAttachment(transitionSpringArmComp);
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> tmp_imc(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Player.IMC_Player'"));
 
@@ -100,15 +123,12 @@ APlayCharacter::APlayCharacter()
 		ia_anchored = tmp_ia_anchored.Object;
 	}
 
-	bUseControllerRotationYaw = false;
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_fire(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerFire.IA_PlayerFire'"));
 
-	springArmComp->bUsePawnControlRotation = true;
-	springArmComp->bEnableCameraLag = true;
-	springArmComp->bEnableCameraRotationLag = true;
-	springArmComp->CameraLagSpeed = 5.f;
-	springArmComp->CameraRotationLagSpeed = 5.f;
-
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	if (tmp_ia_fire.Succeeded())
+	{
+		ia_fire = tmp_ia_fire.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -127,6 +147,9 @@ void APlayCharacter::BeginPlay()
 			subSystem->AddMappingContext(imc, 0);
 		}
 	}
+
+	anchoredCameraComp->SetActive(false);
+	transitionCameraComp->SetActive(false);
 }
 
 // Called every frame
@@ -138,7 +161,31 @@ void APlayCharacter::Tick(float DeltaTime)
 	AddMovementInput(direction);
 
 	direction = FVector::ZeroVector;
-	dodge = false;
+	bIsDodge = false;
+
+	if (currentBlendCameraAlpha != targetBlendCameraAlpha)
+	{
+		float alpha = targetBlendCameraAlpha > 0?
+			currentBlendCameraAlpha + DeltaTime * cameraTransitionSpeedMultiplier :
+			currentBlendCameraAlpha - DeltaTime * cameraTransitionSpeedMultiplier;
+		
+		currentBlendCameraAlpha = FMath::Clamp(alpha, 0, 1);
+		transitionSpringArmComp->TargetArmLength = FMath::Lerp(springArmComp->TargetArmLength, anchoredSpringArmComp->TargetArmLength, currentBlendCameraAlpha);
+		transitionSpringArmComp->SetWorldLocation(FMath::Lerp(springArmComp->GetComponentLocation(), anchoredSpringArmComp->GetComponentLocation(), currentBlendCameraAlpha));
+		transitionSpringArmComp->SocketOffset = FMath::Lerp(springArmComp->SocketOffset, anchoredSpringArmComp->SocketOffset, currentBlendCameraAlpha);
+
+		if (currentBlendCameraAlpha == 0)
+		{
+			transitionCameraComp->SetActive(false);
+			cameraComp->SetActive(true);
+		}
+
+		if (currentBlendCameraAlpha == 1)
+		{
+			transitionCameraComp->SetActive(false);
+			anchoredCameraComp->SetActive(true);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -159,6 +206,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
 		pi->BindAction(ia_anchored, ETriggerEvent::Triggered, this, &APlayCharacter::OnAnchor);
 		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
+		pi->BindAction(ia_fire, ETriggerEvent::Triggered, this, &APlayCharacter::OnPressedFire);
+		pi->BindAction(ia_fire, ETriggerEvent::Completed, this, &APlayCharacter::OnReleasedFire);
 	}
 }
 
@@ -173,7 +222,7 @@ void APlayCharacter::Move(const FInputActionValue& actionValue)
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
-
+	
 	AddControllerYawInput(value.X);
 	AddControllerPitchInput(value.Y);
 }
@@ -200,30 +249,65 @@ void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 
 void APlayCharacter::Dodge()
 {
-	dodge = dodgeAxis != FVector2D::ZeroVector;
+	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
 }
 
 void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
 {
-	springArmComp->SetRelativeLocation(anchoredSpringArmLocation);
-	
-	bUseControllerRotationYaw = true;
+    cameraComp->SetActive(false);
+	transitionCameraComp->SetActive(true);
 
-	// springArmComp->bUsePawnControlRotation = false;
-	springArmComp->bEnableCameraLag = false;
-	springArmComp->bEnableCameraRotationLag = false;
+	transitionSpringArmComp->bUsePawnControlRotation = anchoredSpringArmComp->bUsePawnControlRotation;
+	transitionSpringArmComp->bEnableCameraLag = anchoredSpringArmComp->bEnableCameraLag;
+	transitionSpringArmComp->bEnableCameraRotationLag = anchoredSpringArmComp->bEnableCameraRotationLag;
+	transitionSpringArmComp->CameraLagSpeed = anchoredSpringArmComp->CameraLagSpeed;
+	transitionSpringArmComp->CameraRotationLagSpeed = anchoredSpringArmComp->CameraRotationLagSpeed;
+	
+	targetBlendCameraAlpha = 1.f;
+
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	bIsAnchored = true;
 }
 
 void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 {
-	springArmComp->SetRelativeLocation(FVector::ZeroVector);
+	anchoredCameraComp->SetActive(false);
+	transitionCameraComp->SetActive(true);
+
+	transitionSpringArmComp->bUsePawnControlRotation = springArmComp->bUsePawnControlRotation;
+	transitionSpringArmComp->bEnableCameraLag = springArmComp->bEnableCameraLag;
+	transitionSpringArmComp->bEnableCameraRotationLag = springArmComp->bEnableCameraRotationLag;
+	transitionSpringArmComp->CameraLagSpeed = springArmComp->CameraLagSpeed;
+	transitionSpringArmComp->CameraRotationLagSpeed = springArmComp->CameraRotationLagSpeed;
+
+	targetBlendCameraAlpha = 0.f;
 
 	bUseControllerRotationYaw = false;
-
-	// springArmComp->bUsePawnControlRotation = true;
-	springArmComp->bEnableCameraLag = true;
-	springArmComp->bEnableCameraRotationLag = true;
+	bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	bIsAnchored = false;
 }
 
+void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
+{
+	if (bIsAnchored)
+	{
+		PrintLogFunc(TEXT("Draw Bow"));
+	}
+	else
+	{
+		PrintLogFunc(TEXT("Melee Attack"));
+	}
+}
+
+void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
+{
+	if (bIsAnchored)
+	{
+		PrintLogFunc(TEXT("Fire Arrow"));
+	}
+}
