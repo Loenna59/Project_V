@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BossBaseState.h"
-#include "BossAttackState.generated.h"
+#include "BossCombatState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_V_API UBossAttackState : public UBossBaseState
+class PROJECT_V_API UBossCombatState : public UBossBaseState
 {
 	GENERATED_BODY()
 public:

@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Perception/AIPerceptionTypes.h"
 #include "ThunderJaw.generated.h"
+
+class APlayCharacter;
+class UThunderJawFSM;
+class AThunderJawAIController;
 
 UCLASS()
 class PROJECT_V_API AThunderJaw : public ACharacter
@@ -19,14 +22,22 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-protected:
 	UFUNCTION()
 	void InitComponents();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
-	class UThunderJawFSM* FSM;
-	
+
 public:
+	UFUNCTION(BlueprintCallable)
+	UThunderJawFSM* GetFSMComponent();
+	UFUNCTION(BlueprintCallable)
+	AThunderJawAIController* GetBossAIController();
+	UFUNCTION(BlueprintCallable)
+	APlayCharacter* GetAloy();
+	
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
-	TArray<FVector> PatrolPoints;	
+	UThunderJawFSM* FSM;
+	UPROPERTY()
+	AThunderJawAIController* BossAIController;
+	UPROPERTY()
+	APlayCharacter* Aloy;
 };

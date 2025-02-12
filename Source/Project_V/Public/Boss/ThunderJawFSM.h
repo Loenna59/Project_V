@@ -7,15 +7,23 @@
 #include "ThunderJawFSM.generated.h"
 
 class UBossBaseState;
-class AThunderJawAIController;
 
 UENUM(BlueprintType)
 enum class EBossState : uint8
 {
 	Idle = 0,
 	Patrol,
-	Detect,
-	Attack,
+	Combat,
+	LookOut,
+};
+
+UENUM(BlueprintType)
+enum class EBossAttackState : uint8
+{
+	Melee = 0,
+	MachineGun,
+	DiscLauncher,
+	MouseLaser,
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -25,32 +33,43 @@ class PROJECT_V_API UThunderJawFSM : public UActorComponent
 
 public:
 	UThunderJawFSM();
+
+protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION()
+	void InitStatePool();
+	UFUNCTION()
+	void InitPatrolPoints();
 
+public:
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
-	void ChangeState(EBossState BossState);
+	void ChangeBossState(EBossState BossState);
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
 	UBossBaseState* GetCurrentState();
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
 	UBossBaseState* GetPrevState();
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
-	class AThunderJawAIController* BossAIController;
-protected:
 	UFUNCTION()
-	void InitStatePool();
+	void ChangePatrolTargetPoint();
+	UFUNCTION()
+	void AdjustSpeed(float NewSpeed);
 	
+protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
 	class AThunderJaw* Boss;
-
-	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
 	UBossBaseState* CurrentState;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
 	UBossBaseState* PrevState;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw State")
 	TMap<EBossState, UBossBaseState*> StatePool;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	TArray<FVector> PatrolPoints;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	int CurrentTargetPoint{0};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	bool ArrivedTargetPoint{false};
 };

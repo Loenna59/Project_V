@@ -25,19 +25,21 @@ public:
 	AThunderJawAIController();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable)
-	void MoveToPlayer();
+	
 	UFUNCTION()
-	void PerceptionUpdated(const TArray<AActor*>& Actors);
+	void InitComponent();
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-	
+
 public:
+	UFUNCTION()
+	void MoveToPlayer();
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class AThunderJaw* Boss;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UAIPerceptionComponent* AIPC;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Sence")
@@ -47,7 +49,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Sence")
 	class UAISenseConfig_Damage* DamageConfig;
 
-	UPROPERTY()
-	float OnDetected{false};
-	
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool DetectedTarget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DistanceFromTarget;
 };
