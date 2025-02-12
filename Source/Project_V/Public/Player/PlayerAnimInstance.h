@@ -49,6 +49,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isPlayingDodge;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool isAnchoredBow;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float controlPitch;
+	
 	UFUNCTION(BlueprintCallable, Category=Dodge)
 	void OnMoveDodge();
 };

@@ -222,9 +222,12 @@ void APlayCharacter::Move(const FInputActionValue& actionValue)
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
+
 	
 	AddControllerYawInput(value.X);
 	AddControllerPitchInput(value.Y);
+
+	// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
 }
 
 void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
@@ -266,7 +269,7 @@ void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
 	targetBlendCameraAlpha = 1.f;
 
 	bUseControllerRotationYaw = true;
-	bUseControllerRotationPitch = true;
+	// bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	bIsAnchored = true;
@@ -286,7 +289,7 @@ void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 	targetBlendCameraAlpha = 0.f;
 
 	bUseControllerRotationYaw = false;
-	bUseControllerRotationPitch = false;
+	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bIsAnchored = false;
