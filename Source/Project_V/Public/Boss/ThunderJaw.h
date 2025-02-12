@@ -32,6 +32,7 @@ public:
 	AThunderJawAIController* GetBossAIController();
 	UFUNCTION(BlueprintCallable)
 	APlayCharacter* GetAloy();
+
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -40,4 +41,11 @@ protected:
 	AThunderJawAIController* BossAIController;
 	UPROPERTY()
 	APlayCharacter* Aloy;
+
+
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float DetectDist {600.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float MeleeAttackDist{300.0f};
 };

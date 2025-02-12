@@ -1,7 +1,6 @@
 
 #include "Boss/ThunderJaw.h"
 
-#include "Project_V.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -23,6 +22,10 @@ void AThunderJaw::BeginPlay()
 	Super::BeginPlay();
 	// controller가 생성자에서 할당되지 않기에 Beginplay에서 casting해줌
 	BossAIController = Cast<AThunderJawAIController>(GetController());
+	if (!BossAIController)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("BossAIController Cast Failed"));
+	}
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 }
 
@@ -44,8 +47,9 @@ void AThunderJaw::InitComponents()
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("'/Game/Blueprints/Boss/Animation/ABP_ThunderJaw.ABP_ThunderJaw_C'"));
 	if (tempAnim.Succeeded())
 	{
-		GetMesh()->SetAnimClass(tempAnim.Class);
+		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
+	
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
 
@@ -63,6 +67,7 @@ APlayCharacter* AThunderJaw::GetAloy()
 {
 	return Aloy;
 }
+
 
 
 

@@ -23,7 +23,6 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	{
 		if (Boss->GetBossAIController())
 		{
-			//PrintLogFunc(TEXT("patrol %f"),dist);
 			Boss->GetBossAIController()->MoveToLocation(patrolPointPos);
 		}
 	}
@@ -38,4 +37,6 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
+	UE_LOG(LogTemp,Warning,TEXT("exit patrol state"));
+	Boss->GetBossAIController()->StopMovement();
 }

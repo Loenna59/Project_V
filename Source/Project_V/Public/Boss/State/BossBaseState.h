@@ -18,5 +18,8 @@ public:
 	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) {};
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) {};
 	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) {};
+
+public:
+	EBossState currentStateEnum;
 	
 };

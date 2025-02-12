@@ -6,6 +6,7 @@
 #include "Project_V.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
+#include "Boss/State/BossBaseState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -46,13 +47,27 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		FVector targetPos = Boss->GetAloy()->GetActorLocation();
 		DistanceFromTarget = UKismetMathLibrary::Vector_Distance2D(bossPos,targetPos);
 		DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
-		PrintLogFunc(TEXT("%f"),DistanceFromTarget);
 
-		 if (DistanceFromTarget < SightConfig->SightRadius * 0.7)
+		// target이 앞에있는지 뒤에 있는지 알기위한 내적값
+		FVector direction = (targetPos - bossPos).GetSafeNormal();
+		FacingDot = FVector::DotProduct(Boss->GetActorForwardVector(),direction);
+		//UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
+
+		// 공격모드 거리까지 올 때
+		 if (DistanceFromTarget <= Boss->DetectDist)
 		 {
-		 	Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
+		 	LoseTargetTime = 0.0f;
+		 	if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Combat)
+		 	{
+		 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
+		 	}
 		 }
-
+		// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
+		else if (DistanceFromTarget > Boss->DetectDist && DistanceFromTarget < SightConfig->LoseSightRadius)
+		{
+			LoseTargetTime += DeltaTime;
+		}
+		
 		// stimulus age를 가져와서 target을 놓쳤는지 아닌지를 확인하는 코드
 		FActorPerceptionBlueprintInfo Info;
 		AIPC->GetActorsPerception(Boss->GetAloy(), Info);
@@ -60,11 +75,14 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		{
 			if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 			{
-				UE_LOG(LogTemp,Warning,TEXT("%f"),Stimulus.GetAge());
-				if (Stimulus.GetAge() > SightConfig->GetMaxAge())
+				if (Stimulus.GetAge() > SightConfig->GetMaxAge() || LoseTargetTime > SightConfig->GetMaxAge())
 				{
+					LoseTargetTime = 0.0f;
 					DetectedTarget = false;
-					Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
+					if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Patrol)
+					{
+						Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
+					}
 				}
 			}
 		}
@@ -86,7 +104,7 @@ void AThunderJawAIController::InitComponent()
 	SightConfig->SightRadius = 800.0f;
 	SightConfig->LoseSightRadius = 1200.0f;
 	SightConfig->PeripheralVisionAngleDegrees = 45.0f;
-	SightConfig->SetMaxAge(3.0f);
+	SightConfig->SetMaxAge(10.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;

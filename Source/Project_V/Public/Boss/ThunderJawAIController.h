@@ -55,4 +55,8 @@ public:
 	bool DetectedTarget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DistanceFromTarget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LoseTargetTime{0.0f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FacingDot;
 };
