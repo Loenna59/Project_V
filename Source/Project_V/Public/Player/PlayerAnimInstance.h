@@ -20,14 +20,17 @@ protected:
 	virtual void NativeBeginPlay() override;
 	
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
-	UPROPERTY()
-	class APlayCharacter* player;
 	
 	UPROPERTY()
 	class UCharacterMovementComponent* movementComponent;
+
+	UPROPERTY()
+	class UWeaponAnim* weaponAnim;
 	
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class APlayCharacter* player;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector velocity;
 
@@ -54,6 +57,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float controlPitch;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float drawStrength;
 	
 	UFUNCTION(BlueprintCallable, Category=Dodge)
 	void OnMoveDodge();

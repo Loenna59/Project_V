@@ -6,6 +6,7 @@
 #include "Project_V.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
+#include "Player/WeaponAnim.h"
 
 void UPlayerAnimInstance::NativeBeginPlay()
 {
@@ -13,6 +14,18 @@ void UPlayerAnimInstance::NativeBeginPlay()
 
 	player = CastChecked<APlayCharacter>(GetOwningActor());
 	movementComponent = player->GetCharacterMovement();
+
+	if (player)
+	{
+		if (player->weaponComp->IsValidLowLevel())
+		{
+			UAnimInstance* anim = player->weaponComp->GetAnimInstance();
+			if (anim)
+			{
+				weaponAnim = CastChecked<UWeaponAnim>(anim);
+			}
+		}
+	}
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -49,10 +62,16 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			OnMoveDodge();
 		}
 
-		
+		drawStrength = player->drawStrength;
 
 		float currentPitch = player->GetControlRotation().GetNormalized().Pitch;
 		controlPitch = FMath::Clamp(currentPitch, -80.f, 80.f);
+
+		if (weaponAnim)
+		{
+			weaponAnim->bone = player->GetMesh()->GetBoneTransform(TEXT("index_03_r"));
+			weaponAnim->bIsAnchored = isAnchoredBow;
+		}
 	}
 }
 

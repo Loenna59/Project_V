@@ -10,9 +10,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "MathUtil.h"
 #include "Project_V.h"
 #include "Components/SplineComponent.h"
 #include "Player/PlayerAnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -128,6 +130,24 @@ APlayCharacter::APlayCharacter()
 	if (tmp_ia_fire.Succeeded())
 	{
 		ia_fire = tmp_ia_fire.Object;
+	}
+
+	weaponComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	weaponComp->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_bow(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Bow.SKM_Bow'"));
+
+	if (tmp_bow.Succeeded())
+	{
+		weaponComp->SetSkeletalMesh(tmp_bow.Object);
+	}
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> tmp_weaponAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Bow.ABP_Bow_C'"));
+
+	if (tmp_weaponAnim.Succeeded())
+	{
+		weaponComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		weaponComp->SetAnimInstanceClass(tmp_weaponAnim.Class);
 	}
 }
 
@@ -292,6 +312,7 @@ void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
+	drawStrength = 0;
 	bIsAnchored = false;
 }
 
@@ -299,11 +320,11 @@ void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		PrintLogFunc(TEXT("Draw Bow"));
+		drawStrength = FMathf::Min(drawStrength + GetWorld()->DeltaTimeSeconds * drawSpeedMultiplier, 100);
 	}
 	else
 	{
-		PrintLogFunc(TEXT("Melee Attack"));
+		
 	}
 }
 
@@ -311,6 +332,6 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		PrintLogFunc(TEXT("Fire Arrow"));
+		drawStrength = 0;
 	}
 }
