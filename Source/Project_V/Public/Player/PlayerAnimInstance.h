@@ -60,6 +60,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float drawStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isShot;
 	
 	UFUNCTION(BlueprintCallable, Category=Dodge)
 	void OnMoveDodge();

@@ -66,11 +66,16 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		float currentPitch = player->GetControlRotation().GetNormalized().Pitch;
 		controlPitch = FMath::Clamp(currentPitch, -80.f, 80.f);
-
+		
+		if (player->bIsShot)
+		{
+			isShot = true;
+		}
+		
 		if (weaponAnim)
 		{
 			weaponAnim->bone = player->GetMesh()->GetBoneTransform(TEXT("index_03_r"));
-			weaponAnim->bIsAnchored = isAnchoredBow;
+			weaponAnim->bIsAnchored = !isShot && isAnchoredBow;
 		}
 	}
 }

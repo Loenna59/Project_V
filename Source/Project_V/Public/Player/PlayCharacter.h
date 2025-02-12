@@ -76,6 +76,8 @@ public:
 	
 	float drawStrength = 0;
 
+	bool bIsShot = false;
+
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
 
@@ -136,4 +138,11 @@ private:
 	float currentBlendCameraAlpha;
 	
 	float targetBlendCameraAlpha;
+
+	// Cubic Out Easing 함수
+	float CubicOutEasing(float t)
+	{
+		t = FMath::Clamp(t, 0.0f, 1.0f); // t를 0~1 사이로 제한
+		return (t - 1) * (t - 1) * (t - 1) + 1;
+	}
 };

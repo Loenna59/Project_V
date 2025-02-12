@@ -182,6 +182,7 @@ void APlayCharacter::Tick(float DeltaTime)
 
 	direction = FVector::ZeroVector;
 	bIsDodge = false;
+	bIsShot = false;
 
 	if (currentBlendCameraAlpha != targetBlendCameraAlpha)
 	{
@@ -320,7 +321,19 @@ void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		drawStrength = FMathf::Min(drawStrength + GetWorld()->DeltaTimeSeconds * drawSpeedMultiplier, 100);
+		float targetDrawStrength = 100.0f; // 목표값
+
+		// 진행 비율 계산 (0~1 사이)
+		float progress = FMath::Clamp((drawStrength / targetDrawStrength), 0.0f, 1.0f);
+
+		// Cubic Out Easing 적용
+		float easedProgress = CubicOutEasing(progress);
+
+		// drawStrength 업데이트
+		drawStrength = FMath::Lerp(0.0f, targetDrawStrength, easedProgress);
+
+		// 시간에 따라 증가
+		drawStrength = FMath::Min(drawStrength + GetWorld()->DeltaTimeSeconds, targetDrawStrength);
 	}
 	else
 	{
@@ -332,6 +345,7 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
+		bIsShot = true;
 		drawStrength = 0;
 	}
 }
