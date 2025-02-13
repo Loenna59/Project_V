@@ -10,9 +10,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "MathUtil.h"
 #include "Project_V.h"
 #include "Components/SplineComponent.h"
 #include "Player/PlayerAnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -129,6 +131,24 @@ APlayCharacter::APlayCharacter()
 	{
 		ia_fire = tmp_ia_fire.Object;
 	}
+
+	weaponComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	weaponComp->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_bow(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Bow.SKM_Bow'"));
+
+	if (tmp_bow.Succeeded())
+	{
+		weaponComp->SetSkeletalMesh(tmp_bow.Object);
+	}
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> tmp_weaponAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Bow.ABP_Bow_C'"));
+
+	if (tmp_weaponAnim.Succeeded())
+	{
+		weaponComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		weaponComp->SetAnimInstanceClass(tmp_weaponAnim.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -162,6 +182,7 @@ void APlayCharacter::Tick(float DeltaTime)
 
 	direction = FVector::ZeroVector;
 	bIsDodge = false;
+	bIsShot = false;
 
 	if (currentBlendCameraAlpha != targetBlendCameraAlpha)
 	{
@@ -292,6 +313,7 @@ void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
+	drawStrength = 0;
 	bIsAnchored = false;
 }
 
@@ -299,11 +321,23 @@ void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		PrintLogFunc(TEXT("Draw Bow"));
+		float targetDrawStrength = 100.0f; // 목표값
+
+		// 진행 비율 계산 (0~1 사이)
+		float progress = FMath::Clamp((drawStrength / targetDrawStrength), 0.0f, 1.0f);
+
+		// Cubic Out Easing 적용
+		float easedProgress = CubicOutEasing(progress);
+
+		// drawStrength 업데이트
+		drawStrength = FMath::Lerp(0.0f, targetDrawStrength, easedProgress);
+
+		// 시간에 따라 증가
+		drawStrength = FMath::Min(drawStrength + GetWorld()->DeltaTimeSeconds, targetDrawStrength);
 	}
 	else
 	{
-		PrintLogFunc(TEXT("Melee Attack"));
+		
 	}
 }
 
@@ -311,6 +345,7 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		PrintLogFunc(TEXT("Fire Arrow"));
+		bIsShot = true;
+		drawStrength = 0;
 	}
 }

@@ -7,15 +7,6 @@
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum EMoveKey : uint8
-{
-	MOVE_UP,
-	MOVE_DOWN,
-	MOVE_LEFT,
-	MOVE_RIGHT,
-};
-
 UCLASS()
 class PROJECT_V_API APlayCharacter : public ACharacter
 {
@@ -54,6 +45,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* transitionCameraComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class USkeletalMeshComponent* weaponComp;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float walkSpeed = 600;
 	
@@ -69,6 +63,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float cameraTransitionSpeedMultiplier = 5.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float drawSpeedMultiplier = 100.f;
+
 	FVector2D dodgeAxis;
 
 	bool bIsDodge = false;
@@ -76,6 +73,10 @@ public:
 	bool bIsAnchored = false;
 
 	FVector direction;
+	
+	float drawStrength = 0;
+
+	bool bIsShot = false;
 
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -137,4 +138,11 @@ private:
 	float currentBlendCameraAlpha;
 	
 	float targetBlendCameraAlpha;
+
+	// Cubic Out Easing 함수
+	float CubicOutEasing(float t)
+	{
+		t = FMath::Clamp(t, 0.0f, 1.0f); // t를 0~1 사이로 제한
+		return (t - 1) * (t - 1) * (t - 1) + 1;
+	}
 };
