@@ -56,7 +56,7 @@ public:
 	bool isAnchoredBow;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float controlPitch;
+	FRotator controlSpineRotation;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float drawStrength;

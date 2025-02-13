@@ -64,8 +64,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		drawStrength = player->drawStrength;
 
-		float currentPitch = player->GetControlRotation().GetNormalized().Pitch;
-		controlPitch = FMath::Clamp(currentPitch, -80.f, 80.f);
+		FRotator controlRotation = player->GetControlRotation().GetNormalized();
+
+		controlSpineRotation = controlRotation;
 		
 		if (player->bIsShot)
 		{

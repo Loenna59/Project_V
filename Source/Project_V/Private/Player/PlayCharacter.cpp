@@ -59,9 +59,12 @@ APlayCharacter::APlayCharacter()
 	anchoredSpringArmComp->SetupAttachment(RootComponent);
 	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
 	anchoredSpringArmComp->TargetArmLength = 100;
+	anchoredSpringArmComp->bUsePawnControlRotation = false;
+	anchoredSpringArmComp->ProbeSize = 20;
 
 	anchoredCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("AnchoredCameraComp"));
 	anchoredCameraComp->SetupAttachment(anchoredSpringArmComp);
+	anchoredCameraComp->bUsePawnControlRotation = true;
 
 	transitionSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("TransitionSpringArm"));
 	transitionSpringArmComp->SetupAttachment(RootComponent);
@@ -243,12 +246,27 @@ void APlayCharacter::Move(const FInputActionValue& actionValue)
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
-
 	
 	AddControllerYawInput(value.X);
-	AddControllerPitchInput(value.Y);
 
-	// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
+	float pitch = GetControlRotation().GetNormalized().Pitch;
+
+	if (bIsAnchored)
+	{
+		// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
+
+		if (value.Y > 0 && pitch < -25.f)
+		{
+			return;
+		}
+
+		if (value.Y < 0 && pitch > 25.f)
+		{
+			return;
+		}
+	}
+	
+	AddControllerPitchInput(value.Y);
 }
 
 void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
