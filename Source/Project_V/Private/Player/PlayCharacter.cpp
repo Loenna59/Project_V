@@ -228,7 +228,7 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
 		pi->BindAction(ia_movePressed, ETriggerEvent::Triggered, this, &APlayCharacter::BeginDodge);
 		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
-		pi->BindAction(ia_anchored, ETriggerEvent::Triggered, this, &APlayCharacter::OnAnchor);
+		pi->BindAction(ia_anchored, ETriggerEvent::Started, this, &APlayCharacter::OnAnchor);
 		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
 		pi->BindAction(ia_fire, ETriggerEvent::Triggered, this, &APlayCharacter::OnPressedFire);
 		pi->BindAction(ia_fire, ETriggerEvent::Completed, this, &APlayCharacter::OnReleasedFire);
@@ -255,12 +255,12 @@ void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 	{
 		// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
 
-		if (value.Y > 0 && pitch < -25.f)
+		if (value.Y > 0 && pitch < -45.f)
 		{
 			return;
 		}
 
-		if (value.Y < 0 && pitch > 25.f)
+		if (value.Y < 0 && pitch > 45.f)
 		{
 			return;
 		}
@@ -292,9 +292,14 @@ void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 void APlayCharacter::Dodge()
 {
 	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
+
+	if (bIsAnchored)
+	{
+		OnAnchorRelease();
+	}
 }
 
-void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
+void APlayCharacter::OnAnchor()
 {
     cameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
@@ -314,7 +319,7 @@ void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
 	bIsAnchored = true;
 }
 
-void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
+void APlayCharacter::OnAnchorRelease()
 {
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
@@ -330,28 +335,25 @@ void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 	bUseControllerRotationYaw = false;
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
+	
 	drawStrength = 0;
 	bIsAnchored = false;
+	elapsedDrawingTime = 0;
 }
 
 void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		float targetDrawStrength = 100.0f; // 목표값
+		elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
 
-		// 진행 비율 계산 (0~1 사이)
-		float progress = FMath::Clamp((drawStrength / targetDrawStrength), 0.0f, 1.0f);
+		float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
 
-		// Cubic Out Easing 적용
-		float easedProgress = CubicOutEasing(progress);
-
-		// drawStrength 업데이트
-		drawStrength = FMath::Lerp(0.0f, targetDrawStrength, easedProgress);
-
+		//EaseOutQuad = 1 - (1 - t)^2
+		float quadT = 1 - FMath::Pow(1 - t, 2);
+		
 		// 시간에 따라 증가
-		drawStrength = FMath::Min(drawStrength + GetWorld()->DeltaTimeSeconds, targetDrawStrength);
+		drawStrength = FMath::Lerp(0, targetDrawStrength, quadT);
 	}
 	else
 	{
@@ -365,5 +367,6 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 	{
 		bIsShot = true;
 		drawStrength = 0;
+		elapsedDrawingTime = 0;
 	}
 }

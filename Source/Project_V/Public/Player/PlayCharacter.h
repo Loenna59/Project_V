@@ -64,7 +64,10 @@ public:
 	float cameraTransitionSpeedMultiplier = 5.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
-	float drawSpeedMultiplier = 100.f;
+	float targetDrawStrength = 100.0f; // 활시위 최대값
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	float drawDuration = 1.f; // 활시위가 최대로 당길 때 까지 걸리는 시간
 
 	FVector2D dodgeAxis;
 
@@ -97,10 +100,10 @@ public:
 	void Dodge();
 
 	UFUNCTION()
-	void OnAnchor(const FInputActionValue& actionValue);
+	void OnAnchor();
 
 	UFUNCTION()
-	void OnAnchorRelease(const FInputActionValue& actionValue);
+	void OnAnchorRelease();
 
 	UFUNCTION()
 	void OnPressedFire(const FInputActionValue& actionValue);
@@ -139,10 +142,5 @@ private:
 	
 	float targetBlendCameraAlpha;
 
-	// Cubic Out Easing 함수
-	float CubicOutEasing(float t)
-	{
-		t = FMath::Clamp(t, 0.0f, 1.0f); // t를 0~1 사이로 제한
-		return (t - 1) * (t - 1) * (t - 1) + 1;
-	}
+	float elapsedDrawingTime; // 활 시위 경과 시간
 };
