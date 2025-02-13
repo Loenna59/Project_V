@@ -48,4 +48,7 @@ public:
 	float DetectDist {600.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{300.0f};
+
+	UPROPERTY()
+	bool bIsRotateBody{false};
 };

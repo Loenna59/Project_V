@@ -20,21 +20,3 @@ void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		BossAnimMoveSpeed = FVector::DotProduct(velocity,forward);
 	}
 }
-
-void UThunderJawAnimInstance::PlayMontage(UAnimMontage* montage)
-{
-	if (montage)
-	{
-		Montage_Play(montage);
-		OnMontageBlendingOut.AddDynamic(this,&UThunderJawAnimInstance::OnAnimEnded);
-	}
-}
-
-void UThunderJawAnimInstance::OnAnimEnded(UAnimMontage* Montage, bool bInterrupted)
-{
-	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
-	if (boss)
-	{
-		boss->GetMesh()->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
-	}
-}

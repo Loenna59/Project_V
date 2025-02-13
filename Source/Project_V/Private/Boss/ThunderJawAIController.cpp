@@ -51,7 +51,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		// target이 앞에있는지 뒤에 있는지 알기위한 내적값
 		FVector direction = (targetPos - bossPos).GetSafeNormal();
 		FacingDot = FVector::DotProduct(Boss->GetActorForwardVector(),direction);
-		//UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
+		UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
 
 		// 공격모드 거리까지 올 때
 		 if (DistanceFromTarget <= Boss->DetectDist)
@@ -119,6 +119,11 @@ void AThunderJawAIController::InitComponent()
 void AThunderJawAIController::MoveToPlayer()
 {
 	MoveToActor(Boss->GetAloy(), 200.0f);
+}
+
+void AThunderJawAIController::AIMoveStop()
+{
+	StopMovement();
 }
 
 void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

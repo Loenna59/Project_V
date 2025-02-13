@@ -36,7 +36,9 @@ protected:
 public:
 	UFUNCTION()
 	void MoveToPlayer();
-	
+
+	UFUNCTION(BlueprintCallable)
+	void AIMoveStop();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AThunderJaw* Boss;

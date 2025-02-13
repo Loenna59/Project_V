@@ -19,15 +19,13 @@ enum class EAnimState : uint8
 UCLASS()
 class PROJECT_V_API UThunderJawAnimInstance : public UAnimInstance
 {
-	GENERATED_BODY()
+	GENERATED_BODY() 
 protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 public:
-	UFUNCTION()
-	void PlayMontage(UAnimMontage* montage);
-	UFUNCTION()
-	void OnAnimEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayTurnMontage();
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
