@@ -10,11 +10,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "MathUtil.h"
-#include "Project_V.h"
-#include "Components/SplineComponent.h"
-#include "Player/PlayerAnimInstance.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Player/Arrow.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -23,6 +21,7 @@ APlayCharacter::APlayCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+	GetCapsuleComponent()->SetCollisionProfileName("Player");
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_skeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/CyberpunkSamurai/Meshes/SK_CyberpunkSamurai_WithHelmet.SK_CyberpunkSamurai_WithHelmet'"));
 
@@ -60,7 +59,7 @@ APlayCharacter::APlayCharacter()
 	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
 	anchoredSpringArmComp->TargetArmLength = 100;
 	anchoredSpringArmComp->bUsePawnControlRotation = false;
-	anchoredSpringArmComp->ProbeSize = 20;
+	anchoredSpringArmComp->ProbeSize = 12;
 
 	anchoredCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("AnchoredCameraComp"));
 	anchoredCameraComp->SetupAttachment(anchoredSpringArmComp);
@@ -152,6 +151,11 @@ APlayCharacter::APlayCharacter()
 		weaponComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		weaponComp->SetAnimInstanceClass(tmp_weaponAnim.Class);
 	}
+
+	arrowSlotComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));
+	arrowSlotComp->SetupAttachment(weaponComp, TEXT("bowstring"));
+	arrowSlotComp->SetRelativeLocation(FVector(25, 0, 0));
+	arrowSlotComp->SetRelativeScale3D(FVector(1.1f));
 }
 
 // Called when the game starts or when spawned
@@ -173,6 +177,11 @@ void APlayCharacter::BeginPlay()
 
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
+
+	//temp:: 화살 하나 미리 만들기
+	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
+	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	arrow = spawned_arrow;
 }
 
 // Called every frame
@@ -368,5 +377,11 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 		bIsShot = true;
 		drawStrength = 0;
 		elapsedDrawingTime = 0;
+
+		if (arrow.IsValid())
+		{
+			arrow->Fire();
+			arrow = nullptr;
+		}
 	}
 }

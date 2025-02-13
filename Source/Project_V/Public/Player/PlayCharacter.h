@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
@@ -47,6 +46,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* weaponComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class USceneComponent* arrowSlotComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class AArrow> arrowFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float walkSpeed = 600;
@@ -110,6 +115,7 @@ public:
 
 	UFUNCTION()
 	void OnReleasedFire(const FInputActionValue& actionValue);
+	
 private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
@@ -143,4 +149,7 @@ private:
 	float targetBlendCameraAlpha;
 
 	float elapsedDrawingTime; // 활 시위 경과 시간
+
+	UPROPERTY()
+	TWeakObjectPtr<class AArrow> arrow;
 };
