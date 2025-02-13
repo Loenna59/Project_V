@@ -15,9 +15,9 @@ class PROJECT_V_API UBossBaseState : public UObject
 {
 	GENERATED_BODY()
 public:
-	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) {};
+	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) {UE_LOG(LogTemp,Warning,TEXT("Enter State %d"),currentStateEnum)};
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) {};
-	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) {};
+	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) {UE_LOG(LogTemp,Warning,TEXT("Exit State %d"),currentStateEnum)};
 
 public:
 	EBossState currentStateEnum;

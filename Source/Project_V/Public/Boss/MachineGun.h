@@ -1,0 +1,36 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "MachineGun.generated.h"
+
+UCLASS()
+class PROJECT_V_API AMachineGun : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this actor's properties
+	AMachineGun();
+
+	UFUNCTION()
+	void CreateBullet(FTransform transform);
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void InitComponents();
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UBoxComponent* Root;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USceneComponent* FirePos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	TSubclassOf<class AMachineGunBullet> BulletFactory;
+};

@@ -32,12 +32,4 @@ public:
 	float BossAnimMoveSpeed;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimYaw;
-	UPROPERTY()
-	bool bMontagePlaying = false;
-	
-
-	UPROPERTY()
-	TMap<EAnimState, class UAnimMontage*> MontageMap;
-	UPROPERTY()
-	class UAnimMontage* CurrentMontage;
 };

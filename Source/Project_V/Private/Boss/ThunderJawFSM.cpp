@@ -62,7 +62,6 @@ void UThunderJawFSM::InitPatrolPoints()
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Change State"));
 	if (CurrentState->currentStateEnum == BossState)
 		return;
 	

@@ -32,23 +32,32 @@ public:
 	AThunderJawAIController* GetBossAIController();
 	UFUNCTION(BlueprintCallable)
 	APlayCharacter* GetAloy();
+	UFUNCTION(BlueprintCallable)
+	class AMachineGun* GetLMachineGun();
+	UFUNCTION(BlueprintCallable)
+	class AMachineGun* GetRMachineGun();
 
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	AThunderJawAIController* BossAIController;
 	UPROPERTY()
 	APlayCharacter* Aloy;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class AMachineGun* LMachineGun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class AMachineGun* RMachineGun;
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float DetectDist {600.0f};
+	float CombatDist {600.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{300.0f};
 
 	UPROPERTY()
 	bool bIsRotateBody{false};
+	UPROPERTY()
+	bool bIsAttack{false};
 };

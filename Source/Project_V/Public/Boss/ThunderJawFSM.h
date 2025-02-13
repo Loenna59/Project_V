@@ -17,15 +17,6 @@ enum class EBossState : uint8
 	LookOut,
 };
 
-UENUM(BlueprintType)
-enum class EBossAttackState : uint8
-{
-	Melee = 0,
-	MachineGun,
-	DiscLauncher,
-	MouseLaser,
-};
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UThunderJawFSM : public UActorComponent
 {

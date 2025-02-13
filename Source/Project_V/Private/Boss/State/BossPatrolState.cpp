@@ -37,6 +37,5 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
-	UE_LOG(LogTemp,Warning,TEXT("exit patrol state"));
 	Boss->GetBossAIController()->StopMovement();
 }

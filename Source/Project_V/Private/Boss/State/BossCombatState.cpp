@@ -3,12 +3,12 @@
 
 #include "Boss/State/BossCombatState.h"
 
-#include "Project_V.h"
+#include "Boss/MachineGun.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
-#include "Boss/ThunderJawAnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
+
 
 
 void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
@@ -35,14 +35,17 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	{
 		if (Boss->GetBossAIController()->FacingDot > 0)
 		{
-			float dist = Boss->GetBossAIController()->DistanceFromTarget; 
+			float dist = Boss->GetBossAIController()->DistanceFromTarget;
+			if (!Boss->bIsAttack)
+			{
+			}
 			if (dist <= Boss->MeleeAttackDist)
 			{
 				//UE_LOG(LogTemp,Warning,TEXT("boss melee attack"));
 			}
 			else if (dist > Boss->MeleeAttackDist)
 			{
-				//UE_LOG(LogTemp,Warning,TEXT("boss range attack"));
+				ChooseRandomRangeAttack(Boss);
 			}
 		}
 		else
@@ -55,4 +58,43 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
+}
+
+void UBossCombatState::ChooseRandomRangeAttack(AThunderJaw* Boss)
+{
+	Boss->bIsAttack = true;
+	int randomNum = FMath::RandRange(1,1);
+	if (randomNum == 1)
+	{
+		UseMachineGun(Boss);
+	}
+	else if (randomNum == 2)
+	{
+		UseDiscLauncher(Boss);
+	}
+	else if (randomNum == 3)
+	{
+		UseMouseLaser(Boss);
+	}
+}
+
+void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
+{
+	UE_LOG(LogTemp,Warning,TEXT("using machine gun"));
+	
+
+	Boss->GetLMachineGun()->CreateBullet(Boss->GetLMachineGun()->FirePos->GetComponentTransform());
+	Boss->GetRMachineGun()->CreateBullet(Boss->GetRMachineGun()->FirePos->GetComponentTransform());
+
+	
+}
+
+void UBossCombatState::UseDiscLauncher(AThunderJaw* Boss)
+{
+	UE_LOG(LogTemp,Warning,TEXT("using disc launcher"));
+}
+
+void UBossCombatState::UseMouseLaser(AThunderJaw* Boss)
+{
+	UE_LOG(LogTemp,Warning,TEXT("using mouse laser"));
 }

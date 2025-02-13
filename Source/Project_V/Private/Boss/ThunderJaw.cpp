@@ -1,6 +1,8 @@
 
 #include "Boss/ThunderJaw.h"
 
+#include "Boss/MachineGun.h"
+#include "Boss/MachineGunBullet.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,6 +29,18 @@ void AThunderJaw::BeginPlay()
 		UE_LOG(LogTemp,Warning,TEXT("BossAIController Cast Failed"));
 	}
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
+	if (LMachineGun)
+	{
+		LMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
+	}
+	
+	RMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
+	if (RMachineGun)
+	{
+		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
+	}
 }
 
 void AThunderJaw::Tick(float DeltaTime)
@@ -36,6 +50,7 @@ void AThunderJaw::Tick(float DeltaTime)
 
 void AThunderJaw::InitComponents()
 {
+	
 	FSM = CreateDefaultSubobject<UThunderJawFSM>(TEXT("FSM"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("'/Game/Assets/SciFi_Beasts_Pack/SciFi_Beast05/Mesh/SK_SciFi_Beast05_Skin1.SK_SciFi_Beast05_Skin1'"));
 	if (tempMesh.Succeeded())
@@ -67,6 +82,17 @@ APlayCharacter* AThunderJaw::GetAloy()
 {
 	return Aloy;
 }
+
+class AMachineGun* AThunderJaw::GetLMachineGun()
+{
+	return LMachineGun;
+}
+
+class AMachineGun* AThunderJaw::GetRMachineGun()
+{
+	return RMachineGun;
+}
+
 
 
 

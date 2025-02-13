@@ -37,8 +37,6 @@ public:
 	UFUNCTION()
 	void MoveToPlayer();
 
-	UFUNCTION(BlueprintCallable)
-	void AIMoveStop();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AThunderJaw* Boss;
@@ -53,6 +51,9 @@ protected:
 
 
 public:
+	UPROPERTY(EditAnywhere)
+	float DetectRadius{1200.0f};
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool DetectedTarget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
