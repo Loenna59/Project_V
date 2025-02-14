@@ -117,6 +117,8 @@ public:
 	void OnReleasedFire(const FInputActionValue& actionValue);
 
 	void SpawnArrow();
+
+	void PlaceArrowOnBow();
 	
 private:
 	UPROPERTY()

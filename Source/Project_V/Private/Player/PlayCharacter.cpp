@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Player/Arrow.h"
@@ -55,9 +56,11 @@ APlayCharacter::APlayCharacter()
 	springArmComp->CameraRotationLagSpeed = 5.f;
 
 	anchoredSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("AnchoredSpringArmComp"));
+	
 	anchoredSpringArmComp->SetupAttachment(RootComponent);
 	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
 	anchoredSpringArmComp->TargetArmLength = 100;
+	anchoredSpringArmComp->SocketOffset = FVector(0, 50, 0);
 	anchoredSpringArmComp->bUsePawnControlRotation = false;
 	anchoredSpringArmComp->ProbeSize = 12;
 
@@ -178,7 +181,9 @@ void APlayCharacter::BeginPlay()
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
 	
-	SpawnArrow();
+	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
+	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	arrow = spawned_arrow;
 }
 
 // Called every frame
@@ -391,6 +396,16 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 void APlayCharacter::SpawnArrow()
 {
 	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
-	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	spawned_arrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("PickArrowSocket"));
 	arrow = spawned_arrow;
+}
+
+void APlayCharacter::PlaceArrowOnBow()
+{
+	if (arrow.IsValid())
+	{
+		arrow->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		arrow->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+		arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	}
 }
