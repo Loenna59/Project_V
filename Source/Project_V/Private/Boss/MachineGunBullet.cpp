@@ -82,8 +82,3 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	
 }
-
-void AMachineGunBullet::Die()
-{
-	Destroy();
-}

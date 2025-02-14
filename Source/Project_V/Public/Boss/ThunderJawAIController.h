@@ -35,7 +35,7 @@ protected:
 	UFUNCTION()
 	void UpdateDistanceFromTarget();
 	UFUNCTION()
-	void CheckPlayerInFront();
+	void UpdateFacingDot();
 	UFUNCTION()
 	void EvaluateTargetDistance(float DeltaTime);
 	UFUNCTION()

@@ -3,6 +3,7 @@
 
 #include "Boss/ThunderJawAIController.h"
 
+#include "AnimationEditorViewportClient.h"
 #include "Project_V.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
@@ -39,14 +40,15 @@ void AThunderJawAIController::BeginPlay()
 void AThunderJawAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->CombatDist, 20,FColor::Red);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),SightConfig->SightRadius, 20,FColor::Green);
 	if (DetectedTarget)
 	{
 		// target이 감지 됐을 때 타겟과의 거리를 업데이트 해줌
 		UpdateDistanceFromTarget();
 
-		// 타겟의 앞 뒤 구분
-		CheckPlayerInFront();
+		// 타겟의 앞 뒤 구분을 위한 dot product 함수
+		UpdateFacingDot();
 
 		// 플레이어가 어느 범위에 있는지 확인
 		EvaluateTargetDistance(DeltaTime);
@@ -71,7 +73,7 @@ void AThunderJawAIController::InitComponent()
 	SightConfig->SightRadius = DetectRadius;
 	SightConfig->LoseSightRadius = 1800.0f;
 	SightConfig->PeripheralVisionAngleDegrees = 45.0f;
-	SightConfig->SetMaxAge(10.0f);
+	SightConfig->SetMaxAge(100.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
@@ -107,7 +109,7 @@ void AThunderJawAIController::UpdateDistanceFromTarget()
 	DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
 }
 
-void AThunderJawAIController::CheckPlayerInFront()
+void AThunderJawAIController::UpdateFacingDot()
 {
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
@@ -137,11 +139,14 @@ void AThunderJawAIController::CheckTargetThroughtStimulus()
 {
 	FActorPerceptionBlueprintInfo Info;
 	AIPC->GetActorsPerception(Boss->GetAloy(), Info);
+	
 	for (const auto& Stimulus : Info.LastSensedStimuli)
 	{
 		if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 		{
-			if (Stimulus.GetAge() > SightConfig->GetMaxAge() || LoseTargetTime > SightConfig->GetMaxAge())
+			StopMovement();
+			if (Stimulus.GetAge() > SightConfig->GetMaxAge() ||
+				LoseTargetTime > SightConfig->GetMaxAge())
 			{
 				LoseTargetTime = 0.0f;
 				DetectedTarget = false;

@@ -20,6 +20,8 @@ void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
 {
 	Super::Update(Boss, FSM, DeltaTime);
+
+	// 몸을 돌리는 중이면 공격하지 않음
 	if (Boss->bIsRotateBody)
 	{
 		FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
@@ -32,21 +34,21 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 			Boss->bIsRotateBody = false;
 		}
 	}
+	// 몸을 다돌린 후 다시 플레이어가 앞에 있는지 확인
+	// 이 후 플레이어와의 거리를 계산해서 거리에 따른 공격
 	else
 	{
 		if (Boss->GetBossAIController()->FacingDot > 0)
 		{
 			float dist = Boss->GetBossAIController()->DistanceFromTarget;
-			if (!Boss->bIsAttack)
-			{
-			}
+
 			if (dist <= Boss->MeleeAttackDist)
 			{
 				PRINTLOG(TEXT("boss melee attack"));
 			}
 			else if (dist > Boss->MeleeAttackDist)
 			{
-				ChooseRandomRangeAttack(Boss);
+				RangeAttack(Boss,DeltaTime);
 			}
 		}
 		else
@@ -61,21 +63,48 @@ void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	Super::Exit(Boss, FSM);
 }
 
+void UBossCombatState::RangeAttack(AThunderJaw* Boss, float DeltaTime)
+{
+	PatternCurrentTime += DeltaTime;
+	if (PatternCurrentTime > PatternTime)
+	{
+		PatternCurrentTime = 0;
+		ChooseRandomRangeAttack(Boss);
+	}
+
+	switch (UsingWeapon)
+	{
+	case ERangeWeapon::MachineGun:
+		UseMachineGun(Boss);
+		break;
+	case ERangeWeapon::DiscLauncher:
+		UseDiscLauncher(Boss);
+		break;
+	case ERangeWeapon::MouseLaser:
+		UseMouseLaser(Boss);
+		break;
+	default:
+		break;
+	}
+}
+
 void UBossCombatState::ChooseRandomRangeAttack(AThunderJaw* Boss)
 {
-	Boss->bIsAttack = true;
-	int randomNum = FMath::RandRange(1,1);
+	int randomNum = FMath::RandRange(1,3);
 	if (randomNum == 1)
 	{
-		UseMachineGun(Boss);
+		UsingWeapon = ERangeWeapon::MachineGun;
+		PatternTime = MachineGunPatternTime;		
 	}
 	else if (randomNum == 2)
 	{
-		UseDiscLauncher(Boss);
+		UsingWeapon = ERangeWeapon::DiscLauncher;
+		PatternTime = DiscLauncherPatternTime;
 	}
 	else if (randomNum == 3)
 	{
-		UseMouseLaser(Boss);
+		UsingWeapon = ERangeWeapon::MouseLaser;
+		PatternTime = MouseLaserPatternTime;
 	}
 }
 
@@ -83,14 +112,31 @@ void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Machine Gun"));
 
-	Boss->GetLMachineGun()->CreateBullet(Boss->GetLMachineGun()->FirePos->GetComponentTransform());
-	Boss->GetRMachineGun()->CreateBullet(Boss->GetRMachineGun()->FirePos->GetComponentTransform());
+	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
+	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
+
+	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
+	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
+	MachineGunDelayCurrentTime += GetWorld()->GetDeltaSeconds();
+	if (MachineGunDelayCurrentTime > MachineGunDelay)
+	{
+		MachineGunDelayCurrentTime = 0;
+		Boss->GetLMachineGun()->CreateBullet(Lt);
+		Boss->GetRMachineGun()->CreateBullet(Rt);
+	}
+	
+	// 선형보간으로 약간의 딜레이를 주면서 플레이어를 쳐다보며 직선으로 총알을 쏘게함
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
+	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw,GetWorld()->GetDeltaSeconds(),0.7);
+	Boss->SetActorRotation(FRotator(0,NewYaw,0));
 }
 
 void UBossCombatState::UseDiscLauncher(AThunderJaw* Boss)
 {
+	PRINTLOG(TEXT("Using DiscLauncher"));
 }
 
 void UBossCombatState::UseMouseLaser(AThunderJaw* Boss)
 {
+	PRINTLOG(TEXT("Using MouseLaser"));
 }

@@ -9,6 +9,13 @@
 /**
  * 
  */
+UENUM()
+enum class ERangeWeapon : uint8
+{
+	MachineGun,
+	DiscLauncher,
+	MouseLaser,
+};
 UCLASS()
 class PROJECT_V_API UBossCombatState : public UBossBaseState
 {
@@ -20,6 +27,8 @@ public:
 	
 protected:
 	UFUNCTION()
+	void RangeAttack(AThunderJaw* Boss, float DeltaTime);
+	UFUNCTION()
 	void ChooseRandomRangeAttack(AThunderJaw* Boss);
 	UFUNCTION()
 	void UseMachineGun(AThunderJaw* Boss);
@@ -27,5 +36,29 @@ protected:
 	void UseDiscLauncher(AThunderJaw* Boss);
 	UFUNCTION()
 	void UseMouseLaser(AThunderJaw* Boss);
+
+protected:
+	UPROPERTY()
+	FTimerHandle MachineGunTimer;
+	UPROPERTY()
+	float PatternCurrentTime{0.0};
+	UPROPERTY()
+	float PatternTime{0.0};
+
+	ERangeWeapon UsingWeapon;
+
+	// machine gun
+	UPROPERTY()
+	float MachineGunDelayCurrentTime{0.0};
+	UPROPERTY()
+	float MachineGunDelay{0.2};
+	UPROPERTY()
+	float MachineGunPatternTime{3.0};
+
+	UPROPERTY()
+	float DiscLauncherPatternTime{3.0};
+
+	UPROPERTY()
+	float MouseLaserPatternTime{3.0};
 
 };
