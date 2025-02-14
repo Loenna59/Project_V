@@ -43,52 +43,16 @@ void AThunderJawAIController::Tick(float DeltaTime)
 	if (DetectedTarget)
 	{
 		// target이 감지 됐을 때 타겟과의 거리를 업데이트 해줌
-		FVector bossPos = Boss->GetActorLocation();
-		FVector targetPos = Boss->GetAloy()->GetActorLocation();
-		DistanceFromTarget = UKismetMathLibrary::Vector_Distance2D(bossPos,targetPos);
-		DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
-
+		UpdateDistanceFromTarget();
 
 		// 타겟의 앞 뒤 구분
-		// target이 앞에있는지 뒤에 있는지 알기위한 내적값을 구한다
-		FVector direction = (targetPos - bossPos).GetSafeNormal();
-		FacingDot = FVector::DotProduct(Boss->GetActorForwardVector(),direction);
-		//UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
+		CheckPlayerInFront();
 
-		// 공격모드 거리까지 올 때
-		 if (DistanceFromTarget <= Boss->CombatDist)
-		 {
-		 	LoseTargetTime = 0.0f;
-		 	if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Combat)
-		 	{
-		 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
-		 	}
-		 }
-		// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
-		else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
-		{
-			LoseTargetTime += DeltaTime;
-		}
-
-
+		// 플레이어가 어느 범위에 있는지 확인
+		EvaluateTargetDistance(DeltaTime);
+		
 		// stimulus age를 가져와서 target을 놓쳤는지 아닌지를 확인하는 코드
-		FActorPerceptionBlueprintInfo Info;
-		AIPC->GetActorsPerception(Boss->GetAloy(), Info);
-		for (const auto& Stimulus : Info.LastSensedStimuli)
-		{
-			if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
-			{
-				if (Stimulus.GetAge() > SightConfig->GetMaxAge() || LoseTargetTime > SightConfig->GetMaxAge())
-				{
-					LoseTargetTime = 0.0f;
-					DetectedTarget = false;
-					if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Patrol)
-					{
-						Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
-					}
-				}
-			}
-		}
+		CheckTargetThroughtStimulus();
 	}
 }
 
@@ -115,7 +79,6 @@ void AThunderJawAIController::InitComponent()
 	AIPC->ConfigureSense(*SightConfig);
 	AIPC->SetDominantSense(SightConfig->GetSenseImplementation());
 
-
 	DetectedTarget = false;
 }
 
@@ -136,6 +99,61 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 	}
 }
 
+void AThunderJawAIController::UpdateDistanceFromTarget()
+{
+	FVector bossPos = Boss->GetActorLocation();
+	FVector targetPos = Boss->GetAloy()->GetActorLocation();
+	DistanceFromTarget = UKismetMathLibrary::Vector_Distance2D(bossPos,targetPos);
+	DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
+}
+
+void AThunderJawAIController::CheckPlayerInFront()
+{
+	FVector bossPos = Boss->GetActorLocation();
+	FVector targetPos = Boss->GetAloy()->GetActorLocation();
+	FVector direction = (targetPos - bossPos).GetSafeNormal();
+	FacingDot = FVector::DotProduct(Boss->GetActorForwardVector(),direction);
+	//UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
+}
+
+void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
+{
+	// 공격모드 거리까지 올 때
+	if (DistanceFromTarget <= Boss->CombatDist)
+	{
+		LoseTargetTime = 0.0f;
+		if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Combat)
+		{
+			Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
+		}
+	}
+	// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
+	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
+	{
+		LoseTargetTime += DeltaTime;
+	}
+}
+
+void AThunderJawAIController::CheckTargetThroughtStimulus()
+{
+	FActorPerceptionBlueprintInfo Info;
+	AIPC->GetActorsPerception(Boss->GetAloy(), Info);
+	for (const auto& Stimulus : Info.LastSensedStimuli)
+	{
+		if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
+		{
+			if (Stimulus.GetAge() > SightConfig->GetMaxAge() || LoseTargetTime > SightConfig->GetMaxAge())
+			{
+				LoseTargetTime = 0.0f;
+				DetectedTarget = false;
+				if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Patrol)
+				{
+					Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
+				}
+			}
+		}
+	}
+}
 
 
 

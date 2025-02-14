@@ -32,6 +32,14 @@ protected:
 	void InitComponent();
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	UFUNCTION()
+	void UpdateDistanceFromTarget();
+	UFUNCTION()
+	void CheckPlayerInFront();
+	UFUNCTION()
+	void EvaluateTargetDistance(float DeltaTime);
+	UFUNCTION()
+	void CheckTargetThroughtStimulus();
 
 public:
 	UFUNCTION()

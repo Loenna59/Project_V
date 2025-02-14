@@ -74,7 +74,6 @@ void AMachineGunBullet::InitComponents()
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
 		PMC->ProjectileGravityScale = 0.0f;
-		
 	}
 }
 

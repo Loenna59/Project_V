@@ -17,12 +17,16 @@ public:
 
 	UFUNCTION()
 	void CreateBullet(FTransform transform);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void InitComponents();
+	UFUNCTION()
+	void OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UBoxComponent* Root;

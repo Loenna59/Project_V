@@ -20,6 +20,7 @@ AMachineGun::AMachineGun()
 void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
+	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunBeginOverlap);
 }
 
 // Called every frame
@@ -76,3 +77,7 @@ void AMachineGun::CreateBullet(FTransform transform)
 	GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
 }
 
+void AMachineGun::OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
