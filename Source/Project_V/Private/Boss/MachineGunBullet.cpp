@@ -68,12 +68,12 @@ void AMachineGunBullet::InitComponents()
 	if (PMC)
 	{
 		PMC->SetUpdatedComponent(Root);
-		PMC->InitialSpeed = 3000.0f;
-		PMC->MaxSpeed = 3000.0f;
+		PMC->InitialSpeed = 5000.0f;
+		PMC->MaxSpeed = 5000.0f;
 		PMC->bRotationFollowsVelocity = true;
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
-		PMC->ProjectileGravityScale = 0.0f;
+		PMC->ProjectileGravityScale = 1.0f;
 	}
 }
 

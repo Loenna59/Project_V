@@ -27,6 +27,8 @@ public:
 	
 protected:
 	UFUNCTION()
+	void RotateToTarget(AThunderJaw* Boss, float InterpSpeed);
+	UFUNCTION()
 	void RangeAttack(AThunderJaw* Boss, float DeltaTime);
 	UFUNCTION()
 	void ChooseRandomRangeAttack(AThunderJaw* Boss);
@@ -39,8 +41,6 @@ protected:
 
 protected:
 	UPROPERTY()
-	FTimerHandle MachineGunTimer;
-	UPROPERTY()
 	float PatternCurrentTime{0.0};
 	UPROPERTY()
 	float PatternTime{0.0};
@@ -49,15 +49,15 @@ protected:
 
 	// machine gun
 	UPROPERTY()
+	FTimerHandle MachineGunTimer;
+	UPROPERTY()
 	float MachineGunDelayCurrentTime{0.0};
 	UPROPERTY()
 	float MachineGunDelay{0.2};
 	UPROPERTY()
 	float MachineGunPatternTime{3.0};
-
 	UPROPERTY()
 	float DiscLauncherPatternTime{3.0};
-
 	UPROPERTY()
 	float MouseLaserPatternTime{3.0};
 

@@ -7,6 +7,7 @@
 #include "Boss/MachineGun.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
+#include "Boss/ThunderJawAnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
 
@@ -24,10 +25,9 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	// 몸을 돌리는 중이면 공격하지 않음
 	if (Boss->bIsRotateBody)
 	{
-		FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
-		float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw,DeltaTime,1.0);
-		Boss->SetActorRotation(FRotator(0,NewYaw,0));
-
+		RotateToTarget(Boss,1.0);
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+		
 		// enemy의 시야각 까지 돌렸으면 false로 변경
 		if (Boss->GetBossAIController()->FacingDot > 0.7)
 		{
@@ -63,6 +63,13 @@ void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	Super::Exit(Boss, FSM);
 }
 
+void UBossCombatState::RotateToTarget(AThunderJaw* Boss, float InterpSpeed)
+{
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
+	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
+	Boss->SetActorRotation(FRotator(0,NewYaw,0));
+}
+
 void UBossCombatState::RangeAttack(AThunderJaw* Boss, float DeltaTime)
 {
 	PatternCurrentTime += DeltaTime;
@@ -90,7 +97,7 @@ void UBossCombatState::RangeAttack(AThunderJaw* Boss, float DeltaTime)
 
 void UBossCombatState::ChooseRandomRangeAttack(AThunderJaw* Boss)
 {
-	int randomNum = FMath::RandRange(1,3);
+	int randomNum = FMath::RandRange(1,1);
 	if (randomNum == 1)
 	{
 		UsingWeapon = ERangeWeapon::MachineGun;
@@ -125,10 +132,10 @@ void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
 		Boss->GetRMachineGun()->CreateBullet(Rt);
 	}
 	
-	// 선형보간으로 약간의 딜레이를 주면서 플레이어를 쳐다보며 직선으로 총알을 쏘게함
-	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
-	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw,GetWorld()->GetDeltaSeconds(),0.7);
-	Boss->SetActorRotation(FRotator(0,NewYaw,0));
+	RotateToTarget(Boss,0.7);
+
+	if (Boss->GetBossAIController()->FacingDot < 0.85)
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 }
 
 void UBossCombatState::UseDiscLauncher(AThunderJaw* Boss)

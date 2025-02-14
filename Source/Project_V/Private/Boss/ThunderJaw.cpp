@@ -5,6 +5,7 @@
 #include "Boss/MachineGun.h"
 #include "Boss/MachineGunBullet.h"
 #include "Boss/ThunderJawAIController.h"
+#include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
@@ -42,6 +43,8 @@ void AThunderJaw::BeginPlay()
 	{
 		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
 	}
+
+	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void AThunderJaw::Tick(float DeltaTime)
@@ -77,6 +80,11 @@ UThunderJawFSM* AThunderJaw::GetFSMComponent()
 AThunderJawAIController* AThunderJaw::GetBossAIController()
 {
 	return BossAIController;
+}
+
+class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance()
+{
+	return BossAnimInstance;
 }
 
 APlayCharacter* AThunderJaw::GetAloy()

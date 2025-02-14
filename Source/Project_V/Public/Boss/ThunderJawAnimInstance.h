@@ -9,12 +9,6 @@
 /**
  * 
  */
-UENUM(BlueprintType)
-enum class EAnimState : uint8
-{
-	None,
-	Turn,
-};
 
 UCLASS()
 class PROJECT_V_API UThunderJawAnimInstance : public UAnimInstance
