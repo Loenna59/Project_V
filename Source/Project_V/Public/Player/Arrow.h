@@ -16,6 +16,7 @@ public:
 	AArrow();
 
 protected:
+	UFUNCTION()
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
@@ -26,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UProjectileMovementComponent* projectileMovementComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UParticleSystem* tailVFX;
+
 	UPROPERTY(EditAnywhere, Category=Settings)
 	float initialSpeed = 2000;
 
@@ -34,4 +38,7 @@ public:
 	
 	UFUNCTION()
 	void Fire(float alpha);
+
+	UFUNCTION()
+	void OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

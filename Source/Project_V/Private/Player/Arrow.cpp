@@ -5,6 +5,8 @@
 
 #include "Project_V.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 // Sets default values
 AArrow::AArrow()
@@ -35,12 +37,21 @@ AArrow::AArrow()
 	projectileMovementComp->bRotationFollowsVelocity = true;
 
 	projectileMovementComp->SetActive(false);
+
+	ConstructorHelpers::FObjectFinder<UParticleSystem> tmpEffect(TEXT("/Script/Engine.ParticleSystem'/Game/Assets/Medieval_Weapons/VFX/P_ArrowTrail.P_ArrowTrail'"));
+
+	if (tmpEffect.Succeeded())
+	{
+		tailVFX = tmpEffect.Object;
+	}
 }
 
 // Called when the game starts or when spawned
 void AArrow::BeginPlay()
 {
 	Super::BeginPlay();
+
+	mesh->OnComponentBeginOverlap.AddDynamic(this, &AArrow::OnOverlapped);
 }
 
 void AArrow::Fire(float alpha)
@@ -51,5 +62,13 @@ void AArrow::Fire(float alpha)
 	projectileMovementComp->Velocity = currentVelocity;
 	projectileMovementComp->SetActive(true);
 	projectileMovementComp->Activate();
+
+	UGameplayStatics::SpawnEmitterAttached(tailVFX, mesh);
+}
+
+void AArrow::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
 }
 
