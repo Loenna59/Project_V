@@ -355,6 +355,17 @@ void APlayCharacter::OnAnchorRelease()
 	drawStrength = 0;
 	bIsAnchored = false;
 	elapsedDrawingTime = 0;
+
+	if (arrow.IsValid())
+	{
+		PlaceArrowOnBow();
+	}
+	else
+	{
+		AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
+		spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		arrow = spawned_arrow;
+	}
 }
 
 void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
