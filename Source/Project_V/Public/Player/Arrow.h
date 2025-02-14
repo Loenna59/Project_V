@@ -26,6 +26,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UProjectileMovementComponent* projectileMovementComp;
 
+	UPROPERTY(EditAnywhere, Category=Settings)
+	float initialSpeed = 2000;
+
+	UPROPERTY(EditAnywhere, Category=Settings)
+	float maxSpeed = 2000;
+	
 	UFUNCTION()
 	void Fire();
 };

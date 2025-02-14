@@ -115,6 +115,8 @@ public:
 
 	UFUNCTION()
 	void OnReleasedFire(const FInputActionValue& actionValue);
+
+	void SpawnArrow();
 	
 private:
 	UPROPERTY()

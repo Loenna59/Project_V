@@ -22,15 +22,19 @@ AArrow::AArrow()
 		mesh->SetStaticMesh(tmpMesh.Object);
 		mesh->SetCollisionProfileName(TEXT("PlayerProjectile"));
 	}
-
+	
 	projectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
-	projectileMovementComp->SetUpdatedComponent(RootComponent);
-	projectileMovementComp->InitialSpeed = 10000;
-	projectileMovementComp->MaxSpeed = 10000;
-	projectileMovementComp->ProjectileGravityScale = 1;
-	projectileMovementComp->bShouldBounce = false;
+    projectileMovementComp->SetUpdatedComponent(RootComponent);
 
-	projectileMovementComp->bSimulationEnabled = false;
+    // 물리 속성 설정
+    projectileMovementComp->ProjectileGravityScale = 1;
+    projectileMovementComp->InitialSpeed = initialSpeed;
+    projectileMovementComp->MaxSpeed = maxSpeed;
+    projectileMovementComp->bShouldBounce = false;
+	projectileMovementComp->bAutoActivate = false;
+	projectileMovementComp->bRotationFollowsVelocity = true;
+
+	projectileMovementComp->SetActive(false);
 }
 
 // Called when the game starts or when spawned
@@ -41,23 +45,11 @@ void AArrow::BeginPlay()
 
 void AArrow::Fire()
 {
-	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	FVector currentVelocity = GetActorForwardVector() * initialSpeed;
 	
-	// ProjectileMovementComponent 활성화
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	projectileMovementComp->Velocity = currentVelocity;
 	projectileMovementComp->SetActive(true);
-	projectileMovementComp->Activate(true);
-	projectileMovementComp->SetUpdatedComponent(RootComponent);
-	projectileMovementComp->bSimulationEnabled = true;
-
-
-	// 물리 속성 설정
-	projectileMovementComp->ProjectileGravityScale = 1;
-	projectileMovementComp->InitialSpeed = 10000;
-	projectileMovementComp->MaxSpeed = 10000;
-
-	// Velocity 설정
-	projectileMovementComp->Velocity = FVector(1, 0, 0) * projectileMovementComp->InitialSpeed;
-
-	PrintLogFunc(TEXT("%f"), mesh->GetForwardVector());
+	projectileMovementComp->Activate();
 }
 

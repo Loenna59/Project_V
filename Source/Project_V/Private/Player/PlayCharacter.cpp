@@ -177,11 +177,8 @@ void APlayCharacter::BeginPlay()
 
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
-
-	//temp:: 화살 하나 미리 만들기
-	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
-	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	arrow = spawned_arrow;
+	
+	SpawnArrow();
 }
 
 // Called every frame
@@ -326,6 +323,11 @@ void APlayCharacter::OnAnchor()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	bIsAnchored = true;
+
+	if (!arrow.IsValid())
+	{
+		SpawnArrow();
+	}
 }
 
 void APlayCharacter::OnAnchorRelease()
@@ -384,4 +386,11 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 			arrow = nullptr;
 		}
 	}
+}
+
+void APlayCharacter::SpawnArrow()
+{
+	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
+	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	arrow = spawned_arrow;
 }
