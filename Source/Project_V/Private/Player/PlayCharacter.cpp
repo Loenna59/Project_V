@@ -10,11 +10,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "MathUtil.h"
-#include "Project_V.h"
-#include "Components/SplineComponent.h"
-#include "Player/PlayerAnimInstance.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Player/Arrow.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -23,6 +21,7 @@ APlayCharacter::APlayCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+	GetCapsuleComponent()->SetCollisionProfileName("Player");
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_skeletalMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/CyberpunkSamurai/Meshes/SK_CyberpunkSamurai_WithHelmet.SK_CyberpunkSamurai_WithHelmet'"));
 
@@ -59,9 +58,12 @@ APlayCharacter::APlayCharacter()
 	anchoredSpringArmComp->SetupAttachment(RootComponent);
 	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
 	anchoredSpringArmComp->TargetArmLength = 100;
+	anchoredSpringArmComp->bUsePawnControlRotation = false;
+	anchoredSpringArmComp->ProbeSize = 12;
 
 	anchoredCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("AnchoredCameraComp"));
 	anchoredCameraComp->SetupAttachment(anchoredSpringArmComp);
+	anchoredCameraComp->bUsePawnControlRotation = true;
 
 	transitionSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("TransitionSpringArm"));
 	transitionSpringArmComp->SetupAttachment(RootComponent);
@@ -149,6 +151,11 @@ APlayCharacter::APlayCharacter()
 		weaponComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		weaponComp->SetAnimInstanceClass(tmp_weaponAnim.Class);
 	}
+
+	arrowSlotComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));
+	arrowSlotComp->SetupAttachment(weaponComp, TEXT("bowstring"));
+	arrowSlotComp->SetRelativeLocation(FVector(25, 0, 0));
+	arrowSlotComp->SetRelativeScale3D(FVector(1.1f));
 }
 
 // Called when the game starts or when spawned
@@ -170,6 +177,11 @@ void APlayCharacter::BeginPlay()
 
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
+
+	//temp:: 화살 하나 미리 만들기
+	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
+	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	arrow = spawned_arrow;
 }
 
 // Called every frame
@@ -225,7 +237,7 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
 		pi->BindAction(ia_movePressed, ETriggerEvent::Triggered, this, &APlayCharacter::BeginDodge);
 		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
-		pi->BindAction(ia_anchored, ETriggerEvent::Triggered, this, &APlayCharacter::OnAnchor);
+		pi->BindAction(ia_anchored, ETriggerEvent::Started, this, &APlayCharacter::OnAnchor);
 		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
 		pi->BindAction(ia_fire, ETriggerEvent::Triggered, this, &APlayCharacter::OnPressedFire);
 		pi->BindAction(ia_fire, ETriggerEvent::Completed, this, &APlayCharacter::OnReleasedFire);
@@ -243,12 +255,27 @@ void APlayCharacter::Move(const FInputActionValue& actionValue)
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
-
 	
 	AddControllerYawInput(value.X);
-	AddControllerPitchInput(value.Y);
 
-	// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
+	float pitch = GetControlRotation().GetNormalized().Pitch;
+
+	if (bIsAnchored)
+	{
+		// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
+
+		if (value.Y > 0 && pitch < -45.f)
+		{
+			return;
+		}
+
+		if (value.Y < 0 && pitch > 45.f)
+		{
+			return;
+		}
+	}
+	
+	AddControllerPitchInput(value.Y);
 }
 
 void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
@@ -274,9 +301,14 @@ void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 void APlayCharacter::Dodge()
 {
 	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
+
+	if (bIsAnchored)
+	{
+		OnAnchorRelease();
+	}
 }
 
-void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
+void APlayCharacter::OnAnchor()
 {
     cameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
@@ -296,7 +328,7 @@ void APlayCharacter::OnAnchor(const FInputActionValue& actionValue)
 	bIsAnchored = true;
 }
 
-void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
+void APlayCharacter::OnAnchorRelease()
 {
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
@@ -312,28 +344,25 @@ void APlayCharacter::OnAnchorRelease(const FInputActionValue& actionValue)
 	bUseControllerRotationYaw = false;
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
+	
 	drawStrength = 0;
 	bIsAnchored = false;
+	elapsedDrawingTime = 0;
 }
 
 void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
-		float targetDrawStrength = 100.0f; // 목표값
+		elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
 
-		// 진행 비율 계산 (0~1 사이)
-		float progress = FMath::Clamp((drawStrength / targetDrawStrength), 0.0f, 1.0f);
+		float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
 
-		// Cubic Out Easing 적용
-		float easedProgress = CubicOutEasing(progress);
-
-		// drawStrength 업데이트
-		drawStrength = FMath::Lerp(0.0f, targetDrawStrength, easedProgress);
-
+		//EaseOutQuad = 1 - (1 - t)^2
+		float quadT = 1 - FMath::Pow(1 - t, 2);
+		
 		// 시간에 따라 증가
-		drawStrength = FMath::Min(drawStrength + GetWorld()->DeltaTimeSeconds, targetDrawStrength);
+		drawStrength = FMath::Lerp(0, targetDrawStrength, quadT);
 	}
 	else
 	{
@@ -347,5 +376,12 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 	{
 		bIsShot = true;
 		drawStrength = 0;
+		elapsedDrawingTime = 0;
+
+		if (arrow.IsValid())
+		{
+			arrow->Fire();
+			arrow = nullptr;
+		}
 	}
 }

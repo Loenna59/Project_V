@@ -47,15 +47,23 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (player)
 	{
-		isAnchoredBow = player->bIsAnchored;
-
 		// dodgeDirection = FTransform(player->GetControlRotation()).TransformVector(FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0));
 		dodgeDirection = FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0);
 	
 		if (player->bIsDodge)
 		{
 			isDodged = true;
+			isAnchoredBow = false;
 		}
+		else
+		{
+            isAnchoredBow = player->bIsAnchored;
+		}
+
+		if (!isAnchoredBow)
+		{
+			isShot = false;
+		}	
 
 		if (isPlayingDodge)
 		{
@@ -64,8 +72,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		drawStrength = player->drawStrength;
 
-		float currentPitch = player->GetControlRotation().GetNormalized().Pitch;
-		controlPitch = FMath::Clamp(currentPitch, -80.f, 80.f);
+		FRotator controlRotation = player->GetControlRotation().GetNormalized();
+
+		controlSpineRotation = controlRotation;
 		
 		if (player->bIsShot)
 		{
