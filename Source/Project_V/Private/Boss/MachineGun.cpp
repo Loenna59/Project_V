@@ -36,6 +36,7 @@ void AMachineGun::InitComponents()
 	{
 		SetRootComponent(Root);
 		Root->SetBoxExtent(FVector(18.0,10.0,10.0));
+		Root->SetGenerateOverlapEvents(true);
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));

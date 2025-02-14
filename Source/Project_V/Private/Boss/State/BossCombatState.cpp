@@ -3,6 +3,7 @@
 
 #include "Boss/State/BossCombatState.h"
 
+#include "Project_V.h"
 #include "Boss/MachineGun.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
@@ -41,7 +42,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 			}
 			if (dist <= Boss->MeleeAttackDist)
 			{
-				//UE_LOG(LogTemp,Warning,TEXT("boss melee attack"));
+				PRINTLOG(TEXT("boss melee attack"));
 			}
 			else if (dist > Boss->MeleeAttackDist)
 			{
@@ -80,21 +81,16 @@ void UBossCombatState::ChooseRandomRangeAttack(AThunderJaw* Boss)
 
 void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
 {
-	UE_LOG(LogTemp,Warning,TEXT("using machine gun"));
-	
+	PRINTLOG(TEXT("Using Machine Gun"));
 
 	Boss->GetLMachineGun()->CreateBullet(Boss->GetLMachineGun()->FirePos->GetComponentTransform());
 	Boss->GetRMachineGun()->CreateBullet(Boss->GetRMachineGun()->FirePos->GetComponentTransform());
-
-	
 }
 
 void UBossCombatState::UseDiscLauncher(AThunderJaw* Boss)
 {
-	UE_LOG(LogTemp,Warning,TEXT("using disc launcher"));
 }
 
 void UBossCombatState::UseMouseLaser(AThunderJaw* Boss)
 {
-	UE_LOG(LogTemp,Warning,TEXT("using mouse laser"));
 }

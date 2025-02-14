@@ -62,7 +62,7 @@ void AThunderJawAIController::InitComponent()
 	AIPC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPC"));
 	if (!AIPC)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("AIPC is null"));
+		PRINTLOG(TEXT("AIPC is null"));
 	}
 		
 	SetPerceptionComponent(*AIPC);
@@ -113,7 +113,6 @@ void AThunderJawAIController::CheckPlayerInFront()
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();
 	FacingDot = FVector::DotProduct(Boss->GetActorForwardVector(),direction);
-	//UE_LOG(LogTemp,Warning,TEXT("dotproduct : %f"),FacingDot);
 }
 
 void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)

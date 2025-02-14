@@ -1,6 +1,7 @@
 
 #include "Boss/ThunderJaw.h"
 
+#include "Project_V.h"
 #include "Boss/MachineGun.h"
 #include "Boss/MachineGunBullet.h"
 #include "Boss/ThunderJawAIController.h"
@@ -26,7 +27,7 @@ void AThunderJaw::BeginPlay()
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	if (!BossAIController)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("BossAIController Cast Failed"));
+		PRINTLOG(TEXT("BossAIController Cast Failed"));
 	}
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 

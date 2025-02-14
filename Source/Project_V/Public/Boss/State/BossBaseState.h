@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Project_V.h"
 #include "Boss/ThunderJawFSM.h"
 #include "UObject/Object.h"
 #include "BossBaseState.generated.h"
@@ -15,9 +16,17 @@ class PROJECT_V_API UBossBaseState : public UObject
 {
 	GENERATED_BODY()
 public:
-	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) {UE_LOG(LogTemp,Warning,TEXT("Enter State %d"),currentStateEnum)};
+	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
+	{
+		FString str = UEnum::GetValueAsString(currentStateEnum);
+		PRINTLOG(TEXT("Enter State %s"), *str);
+	};
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) {};
-	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) {UE_LOG(LogTemp,Warning,TEXT("Exit State %d"),currentStateEnum)};
+	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
+	{
+		FString str = UEnum::GetValueAsString(currentStateEnum);
+		PRINTLOG(TEXT("Exit State %s"), *str);
+	};
 
 public:
 	EBossState currentStateEnum;
