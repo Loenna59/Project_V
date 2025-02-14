@@ -58,7 +58,7 @@ void AMachineGunBullet::InitComponents()
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Blueprints/Boss/M_MachineGunBullet.M_MachineGunBullet'"));
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Blueprints/Boss/Material/M_MachineGunBullet.M_MachineGunBullet'"));
 	if (tempMat.Succeeded())
 	{
 		Mesh->SetMaterial(0,tempMat.Object);

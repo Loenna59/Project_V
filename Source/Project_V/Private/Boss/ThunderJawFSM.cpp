@@ -6,6 +6,7 @@
 #include "Boss/State/BossCombatState.h"
 #include "Boss/State/BossBaseState.h"
 #include "Boss/State/BossIdleState.h"
+#include "Boss/State/BossLookOutState.h"
 #include "Boss/State/BossPatrolState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -50,6 +51,9 @@ void UThunderJawFSM::InitStatePool()
 	// Combat State
 	StatePool.Add(EBossState::Combat, NewObject<UBossCombatState>(this, UBossCombatState::StaticClass()));
 	StatePool[EBossState::Combat]->currentStateEnum = EBossState::Combat;
+	// LookOut State
+	StatePool.Add(EBossState::LookOut, NewObject<UBossLookOutState>(this,UBossLookOutState::StaticClass()));
+	StatePool[EBossState::LookOut]->currentStateEnum = EBossState::LookOut;
 }
 
 void UThunderJawFSM::InitPatrolPoints()
@@ -93,7 +97,6 @@ void UThunderJawFSM::ChangePatrolTargetPoint()
 {
 	if (ArrivedTargetPoint)
 	{
-		//PrintLogFunc(TEXT("%d"),CurrentTargetPoint);
 		ArrivedTargetPoint = false;
 		if (CurrentTargetPoint >= PatrolPoints.Num() - 1)
 		{
