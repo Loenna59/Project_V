@@ -43,9 +43,9 @@ void AArrow::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AArrow::Fire()
+void AArrow::Fire(float alpha)
 {
-	FVector currentVelocity = GetActorForwardVector() * initialSpeed;
+	FVector currentVelocity = GetActorForwardVector() * initialSpeed * FMath::Clamp(alpha, 0, 1);
 	
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	projectileMovementComp->Velocity = currentVelocity;

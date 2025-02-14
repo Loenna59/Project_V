@@ -33,5 +33,5 @@ public:
 	float maxSpeed = 2000;
 	
 	UFUNCTION()
-	void Fire();
+	void Fire(float alpha);
 };

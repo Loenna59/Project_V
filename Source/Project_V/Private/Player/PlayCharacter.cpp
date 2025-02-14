@@ -376,15 +376,15 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
+		if (arrow.IsValid())
+		{
+			arrow->Fire(drawStrength / targetDrawStrength);
+			arrow = nullptr;
+		}
+		
 		bIsShot = true;
 		drawStrength = 0;
 		elapsedDrawingTime = 0;
-
-		if (arrow.IsValid())
-		{
-			arrow->Fire();
-			arrow = nullptr;
-		}
 	}
 }
 
