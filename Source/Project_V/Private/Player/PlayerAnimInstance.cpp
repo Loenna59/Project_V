@@ -70,7 +70,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			OnMoveDodge();
 		}
 
-		drawStrength = player->drawStrength;
+		drawStrength = player->GetDrawStrength();
 
 		FRotator controlRotation = player->GetControlRotation().GetNormalized();
 

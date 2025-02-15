@@ -10,14 +10,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "KismetTraceUtils.h"
-#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Concepts/Iterable.h"
-#include "Evaluation/Blending/MovieSceneBlendType.h"
+#include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/Arrow.h"
+#include "UI/CrosshairUI.h"
+#include "UI/PlayerHUD.h"
+#include "UI/PlayerUI.h"
 
 // Sets default values
 APlayCharacter::APlayCharacter()
@@ -188,6 +188,14 @@ void APlayCharacter::BeginPlay()
 	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
 	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	arrow = spawned_arrow;
+
+	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	if (hud)
+	{
+		ui = hud->GetPlayerUI();
+		ui->SetVisibleUI(CameraMode::Default);
+	}
 }
 
 // Called every frame
@@ -316,6 +324,8 @@ void APlayCharacter::Dodge()
 
 void APlayCharacter::OnAnchor()
 {
+	ui->SetVisibleUI(CameraMode::Anchored);
+	
     cameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
 
@@ -341,6 +351,8 @@ void APlayCharacter::OnAnchor()
 
 void APlayCharacter::OnAnchorRelease()
 {
+	ui->SetVisibleUI(CameraMode::Default);
+	
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
 
@@ -356,7 +368,7 @@ void APlayCharacter::OnAnchorRelease()
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
-	drawStrength = 0;
+	SetDrawStrength(0);
 	bIsAnchored = false;
 	elapsedDrawingTime = 0;
 
@@ -384,7 +396,7 @@ void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 		float quadT = 1 - FMath::Pow(1 - t, 2);
 		
 		// 시간에 따라 증가
-		drawStrength = FMath::Lerp(0, targetDrawStrength, quadT);
+		SetDrawStrength(FMath::Lerp(0, targetDrawStrength, quadT));
 	}
 	else
 	{
@@ -403,7 +415,7 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 		}
 		
 		bIsShot = true;
-		drawStrength = 0;
+		SetDrawStrength(0);
 		elapsedDrawingTime = 0;
 	}
 }
@@ -438,4 +450,14 @@ FVector APlayCharacter::CalculateAnimToVector()
 	bool isHit = UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, TraceTypeQuery1, false, ignores, EDrawDebugTrace::None, hitResult, true);
 
 	return isHit? hitResult.Location : hitResult.TraceEnd;
+}
+
+void APlayCharacter::SetDrawStrength(float strength)
+{
+	drawStrength = strength;
+
+	if (ui)
+	{
+		ui->Crosshair->UpdateCircle(strength);
+	}
 }

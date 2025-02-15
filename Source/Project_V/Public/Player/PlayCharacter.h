@@ -81,8 +81,6 @@ public:
 	bool bIsAnchored = false;
 
 	FVector direction;
-	
-	float drawStrength = 0;
 
 	bool bIsShot = false;
 
@@ -148,6 +146,10 @@ private:
 	UPROPERTY()
 	class UInputAction* ia_fire;
 
+	class UPlayerUI* ui;
+
+	float drawStrength = 0;
+
 	float currentBlendCameraAlpha;
 	
 	float targetBlendCameraAlpha;
@@ -158,4 +160,12 @@ private:
 	TWeakObjectPtr<class AArrow> arrow;
 
 	FVector CalculateAnimToVector();
+
+public:
+	float GetDrawStrength() const
+	{
+		return drawStrength;
+	}
+
+	void SetDrawStrength(float strength);
 };
