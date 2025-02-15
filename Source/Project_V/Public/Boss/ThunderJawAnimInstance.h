@@ -22,6 +22,8 @@ public:
 	void OnPlayTurnMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayChargeMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayRageMontage();	
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")

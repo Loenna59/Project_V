@@ -60,7 +60,7 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere)
-	float DetectRadius{1200.0f};
+	float DetectRadius{1600.0f};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool DetectedTarget;

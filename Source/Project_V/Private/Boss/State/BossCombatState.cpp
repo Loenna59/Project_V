@@ -72,6 +72,7 @@ void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
 	PatternCurrentTime += DeltaTime;
 	if (PatternCurrentTime >= PatternTime)
 	{
+		PRINTLOG(TEXT("ChangePattern"));
 		PatternCurrentTime = 0;
 		StartPattern(Boss);
 	}
@@ -82,14 +83,17 @@ void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
 		case EAttackPattern::Charge:
 			Charge(Boss);
 			break;
+		case EAttackPattern::Tail:
+			Tail(Boss);
+			break;
 		case EAttackPattern::MachineGun:
-			UseMachineGun(Boss);
+			MachineGun(Boss);
 			break;
 		case EAttackPattern::DiscLauncher:
-			UseDiscLauncher(Boss);
+			DiscLauncher(Boss);
 			break;
 		case EAttackPattern::MouseLaser:
-			UseMouseLaser(Boss);
+			MouseLaser(Boss);
 			break;
 		default:
 			break;
@@ -100,6 +104,11 @@ void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
 
 void UBossCombatState::StartPattern(AThunderJaw* Boss)
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(PatternTimerHandle))
+	{
+		return;
+	}
+	
 	bIsDelay = true;
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
 	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
@@ -116,6 +125,11 @@ void UBossCombatState::PatternDelayEnd(AThunderJaw* Boss)
 {
 	bIsDelay = false;
 	GetWorld()->GetTimerManager().ClearTimer(PatternTimerHandle);
+
+	// 한번만 실행되는 공격들 flag 초기화
+	ChargeFlag = false;
+
+	
 	ChooseRandomPattern(Boss);
 }
 
@@ -160,11 +174,25 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 void UBossCombatState::Charge(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("Charge"));
-	Boss->GetBossAnimInstance()->OnPlayChargeMontage();
+	// 프레임 한번만 불리면 boss가 원하는 위치로 이동하지 못하는 문제발생
+	// 수정필요
+	if (!ChargeFlag)
+	{
+		PRINTLOG(TEXT("Using Charge"));
+		ChargeFlag = true;
+		FVector targetPos = Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation();
+		//targetPos.Normalize();
+
+		Boss->GetBossAnimInstance()->OnPlayChargeMontage();
+	}
 }
 
-void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
+void UBossCombatState::Tail(AThunderJaw* Boss)
+{
+	PRINTLOG(TEXT("Using Tail"));
+}
+
+void UBossCombatState::MachineGun(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Machine Gun"));
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
@@ -186,12 +214,12 @@ void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 }
 
-void UBossCombatState::UseDiscLauncher(AThunderJaw* Boss)
+void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using DiscLauncher"));
 }
 
-void UBossCombatState::UseMouseLaser(AThunderJaw* Boss)
+void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using MouseLaser"));
 }

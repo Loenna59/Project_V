@@ -73,7 +73,7 @@ void AThunderJawAIController::InitComponent()
 	
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = DetectRadius;
-	SightConfig->LoseSightRadius = 1800.0f;
+	SightConfig->LoseSightRadius = DetectRadius + 1000.0f;
 	SightConfig->PeripheralVisionAngleDegrees = 45.0f;
 	SightConfig->SetMaxAge(100.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
@@ -97,8 +97,12 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
-			PrintLogFunc(TEXT("find target"));
-			DetectedTarget = true;
+			auto* player = Cast<APlayCharacter>(Actor);
+			if (player)
+			{
+				PRINTLOG(TEXT("Target is in Sight"));
+				DetectedTarget = true;
+			}
 		}
 	}
 }
@@ -107,6 +111,7 @@ void AThunderJawAIController::UpdateDistanceFromTarget()
 {
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
+	// 평지여서 2D로 해놓음, 나중에 평지가 아니게 되면 바꿔야함
 	DistanceFromTarget = UKismetMathLibrary::Vector_Distance2D(bossPos,targetPos);
 	DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
 }
@@ -121,19 +126,23 @@ void AThunderJawAIController::UpdateFacingDot()
 
 void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 {
+	auto* bossFSM = Boss->GetFSMComponent();
 	// 공격모드 거리까지 올 때
 	if (DistanceFromTarget <= Boss->CombatDist)
 	{
 		LoseTargetTime = 0.0f;
-		if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Combat)
-		{
-			Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
-		}
+		bossFSM->ChangeBossState(EBossState::Combat);
 	}
 	// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
 	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
-		LoseTargetTime += DeltaTime;
+		// Radar Pattern 생기면 실행할 부분
+		//PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
+		{
+			LoseTargetTime += DeltaTime;
+			bossFSM->ChangeBossState(EBossState::LookOut);
+		}
 	}
 }
 
@@ -152,10 +161,7 @@ void AThunderJawAIController::CheckTargetThroughtStimulus()
 			{
 				LoseTargetTime = 0.0f;
 				DetectedTarget = false;
-				if (Boss->GetFSMComponent()->GetCurrentState()->currentStateEnum != EBossState::Patrol)
-				{
-					Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
-				}
+				Boss->GetFSMComponent()->ChangeBossState(EBossState::Patrol);
 			}
 		}
 	}

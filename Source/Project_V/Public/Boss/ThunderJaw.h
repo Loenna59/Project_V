@@ -58,7 +58,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float CombatDist {1000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{300.0f};
+	float MeleeAttackDist{500.0f};
 
 	UPROPERTY()
 	bool bIsRotateBody{false};

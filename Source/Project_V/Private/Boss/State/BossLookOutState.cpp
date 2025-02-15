@@ -3,9 +3,13 @@
 
 #include "Boss/State/BossLookOutState.h"
 
+#include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAnimInstance.h"
+
 void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
+	Boss->GetBossAnimInstance()->OnPlayRageMontage();
 }
 
 void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)

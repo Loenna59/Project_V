@@ -44,16 +44,16 @@ void UThunderJawFSM::InitStatePool()
 {
 	// Idle State
 	StatePool.Add(EBossState::Idle, NewObject<UBossIdleState>(this, UBossIdleState::StaticClass()));
-	StatePool[EBossState::Idle]->currentStateEnum = EBossState::Idle;
+	StatePool[EBossState::Idle]->BossState = EBossState::Idle;
 	// Patrol State
 	StatePool.Add(EBossState::Patrol, NewObject<UBossPatrolState>(this,UBossPatrolState::StaticClass()));
-	StatePool[EBossState::Patrol]->currentStateEnum = EBossState::Patrol;
+	StatePool[EBossState::Patrol]->BossState = EBossState::Patrol;
 	// Combat State
 	StatePool.Add(EBossState::Combat, NewObject<UBossCombatState>(this, UBossCombatState::StaticClass()));
-	StatePool[EBossState::Combat]->currentStateEnum = EBossState::Combat;
+	StatePool[EBossState::Combat]->BossState = EBossState::Combat;
 	// LookOut State
 	StatePool.Add(EBossState::LookOut, NewObject<UBossLookOutState>(this,UBossLookOutState::StaticClass()));
-	StatePool[EBossState::LookOut]->currentStateEnum = EBossState::LookOut;
+	StatePool[EBossState::LookOut]->BossState = EBossState::LookOut;
 }
 
 void UThunderJawFSM::InitPatrolPoints()
@@ -66,8 +66,10 @@ void UThunderJawFSM::InitPatrolPoints()
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
 {
-	if (CurrentState->currentStateEnum == BossState)
+	if (CurrentState->BossState == BossState)
+	{
 		return;
+	}
 	
 	CurrentState->Exit(Boss, this);
 	PrevState = CurrentState;

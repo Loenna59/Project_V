@@ -44,14 +44,16 @@ protected:
 	// Melee Attack
 	UFUNCTION()
 	void Charge(AThunderJaw* Boss);
+	UFUNCTION()
+	void Tail(AThunderJaw* Boss);
 
 	// Range Attack
 	UFUNCTION()
-	void UseMachineGun(AThunderJaw* Boss);
+	void MachineGun(AThunderJaw* Boss);
 	UFUNCTION()
-	void UseDiscLauncher(AThunderJaw* Boss);
+	void DiscLauncher(AThunderJaw* Boss);
 	UFUNCTION()
-	void UseMouseLaser(AThunderJaw* Boss);
+	void MouseLaser(AThunderJaw* Boss);
 
 protected:
 	// Pattern
@@ -59,21 +61,23 @@ protected:
 	float PatternCurrentTime{0.0};
 	UPROPERTY()
 	float PatternTime{0.0};
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float PatternDelay{2.0};
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	bool bIsDelay{false};	
 
 	UPROPERTY()
 	FTimerHandle PatternTimerHandle;	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	EAttackPattern UsingPattern;
 
 	// Charge
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float ChargePatternTime{2.0};
+	UPROPERTY()
+	bool ChargeFlag{false};
 	// Tail
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float TailPatternTime{2.0};
 
 	// Machine Gun
@@ -83,13 +87,13 @@ protected:
 	float MachineGunDelayCurrentTime{0.0};
 	UPROPERTY()
 	float MachineGunDelay{0.1};
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float MachineGunPatternTime{3.0};
 	// Disc Launcher
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float DiscLauncherPatternTime{3.0};
 	// Mouse Laser
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY()
 	float MouseLaserPatternTime{3.0};
 
 };
