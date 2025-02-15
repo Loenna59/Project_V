@@ -184,10 +184,14 @@ void APlayCharacter::BeginPlay()
 
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
-	
+
+	//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
 	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	arrow = spawned_arrow;
+
+	bIsCompleteReload = true;
+	//
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
@@ -382,12 +386,19 @@ void APlayCharacter::OnAnchorRelease()
 		spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 		arrow = spawned_arrow;
 	}
+
+	bIsCompleteReload = true;
 }
 
 void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
+		if (!bIsCompleteReload)
+		{
+			return;
+		}
+		
 		elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
 
 		float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
@@ -398,20 +409,22 @@ void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 		// 시간에 따라 증가
 		SetDrawStrength(FMath::Lerp(0, targetDrawStrength, quadT));
 	}
-	else
-	{
-		
-	}
 }
 
 void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
 	if (bIsAnchored)
 	{
+		if (!bIsCompleteReload)
+		{
+			return;
+		}
+		
 		if (arrow.IsValid())
 		{
 			arrow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
 			arrow = nullptr;
+			bIsCompleteReload = false;
 		}
 		
 		bIsShot = true;
@@ -435,6 +448,8 @@ void APlayCharacter::PlaceArrowOnBow()
 		arrow->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
 		arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
+
+	bIsCompleteReload = true;
 }
 
 FVector APlayCharacter::CalculateAnimToVector()

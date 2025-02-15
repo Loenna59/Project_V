@@ -80,6 +80,8 @@ public:
 	
 	bool bIsAnchored = false;
 
+	bool bIsCompleteReload = false;
+
 	FVector direction;
 
 	bool bIsShot = false;
