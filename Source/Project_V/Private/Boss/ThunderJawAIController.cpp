@@ -42,6 +42,8 @@ void AThunderJawAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->CombatDist, 20,FColor::Red);
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),SightConfig->SightRadius, 20,FColor::Green);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
+
 	if (DetectedTarget)
 	{
 		// target이 감지 됐을 때 타겟과의 거리를 업데이트 해줌

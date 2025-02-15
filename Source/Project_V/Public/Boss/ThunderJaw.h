@@ -62,6 +62,4 @@ public:
 
 	UPROPERTY()
 	bool bIsRotateBody{false};
-	UPROPERTY()
-	bool bIsAttack{false};
 };

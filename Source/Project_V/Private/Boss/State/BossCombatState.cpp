@@ -12,7 +12,6 @@
 #include "Player/PlayCharacter.h"
 
 
-
 void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
@@ -40,16 +39,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	{
 		if (Boss->GetBossAIController()->FacingDot > 0)
 		{
-			float dist = Boss->GetBossAIController()->DistanceFromTarget;
-
-			if (dist <= Boss->MeleeAttackDist)
-			{
-				PRINTLOG(TEXT("boss melee attack"));
-			}
-			else if (dist > Boss->MeleeAttackDist)
-			{
-				RangeAttack(Boss,DeltaTime);
-			}
+			Attack(Boss,DeltaTime);
 		}
 		else
 		{
@@ -65,60 +55,118 @@ void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 
 void UBossCombatState::RotateToTarget(AThunderJaw* Boss, float InterpSpeed)
 {
+	// 타겟 위치로 몸을 돌리는 함수
+	
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
 	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
 	Boss->SetActorRotation(FRotator(0,NewYaw,0));
 }
 
-void UBossCombatState::RangeAttack(AThunderJaw* Boss, float DeltaTime)
+void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
 {
+	if (bIsDelay)
+	{
+		return;
+	}
+	
 	PatternCurrentTime += DeltaTime;
-	if (PatternCurrentTime > PatternTime)
+	if (PatternCurrentTime >= PatternTime)
 	{
 		PatternCurrentTime = 0;
-		ChooseRandomRangeAttack(Boss);
+		StartPattern(Boss);
+	}
+	else
+	{
+		switch (UsingPattern)
+		{
+		case EAttackPattern::Charge:
+			Charge(Boss);
+			break;
+		case EAttackPattern::MachineGun:
+			UseMachineGun(Boss);
+			break;
+		case EAttackPattern::DiscLauncher:
+			UseDiscLauncher(Boss);
+			break;
+		case EAttackPattern::MouseLaser:
+			UseMouseLaser(Boss);
+			break;
+		default:
+			break;
+		}
 	}
 
-	switch (UsingWeapon)
+}
+
+void UBossCombatState::StartPattern(AThunderJaw* Boss)
+{
+	bIsDelay = true;
+	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
+	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
+		[this,WeakBoss]()
+		{
+			if (WeakBoss.IsValid())
+			{
+				PatternDelayEnd(WeakBoss.Get());
+			}
+		},PatternDelay,false);
+}
+
+void UBossCombatState::PatternDelayEnd(AThunderJaw* Boss)
+{
+	bIsDelay = false;
+	GetWorld()->GetTimerManager().ClearTimer(PatternTimerHandle);
+	ChooseRandomPattern(Boss);
+}
+
+void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
+{
+	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
+
+	if (Dist <= Boss->MeleeAttackDist)
 	{
-	case ERangeWeapon::MachineGun:
-		UseMachineGun(Boss);
-		break;
-	case ERangeWeapon::DiscLauncher:
-		UseDiscLauncher(Boss);
-		break;
-	case ERangeWeapon::MouseLaser:
-		UseMouseLaser(Boss);
-		break;
-	default:
-		break;
+		int randomNum = FMath::RandRange(0,0);
+		if (randomNum == 0)
+		{
+			UsingPattern = EAttackPattern::Charge;
+			PatternTime = ChargePatternTime;
+		}
+		else if (randomNum == 1)
+		{
+			UsingPattern = EAttackPattern::Tail;
+			PatternTime = TailPatternTime;
+		}
+	}
+	else
+	{
+		int randomNum = FMath::RandRange(2,2);
+		if (randomNum == 2)
+		{
+			UsingPattern = EAttackPattern::MachineGun;
+			PatternTime = MachineGunPatternTime;		
+		}
+		else if (randomNum == 3)
+		{
+			UsingPattern = EAttackPattern::DiscLauncher;
+			PatternTime = DiscLauncherPatternTime;
+		}
+		else if (randomNum == 4)
+		{
+			UsingPattern = EAttackPattern::MouseLaser;
+			PatternTime = MouseLaserPatternTime;
+		}
 	}
 }
 
-void UBossCombatState::ChooseRandomRangeAttack(AThunderJaw* Boss)
+void UBossCombatState::Charge(AThunderJaw* Boss)
 {
-	int randomNum = FMath::RandRange(1,1);
-	if (randomNum == 1)
-	{
-		UsingWeapon = ERangeWeapon::MachineGun;
-		PatternTime = MachineGunPatternTime;		
-	}
-	else if (randomNum == 2)
-	{
-		UsingWeapon = ERangeWeapon::DiscLauncher;
-		PatternTime = DiscLauncherPatternTime;
-	}
-	else if (randomNum == 3)
-	{
-		UsingWeapon = ERangeWeapon::MouseLaser;
-		PatternTime = MouseLaserPatternTime;
-	}
+	PRINTLOG(TEXT("Charge"));
+	Boss->GetBossAnimInstance()->OnPlayChargeMontage();
 }
 
 void UBossCombatState::UseMachineGun(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Machine Gun"));
-
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
 	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
 

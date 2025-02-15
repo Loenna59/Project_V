@@ -20,6 +20,8 @@ protected:
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayTurnMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayChargeMontage();
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")

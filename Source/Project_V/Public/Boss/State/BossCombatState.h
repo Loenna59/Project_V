@@ -10,12 +10,15 @@
  * 
  */
 UENUM()
-enum class ERangeWeapon : uint8
+enum class EAttackPattern : uint8
 {
+	Charge = 0,
+	Tail,
 	MachineGun,
 	DiscLauncher,
 	MouseLaser,
 };
+
 UCLASS()
 class PROJECT_V_API UBossCombatState : public UBossBaseState
 {
@@ -24,14 +27,25 @@ public:
 	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) override;
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) override;
 	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) override;
-	
+
 protected:
 	UFUNCTION()
 	void RotateToTarget(AThunderJaw* Boss, float InterpSpeed);
+	
 	UFUNCTION()
-	void RangeAttack(AThunderJaw* Boss, float DeltaTime);
+	void Attack(AThunderJaw* Boss, float DeltaTime);
 	UFUNCTION()
-	void ChooseRandomRangeAttack(AThunderJaw* Boss);
+	void ChooseRandomPattern(AThunderJaw* Boss);
+	UFUNCTION()
+	void StartPattern(AThunderJaw* Boss);
+	UFUNCTION()
+	void PatternDelayEnd(AThunderJaw* Boss);
+	
+	// Melee Attack
+	UFUNCTION()
+	void Charge(AThunderJaw* Boss);
+
+	// Range Attack
 	UFUNCTION()
 	void UseMachineGun(AThunderJaw* Boss);
 	UFUNCTION()
@@ -40,25 +54,42 @@ protected:
 	void UseMouseLaser(AThunderJaw* Boss);
 
 protected:
+	// Pattern
 	UPROPERTY()
 	float PatternCurrentTime{0.0};
 	UPROPERTY()
 	float PatternTime{0.0};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	float PatternDelay{2.0};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	bool bIsDelay{false};	
 
-	ERangeWeapon UsingWeapon;
+	UPROPERTY()
+	FTimerHandle PatternTimerHandle;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	EAttackPattern UsingPattern;
 
-	// machine gun
+	// Charge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	float ChargePatternTime{2.0};
+	// Tail
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	float TailPatternTime{2.0};
+
+	// Machine Gun
 	UPROPERTY()
 	FTimerHandle MachineGunTimer;
 	UPROPERTY()
 	float MachineGunDelayCurrentTime{0.0};
 	UPROPERTY()
-	float MachineGunDelay{0.2};
-	UPROPERTY()
+	float MachineGunDelay{0.1};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float MachineGunPatternTime{3.0};
-	UPROPERTY()
+	// Disc Launcher
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float DiscLauncherPatternTime{3.0};
-	UPROPERTY()
+	// Mouse Laser
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float MouseLaserPatternTime{3.0};
 
 };
