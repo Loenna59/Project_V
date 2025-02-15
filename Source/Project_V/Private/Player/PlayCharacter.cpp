@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
@@ -311,6 +312,12 @@ void APlayCharacter::Sprint(const FInputActionValue& actionValue)
 
 void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 {
+	if (bIsPlayingDodge)
+	{
+		return;
+	}
+
+	prevDodgeAxis = dodgeAxis;
 	dodgeAxis = actionValue.Get<FVector2D>();
 
 	// PrintLogFunc(TEXT("%f %f"), dodgeAxis.X, dodgeAxis.Y);
@@ -318,7 +325,27 @@ void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
 
 void APlayCharacter::Dodge()
 {
-	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
+	if (bIsPlayingDodge)
+	{
+		return;
+	}
+
+	if (dodgeAxis.X != 0 && FMath::IsWithin(prevDodgeAxis.X + dodgeAxis.X, -1.5f, 1.5f))
+	{
+		prevDodgeAxis = FVector2D::ZeroVector;
+		dodgeAxis = FVector2D::ZeroVector;
+		return;
+	}
+
+	 
+	if (dodgeAxis.Y != 0 && FMath::IsWithin(prevDodgeAxis.Y + dodgeAxis.Y, -1.5f, 1.5f))
+	{
+		prevDodgeAxis = FVector2D::ZeroVector;
+		dodgeAxis = FVector2D::ZeroVector;
+		return;
+	}
+	
+	bIsDodge = dodgeAxis != FVector2D::ZeroVector;;
 
 	if (bIsAnchored)
 	{
@@ -474,5 +501,16 @@ void APlayCharacter::SetDrawStrength(float strength)
 	if (ui)
 	{
 		ui->Crosshair->UpdateCircle(strength);
+	}
+}
+
+void APlayCharacter::SetPlayingDodge(bool isPlaying)
+{
+	bIsPlayingDodge = isPlaying;
+
+	if (!isPlaying)
+	{
+		prevDodgeAxis = FVector2D::ZeroVector;
+		dodgeAxis = FVector2D::ZeroVector;
 	}
 }

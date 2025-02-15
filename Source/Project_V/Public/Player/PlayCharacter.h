@@ -74,7 +74,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	float drawDuration = 1.f; // 활시위가 최대로 당길 때 까지 걸리는 시간
 
+	FVector2D prevDodgeAxis;
 	FVector2D dodgeAxis;
+	
+	FVector direction;
 
 	bool bIsDodge = false;
 	
@@ -82,7 +85,7 @@ public:
 
 	bool bIsCompleteReload = false;
 
-	FVector direction;
+	bool bIsPlayingDodge = false;
 
 	bool bIsShot = false;
 
@@ -170,4 +173,6 @@ public:
 	}
 
 	void SetDrawStrength(float strength);
+
+	void SetPlayingDodge(bool isPlaying);
 };
