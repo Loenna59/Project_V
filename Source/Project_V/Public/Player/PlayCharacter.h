@@ -119,7 +119,7 @@ public:
 	void SpawnArrow();
 
 	void PlaceArrowOnBow();
-	
+
 private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
@@ -156,4 +156,6 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<class AArrow> arrow;
+
+	FVector CalculateAnimToVector();
 };

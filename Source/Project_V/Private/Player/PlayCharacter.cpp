@@ -10,9 +10,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "KismetTraceUtils.h"
 #include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Concepts/Iterable.h"
+#include "Evaluation/Blending/MovieSceneBlendType.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/Arrow.h"
 
 // Sets default values
@@ -394,7 +398,7 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 	{
 		if (arrow.IsValid())
 		{
-			arrow->Fire(drawStrength / targetDrawStrength);
+			arrow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
 			arrow = nullptr;
 		}
 		
@@ -419,4 +423,19 @@ void APlayCharacter::PlaceArrowOnBow()
 		arrow->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
 		arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
+}
+
+FVector APlayCharacter::CalculateAnimToVector()
+{
+	FVector start = anchoredCameraComp->GetComponentLocation();
+	FVector end = start + anchoredCameraComp->GetForwardVector() * 10000;
+
+	TArray<AActor*> ignores;
+	ignores.Add(this);
+
+	FHitResult hitResult;
+
+	bool isHit = UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, TraceTypeQuery1, false, ignores, EDrawDebugTrace::None, hitResult, true);
+
+	return isHit? hitResult.Location : hitResult.TraceEnd;
 }

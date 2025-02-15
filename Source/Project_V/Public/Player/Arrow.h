@@ -31,13 +31,13 @@ public:
 	class UParticleSystem* tailVFX;
 
 	UPROPERTY(EditAnywhere, Category=Settings)
-	float initialSpeed = 2000;
+	float initialSpeed = 5000;
 
 	UPROPERTY(EditAnywhere, Category=Settings)
-	float maxSpeed = 2000;
+	float maxSpeed = 5000;
 	
 	UFUNCTION()
-	void Fire(float alpha);
+	void Fire(FVector to, float alpha);
 
 	UFUNCTION()
 	void OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

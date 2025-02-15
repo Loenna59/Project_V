@@ -30,8 +30,6 @@ AArrow::AArrow()
 
     // 물리 속성 설정
     projectileMovementComp->ProjectileGravityScale = 1;
-    projectileMovementComp->InitialSpeed = initialSpeed;
-    projectileMovementComp->MaxSpeed = maxSpeed;
     projectileMovementComp->bShouldBounce = false;
 	projectileMovementComp->bAutoActivate = false;
 	projectileMovementComp->bRotationFollowsVelocity = true;
@@ -51,14 +49,19 @@ void AArrow::BeginPlay()
 {
 	Super::BeginPlay();
 
+	projectileMovementComp->InitialSpeed = initialSpeed;
+	projectileMovementComp->MaxSpeed = maxSpeed;
 	mesh->OnComponentBeginOverlap.AddDynamic(this, &AArrow::OnOverlapped);
 }
 
-void AArrow::Fire(float alpha)
+void AArrow::Fire(FVector to, float alpha)
 {
-	FVector currentVelocity = GetActorForwardVector() * initialSpeed * FMath::Clamp(alpha, 0, 1);
+	FVector direction = (to - GetActorLocation()).GetSafeNormal();
+	
+	FVector currentVelocity = direction * initialSpeed * FMath::Clamp(alpha, 0, 1);
 	
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	
 	projectileMovementComp->Velocity = currentVelocity;
 	projectileMovementComp->SetActive(true);
 	projectileMovementComp->Activate();
