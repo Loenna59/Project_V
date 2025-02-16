@@ -76,14 +76,22 @@ protected:
 
 	// Charge
 	UPROPERTY()
-	float ChargePatternTime{2.0};
+	float recoilTime{1.5};
+	UPROPERTY()
+	float ChargePatternTime = recoilTime + 2.0;
 	UPROPERTY()
 	bool ChargeFlag{false};
 	UPROPERTY()
+	bool ChargeStart{false};
+	UPROPERTY()
 	FVector PerposeLocation;
+	UPROPERTY()
+	FTimerHandle ChargeTimerHandle;
+
+	
 	// Tail
 	UPROPERTY()
-	float TailPatternTime{1.5};
+	float TailPatternTime{1.0};
 
 	// Machine Gun
 	UPROPERTY()
@@ -94,9 +102,11 @@ protected:
 	float MachineGunDelay{0.1};
 	UPROPERTY()
 	float MachineGunPatternTime{3.0};
+	
 	// Disc Launcher
 	UPROPERTY()
 	float DiscLauncherPatternTime{3.0};
+	
 	// Mouse Laser
 	UPROPERTY()
 	float MouseLaserPatternTime{3.0};

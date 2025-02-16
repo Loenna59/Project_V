@@ -8,6 +8,7 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
 
@@ -144,7 +145,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int randomNum = FMath::RandRange(0,1);
+		int randomNum = FMath::RandRange(0,0);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -182,11 +183,34 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 	if (!ChargeFlag)
 	{
 		ChargeFlag = true;
+		ChargeStart = false;
 		PerposeLocation = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
+		
+		TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
+		GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle,[this,WeakBoss]()
+		{
+			if (WeakBoss.IsValid())
+			{
+				PRINTLOG(TEXT("Using Charge"));
+				ChargeStart = true;
+			}
+		},recoilTime,false);
 	}
-	PRINTLOG(TEXT("Using Charge"));
-	Boss->AddMovementInput(PerposeLocation, 10.0f);
-	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
+
+	if (!ChargeStart)
+	{
+		// 플레이어를 바라보면서 뒷걸음질을 하기 위해 움직이는 방향으로 회전하지 않게 막음
+		Boss->GetCharacterMovement()->bOrientRotationToMovement = false;
+		// 플레이어를 바라보게 몸을 돌려줌
+		RotateToTarget(Boss,1.0f);
+		Boss->AddMovementInput(-PerposeLocation, 5.0f);
+	}
+	else
+	{
+		Boss->GetCharacterMovement()->bOrientRotationToMovement = true;
+		Boss->AddMovementInput(PerposeLocation,10.0f);
+		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
+	}
 }
 
 void UBossCombatState::Tail(AThunderJaw* Boss)
