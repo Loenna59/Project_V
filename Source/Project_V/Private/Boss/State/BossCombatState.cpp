@@ -22,28 +22,43 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	Super::Update(Boss, FSM, DeltaTime);
 
 	// 몸을 돌리는 중이면 공격하지 않음
-	if (Boss->bIsRotateBody)
+	if (bIsRotateBody)
 	{
 		RotateToTarget(Boss,1.0);
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 		
-		// enemy의 시야각 까지 돌렸으면 false로 변경
-		if (Boss->GetBossAIController()->FacingDot > 0.7)
+		// enemy의 정면까지 돌렸으면 false로 변경
+		if (Boss->GetBossAIController()->FacingDot > 0.9)
 		{
-			Boss->bIsRotateBody = false;
+			bIsRotateBody = false;
+			StartChoosingPatternCycle(Boss);
 		}
 	}
 	// 몸을 다돌린 후 다시 플레이어가 앞에 있는지 확인
 	// 이 후 플레이어와의 거리를 계산해서 거리에 따른 공격
 	else
 	{
-		if (Boss->GetBossAIController()->FacingDot > 0)
+		if (Boss->GetBossAIController()->FacingDot > 0 ||
+			UsingPattern != EAttackPattern::None)
 		{
-			Attack(Boss,DeltaTime);
+			if (bIsDelay)
+			{
+				return;
+			}
+			
+			PatternCurrentTime += DeltaTime;
+			if (PatternCurrentTime > PatternTime)
+			{
+				StartChoosingPatternCycle(Boss);
+			}
+			else
+			{
+				Attack(Boss,DeltaTime);
+			}
 		}
-		else
+		else if (Boss->GetBossAIController()->FacingDot <= 0)
 		{
-			Boss->bIsRotateBody = true;
+			bIsRotateBody = true;
 		}
 	}
 }
@@ -64,77 +79,67 @@ void UBossCombatState::RotateToTarget(AThunderJaw* Boss, float InterpSpeed)
 
 void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
 {
-	if (bIsDelay)
+	switch (UsingPattern)
 	{
-		return;
+	case EAttackPattern::Charge:
+		Charge(Boss);
+		break;
+	case EAttackPattern::Tail:
+		Tail(Boss);
+		break;
+	case EAttackPattern::MachineGun:
+		MachineGun(Boss);
+		break;
+	case EAttackPattern::DiscLauncher:
+		DiscLauncher(Boss);
+		break;
+	case EAttackPattern::MouseLaser:
+		MouseLaser(Boss);
+		break;
+	default:
+		break;
 	}
-	
-	PatternCurrentTime += DeltaTime;
-	if (PatternCurrentTime >= PatternTime)
-	{
-		PRINTLOG(TEXT("ChangePattern"));
-		PatternCurrentTime = 0;
-		StartPattern(Boss);
-	}
-	else
-	{
-		switch (UsingPattern)
-		{
-		case EAttackPattern::Charge:
-			Charge(Boss);
-			break;
-		case EAttackPattern::Tail:
-			Tail(Boss);
-			break;
-		case EAttackPattern::MachineGun:
-			MachineGun(Boss);
-			break;
-		case EAttackPattern::DiscLauncher:
-			DiscLauncher(Boss);
-			break;
-		case EAttackPattern::MouseLaser:
-			MouseLaser(Boss);
-			break;
-		default:
-			break;
-		}
-	}
-
 }
 
-void UBossCombatState::StartPattern(AThunderJaw* Boss)
+void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 {
+	PRINTLOG(TEXT("startpattern"));
 	if (GetWorld()->GetTimerManager().IsTimerActive(PatternTimerHandle))
 	{
-		return;
+		PRINTLOG(TEXT("timer exist"));
+		GetWorld()->GetTimerManager().ClearTimer(PatternTimerHandle);
 	}
-	
+
 	bIsDelay = true;
+
+	// 패턴관련 변수 초기화
+	UsingPattern = EAttackPattern::None;
+	PatternCurrentTime = 0;
+	PatternTime = 0;
+
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
 	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
 		[this,WeakBoss]()
 		{
 			if (WeakBoss.IsValid())
 			{
-				PatternDelayEnd(WeakBoss.Get());
+				DelayEndBeforeChoosingPattern(WeakBoss.Get());
 			}
 		},PatternDelay,false);
 }
 
-void UBossCombatState::PatternDelayEnd(AThunderJaw* Boss)
+void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
 {
+	PRINTLOG(TEXT("PatternDelayEnd"));
 	bIsDelay = false;
-	GetWorld()->GetTimerManager().ClearTimer(PatternTimerHandle);
-
-	// 한번만 실행되는 공격들 flag 초기화
 	ChargeFlag = false;
-
 	
 	ChooseRandomPattern(Boss);
 }
 
 void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 {
+	PRINTLOG(TEXT("ChooseRandomPattern"));
 	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
 
 	if (Dist <= Boss->MeleeAttackDist)
@@ -176,15 +181,15 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 {
 	// 프레임 한번만 불리면 boss가 원하는 위치로 이동하지 못하는 문제발생
 	// 수정필요
+
 	if (!ChargeFlag)
 	{
-		PRINTLOG(TEXT("Using Charge"));
 		ChargeFlag = true;
-		FVector targetPos = Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation();
-		//targetPos.Normalize();
-
-		Boss->GetBossAnimInstance()->OnPlayChargeMontage();
+		PerposeLocation = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
 	}
+	PRINTLOG(TEXT("Using Charge"));
+	Boss->AddMovementInput(PerposeLocation, 10.0f);
+	Boss->GetBossAnimInstance()->OnPlayChargeMontage();
 }
 
 void UBossCombatState::Tail(AThunderJaw* Boss)

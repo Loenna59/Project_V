@@ -12,7 +12,8 @@
 UENUM()
 enum class EAttackPattern : uint8
 {
-	Charge = 0,
+	None = 0,
+	Charge,
 	Tail,
 	MachineGun,
 	DiscLauncher,
@@ -37,9 +38,9 @@ protected:
 	UFUNCTION()
 	void ChooseRandomPattern(AThunderJaw* Boss);
 	UFUNCTION()
-	void StartPattern(AThunderJaw* Boss);
+	void StartChoosingPatternCycle(AThunderJaw* Boss);
 	UFUNCTION()
-	void PatternDelayEnd(AThunderJaw* Boss);
+	void DelayEndBeforeChoosingPattern(AThunderJaw* Boss);
 	
 	// Melee Attack
 	UFUNCTION()
@@ -56,6 +57,8 @@ protected:
 	void MouseLaser(AThunderJaw* Boss);
 
 protected:
+	UPROPERTY()
+	bool bIsRotateBody{false};
 	// Pattern
 	UPROPERTY()
 	float PatternCurrentTime{0.0};
@@ -73,9 +76,11 @@ protected:
 
 	// Charge
 	UPROPERTY()
-	float ChargePatternTime{2.0};
+	float ChargePatternTime{2.5};
 	UPROPERTY()
 	bool ChargeFlag{false};
+	UPROPERTY()
+	FVector PerposeLocation;
 	// Tail
 	UPROPERTY()
 	float TailPatternTime{2.0};
