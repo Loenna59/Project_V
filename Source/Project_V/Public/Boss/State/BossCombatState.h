@@ -76,14 +76,14 @@ protected:
 
 	// Charge
 	UPROPERTY()
-	float ChargePatternTime{2.5};
+	float ChargePatternTime{2.0};
 	UPROPERTY()
 	bool ChargeFlag{false};
 	UPROPERTY()
 	FVector PerposeLocation;
 	// Tail
 	UPROPERTY()
-	float TailPatternTime{2.0};
+	float TailPatternTime{1.5};
 
 	// Machine Gun
 	UPROPERTY()

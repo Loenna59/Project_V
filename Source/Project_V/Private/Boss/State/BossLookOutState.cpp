@@ -9,7 +9,7 @@
 void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	Boss->GetBossAnimInstance()->OnPlayRageMontage();
+	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Rage);
 }
 
 void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)

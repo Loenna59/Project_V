@@ -25,7 +25,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	if (bIsRotateBody)
 	{
 		RotateToTarget(Boss,1.0);
-		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
 		
 		// enemy의 정면까지 돌렸으면 false로 변경
 		if (Boss->GetBossAIController()->FacingDot > 0.9)
@@ -144,7 +144,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int randomNum = FMath::RandRange(0,0);
+		int randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -179,9 +179,6 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 void UBossCombatState::Charge(AThunderJaw* Boss)
 {
-	// 프레임 한번만 불리면 boss가 원하는 위치로 이동하지 못하는 문제발생
-	// 수정필요
-
 	if (!ChargeFlag)
 	{
 		ChargeFlag = true;
@@ -189,12 +186,13 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 	}
 	PRINTLOG(TEXT("Using Charge"));
 	Boss->AddMovementInput(PerposeLocation, 10.0f);
-	Boss->GetBossAnimInstance()->OnPlayChargeMontage();
+	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
 }
 
 void UBossCombatState::Tail(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Tail"));
+	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
@@ -202,6 +200,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using Machine Gun"));
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
 	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
+	FVector dir = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -209,14 +208,16 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	if (MachineGunDelayCurrentTime > MachineGunDelay)
 	{
 		MachineGunDelayCurrentTime = 0;
-		Boss->GetLMachineGun()->CreateBullet(Lt);
-		Boss->GetRMachineGun()->CreateBullet(Rt);
+		Boss->GetLMachineGun()->CreateBullet(Lt,dir);
+		Boss->GetRMachineGun()->CreateBullet(Rt,dir);
 	}
 	
 	RotateToTarget(Boss,0.7);
 
 	if (Boss->GetBossAIController()->FacingDot < 0.85)
-		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+	{
+		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
+	}
 }
 
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)

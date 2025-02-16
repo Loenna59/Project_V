@@ -73,9 +73,13 @@ void AMachineGun::InitComponents()
 	}
 }
 
-void AMachineGun::CreateBullet(FTransform transform)
+void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 {
-	GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
+	AMachineGunBullet* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
+	if (bullet)
+	{
+		bullet->FireInDirection(direction);
+	}
 }
 
 void AMachineGun::OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

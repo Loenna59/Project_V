@@ -59,7 +59,8 @@ void AThunderJaw::InitComponents()
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
-		GetMesh()->SetRelativeLocation(FVector(0,0,-70.0f));
+		GetMesh()->SetRelativeLocation(FVector(0,0,-100.0));
+		GetMesh()->SetRelativeRotation(FRotator(0,-90,0));
 	}
 
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("'/Game/Blueprints/Boss/Animation/ABP_ThunderJaw.ABP_ThunderJaw_C'"));

@@ -9,7 +9,15 @@
 /**
  * 
  */
-
+UENUM(BlueprintType)
+enum class EBossMontage : uint8
+{
+	None,
+	Turn,
+	Rage,
+	Charge,
+	Tail
+};
 UCLASS()
 class PROJECT_V_API UThunderJawAnimInstance : public UAnimInstance
 {
@@ -19,11 +27,7 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
-	void OnPlayTurnMontage();
-	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
-	void OnPlayChargeMontage();
-	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
-	void OnPlayRageMontage();	
+	void OnPlayMontage(EBossMontage montage);
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")

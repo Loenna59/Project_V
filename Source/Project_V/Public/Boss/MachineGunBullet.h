@@ -25,6 +25,8 @@ protected:
 	void OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
+	UFUNCTION()
+	void FireInDirection(const FVector& Direction);
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")

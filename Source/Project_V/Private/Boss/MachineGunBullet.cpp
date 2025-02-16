@@ -68,8 +68,8 @@ void AMachineGunBullet::InitComponents()
 	if (PMC)
 	{
 		PMC->SetUpdatedComponent(Root);
-		PMC->InitialSpeed = 5000.0f;
-		PMC->MaxSpeed = 5000.0f;
+		PMC->InitialSpeed = 3000.0f;
+		PMC->MaxSpeed = 3000.0f;
 		PMC->bRotationFollowsVelocity = true;
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
@@ -81,4 +81,9 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
+}
+
+void AMachineGunBullet::FireInDirection(const FVector& Direction)
+{
+	PMC->Velocity = Direction * PMC->InitialSpeed;
 }
