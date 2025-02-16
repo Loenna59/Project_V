@@ -37,4 +37,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	TSubclassOf<class AMachineGunBullet> BulletFactory;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MaxHP{100};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float CurrentHP{CurrentHP = MaxHP};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bIsBroken{false};	
 };

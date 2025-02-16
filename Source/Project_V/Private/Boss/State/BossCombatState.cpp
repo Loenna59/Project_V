@@ -150,7 +150,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int randomNum = FMath::RandRange(0,0);
+		int randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;

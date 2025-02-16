@@ -9,6 +9,8 @@
 void UBossIdleState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
+	Boss->GetEyeMatInst()->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
+	Boss->GetEyeMatInst()->SetScalarParameterValue(FName("EmissivePower"),100);
 	Boss->GetBossAIController()->StopMovement();
 }
 

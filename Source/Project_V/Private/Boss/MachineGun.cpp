@@ -85,4 +85,8 @@ void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 void AMachineGun::OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (CurrentHP <= 0)
+	{
+		bIsBroken = true;
+	}
 }
