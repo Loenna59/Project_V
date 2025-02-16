@@ -31,7 +31,7 @@ public:
 
 protected:
 	UFUNCTION()
-	void RotateToTarget(AThunderJaw* Boss, float InterpSpeed);
+	void RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed);
 	
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss, float DeltaTime);

@@ -29,6 +29,20 @@ void AThunderJaw::BeginPlay()
 	{
 		PRINTLOG(TEXT("BossAIController Cast Failed"));
 	}
+
+	UMaterialInterface* BaseMat = GetMesh()->GetMaterial(1);
+	if (BaseMat)
+	{
+		EyeMatInst = UMaterialInstanceDynamic::Create(BaseMat,this);
+		GetMesh()->SetMaterial(1,EyeMatInst);
+	}
+
+	if (EyeMatInst)
+	{
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),100);
+	}
+	
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
@@ -68,6 +82,8 @@ void AThunderJaw::InitComponents()
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
+
+	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 	
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
@@ -85,6 +101,11 @@ AThunderJawAIController* AThunderJaw::GetBossAIController()
 class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance()
 {
 	return BossAnimInstance;
+}
+
+class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst()
+{
+	return EyeMatInst;
 }
 
 APlayCharacter* AThunderJaw::GetAloy()
