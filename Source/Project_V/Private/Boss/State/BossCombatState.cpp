@@ -118,6 +118,12 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	PatternCurrentTime = 0;
 	PatternTime = 0;
 
+	if (ChargeFlag)
+	{
+		ChargeFlag = false;
+		Boss->GetCharacterMovement()->MaxWalkSpeed /= 2.0;
+	}
+
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
 	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
 		[this,WeakBoss]()
@@ -133,8 +139,6 @@ void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("PatternDelayEnd"));
 	bIsDelay = false;
-	ChargeFlag = false;
-	
 	ChooseRandomPattern(Boss);
 }
 
@@ -149,7 +153,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
-			PatternTime = ChargePatternTime;
+			PatternTime = recoilTime + ChargeTime;
 		}
 		else if (randomNum == 1)
 		{
@@ -185,17 +189,19 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		ChargeFlag = true;
 		ChargeStart = false;
 		PerposeLocation = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
-		
+
 		TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
-		GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle,[this,WeakBoss]()
+		GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle,[this, WeakBoss]()
 		{
 			if (WeakBoss.IsValid())
 			{
-				PRINTLOG(TEXT("Using Charge"));
 				ChargeStart = true;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 2.0;
 			}
 		},recoilTime,false);
 	}
+	
+	PRINTLOG(TEXT("Using Charge"));
 
 	if (!ChargeStart)
 	{
@@ -203,12 +209,13 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		Boss->GetCharacterMovement()->bOrientRotationToMovement = false;
 		// 플레이어를 바라보게 몸을 돌려줌
 		RotateToTarget(Boss,1.0f);
-		Boss->AddMovementInput(-PerposeLocation, 5.0f);
+		Boss->AddMovementInput(-PerposeLocation);
 	}
 	else
 	{
+		// 돌진 전에 한 설정 되돌리기
 		Boss->GetCharacterMovement()->bOrientRotationToMovement = true;
-		Boss->AddMovementInput(PerposeLocation,10.0f);
+		Boss->AddMovementInput(PerposeLocation);
 		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
 	}
 }

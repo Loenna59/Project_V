@@ -78,7 +78,7 @@ protected:
 	UPROPERTY()
 	float recoilTime{1.5};
 	UPROPERTY()
-	float ChargePatternTime = recoilTime + 2.0;
+	float ChargeTime{2.0};
 	UPROPERTY()
 	bool ChargeFlag{false};
 	UPROPERTY()
