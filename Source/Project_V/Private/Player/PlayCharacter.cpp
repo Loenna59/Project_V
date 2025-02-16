@@ -111,7 +111,7 @@ APlayCharacter::APlayCharacter()
 
 	if (tmp_ia_sprint.Succeeded())
 	{
-		ia_sprint = tmp_ia_sprint.Object;
+		ia_shift = tmp_ia_sprint.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_move_pressed(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerMovePressed.IA_PlayerMovePressed'"));
@@ -164,6 +164,9 @@ APlayCharacter::APlayCharacter()
 	arrowSlotComp->SetupAttachment(weaponComp, TEXT("bowstring"));
 	arrowSlotComp->SetRelativeLocation(FVector(25, 0, 0));
 	arrowSlotComp->SetRelativeScale3D(FVector(1.1f));
+
+	targetFOV = maxFOV;
+	targetMultiplier = releaseMotionMultiplier;
 }
 
 // Called when the game starts or when spawned
@@ -238,6 +241,12 @@ void APlayCharacter::Tick(float DeltaTime)
 			anchoredCameraComp->SetActive(true);
 		}
 	}
+
+	if (anchoredCameraComp->FieldOfView != targetFOV)
+	{
+		float fov = FMath::Lerp(anchoredCameraComp->FieldOfView, targetFOV, DeltaTime * targetMultiplier);
+		anchoredCameraComp->SetFieldOfView(FMath::Clamp(fov, minFOV, maxFOV));
+	}
 }
 
 // Called to bind functionality to input
@@ -246,14 +255,14 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	auto pi = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-
+	
 	if (pi)
 	{
 		pi->BindAction(ia_move, ETriggerEvent::Triggered, this, &APlayCharacter::Move);
 		pi->BindAction(ia_rotate, ETriggerEvent::Triggered, this, &APlayCharacter::Rotate);
 		pi->BindAction(ia_jump, ETriggerEvent::Started, this, &APlayCharacter::ActionJump);
-		pi->BindAction(ia_sprint, ETriggerEvent::Triggered, this, &APlayCharacter::Sprint);
-		pi->BindAction(ia_sprint, ETriggerEvent::Completed, this, &APlayCharacter::Sprint);
+		pi->BindAction(ia_shift, ETriggerEvent::Triggered, this, &APlayCharacter::OnTriggerShift);
+		pi->BindAction(ia_shift, ETriggerEvent::Completed, this, &APlayCharacter::OnTriggerShift);
 		pi->BindAction(ia_movePressed, ETriggerEvent::Triggered, this, &APlayCharacter::BeginDodge);
 		pi->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &APlayCharacter::Dodge);
 		pi->BindAction(ia_anchored, ETriggerEvent::Started, this, &APlayCharacter::OnAnchor);
@@ -302,12 +311,23 @@ void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
 	ACharacter::Jump();
 }
 
-void APlayCharacter::Sprint(const FInputActionValue& actionValue)
+void APlayCharacter::OnTriggerShift(const FInputActionValue& actionValue)
 {
-	bool value = actionValue.Get<bool>();
-	float speed = value? sprintSpeed : walkSpeed;
-
-	GetCharacterMovement()->MaxWalkSpeed = speed;
+	if (bIsAnchored && drawStrength > 0)
+	{
+		// zoom mode
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), slowDilation); 
+		GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+		targetFOV = minFOV;
+		targetMultiplier = slowMotionMultiplier;
+	}
+	else
+	{
+		bool value = actionValue.Get<bool>();
+		float speed = value? sprintSpeed : walkSpeed;
+	
+		GetCharacterMovement()->MaxWalkSpeed = speed;
+	}
 }
 
 void APlayCharacter::BeginDodge(const FInputActionValue& actionValue)
@@ -400,6 +420,7 @@ void APlayCharacter::OnAnchorRelease()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 	SetDrawStrength(0);
+	anchoredCameraComp->SetFieldOfView(maxFOV);
 	bIsAnchored = false;
 	elapsedDrawingTime = 0;
 
@@ -501,6 +522,13 @@ void APlayCharacter::SetDrawStrength(float strength)
 	if (ui)
 	{
 		ui->Crosshair->UpdateCircle(strength);
+	}
+
+	if (drawStrength < 0.01f)
+	{
+		targetFOV = maxFOV;
+		targetMultiplier = releaseMotionMultiplier;
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f); 
 	}
 }
 

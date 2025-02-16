@@ -53,28 +53,38 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class AArrow> arrowFactory;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float walkSpeed = 600;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float sprintSpeed = 1200;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float dodgeSpeed = 800;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	double minPinchDegrees = 50;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float cameraTransitionSpeedMultiplier = 5.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float targetDrawStrength = 100.0f; // 활시위 최대값
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float drawDuration = 1.f; // 활시위가 최대로 당길 때 까지 걸리는 시간
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float slowDilation = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float slowMotionMultiplier = 5.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float releaseMotionMultiplier = 10.f;
+
 	FVector2D prevDodgeAxis;
+	
 	FVector2D dodgeAxis;
 	
 	FVector direction;
@@ -99,7 +109,7 @@ public:
 	void ActionJump(const FInputActionValue& actionValue);
 
 	UFUNCTION()
-	void Sprint(const FInputActionValue& actionValue);
+	void OnTriggerShift(const FInputActionValue& actionValue);
 
 	UFUNCTION()
 	void BeginDodge(const FInputActionValue& actionValue);
@@ -124,6 +134,9 @@ public:
 	void PlaceArrowOnBow();
 
 private:
+	const float maxFOV = 90;
+	const float minFOV = 40; 
+	
 	UPROPERTY()
 	class UInputMappingContext* imc;
 
@@ -137,7 +150,7 @@ private:
 	class UInputAction* ia_jump;
 
 	UPROPERTY()
-	class UInputAction* ia_sprint;
+	class UInputAction* ia_shift;
 
 	UPROPERTY()
 	class UInputAction* ia_movePressed;
@@ -160,6 +173,10 @@ private:
 	float targetBlendCameraAlpha;
 
 	float elapsedDrawingTime; // 활 시위 경과 시간
+
+	float targetFOV;
+
+	float targetMultiplier;
 
 	UPROPERTY()
 	TWeakObjectPtr<class AArrow> arrow;
