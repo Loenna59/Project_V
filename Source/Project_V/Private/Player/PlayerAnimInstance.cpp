@@ -3,6 +3,7 @@
 
 #include "Player/PlayerAnimInstance.h"
 
+#include "Project_V.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerWeapon.h"
@@ -14,18 +15,11 @@ void UPlayerAnimInstance::NativeBeginPlay()
 
 	player = CastChecked<APlayCharacter>(GetOwningActor());
 	movementComponent = player->GetCharacterMovement();
+}
 
-	if (player)
-	{
-		if (player->bow)
-		{
-			UAnimInstance* anim = player->bow->GetAnimInstance();
-			if (anim)
-			{
-				weaponAnim = CastChecked<UWeaponAnim>(anim);
-			}
-		}
-	}
+void UPlayerAnimInstance::SetWeaponAnim(UAnimInstance* anim)
+{
+	weaponAnim = CastChecked<UWeaponAnim>(anim);
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

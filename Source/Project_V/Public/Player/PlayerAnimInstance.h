@@ -66,4 +66,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category=Dodge)
 	void OnMoveDodge();
+
+	void SetWeaponAnim(UAnimInstance* anim);
 };

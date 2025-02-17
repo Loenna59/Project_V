@@ -14,6 +14,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerHUD.h"
@@ -33,13 +34,6 @@ APlayCharacter::APlayCharacter()
 	if (tmp_skeletalMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tmp_skeletalMesh.Object);
-	}
-
-	ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> tmp(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player_C'"));
-	if (tmp.Succeeded())
-	{
-		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		GetMesh()->SetAnimInstanceClass(tmp.Object);
 	}
 	
 	bUseControllerRotationYaw = false;
@@ -155,6 +149,13 @@ APlayCharacter::APlayCharacter()
 		equipWeaponMontage = tmp_montage.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> tmp(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player_C'"));
+	if (tmp.Succeeded())
+	{
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		GetMesh()->SetAnimInstanceClass(tmp.Object);
+	}
+
 	targetFOV = maxFOV;
 	targetMultiplier = releaseMotionMultiplier;
 }
@@ -179,7 +180,7 @@ void APlayCharacter::BeginPlay()
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
 
-	if (bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory))
+	if ((bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory)))
 	{
 		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BowSocket"));
 		
@@ -196,6 +197,16 @@ void APlayCharacter::BeginPlay()
 		ui = hud->GetPlayerUI();
 		ui->SetVisibleUI(CameraMode::Default);
 		SetCurrentHealth(maxHealth);
+	}
+
+	UAnimInstance* anim = GetMesh()->GetAnimInstance();
+
+	if (anim && bow)
+	{
+		if (UPlayerAnimInstance* playerAnim = Cast<UPlayerAnimInstance>(anim))
+		{
+			playerAnim->SetWeaponAnim(bow->GetAnimInstance());
+		}
 	}
 }
 
