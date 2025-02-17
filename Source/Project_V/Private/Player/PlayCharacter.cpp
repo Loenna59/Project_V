@@ -203,6 +203,7 @@ void APlayCharacter::BeginPlay()
 	{
 		ui = hud->GetPlayerUI();
 		ui->SetVisibleUI(CameraMode::Default);
+		SetCurrentHealth(maxHealth);
 	}
 }
 
@@ -365,7 +366,7 @@ void APlayCharacter::Dodge()
 		return;
 	}
 	
-	bIsDodge = dodgeAxis != FVector2D::ZeroVector;;
+	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
 
 	if (bIsAnchored)
 	{
@@ -540,5 +541,14 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 	{
 		prevDodgeAxis = FVector2D::ZeroVector;
 		dodgeAxis = FVector2D::ZeroVector;
+	}
+}
+
+void APlayCharacter::SetCurrentHealth(float health)
+{
+	currentHealth = health;
+	if (ui)
+	{
+		ui->SetHealthUI(currentHealth, maxHealth);
 	}
 }

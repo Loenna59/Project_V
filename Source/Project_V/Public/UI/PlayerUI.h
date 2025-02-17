@@ -25,5 +25,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UCrosshairUI* Crosshair;
 
+	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
+	class UPlayerHPUI* HealthUI;
+
 	void SetVisibleUI(CameraMode mode);
+
+	void SetHealthUI(float current, float max);
 };

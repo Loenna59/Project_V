@@ -83,6 +83,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float releaseMotionMultiplier = 10.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
+	float maxHealth = 100;
+
 	FVector2D prevDodgeAxis;
 	
 	FVector2D dodgeAxis;
@@ -178,6 +181,8 @@ private:
 
 	float targetMultiplier;
 
+	float currentHealth;
+
 	UPROPERTY()
 	TWeakObjectPtr<class AArrow> arrow;
 
@@ -192,4 +197,6 @@ public:
 	void SetDrawStrength(float strength);
 
 	void SetPlayingDodge(bool isPlaying);
+
+	void SetCurrentHealth(float health);
 };
