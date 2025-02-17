@@ -122,7 +122,7 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	if (ChargeFlag)
 	{
 		ChargeFlag = false;
-		Boss->GetCharacterMovement()->MaxWalkSpeed /= 2.0;
+		Boss->GetCharacterMovement()->MaxWalkSpeed /= 1.75;
 	}
 
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
@@ -197,7 +197,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 2.0;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 1.75;
 			}
 		},recoilTime,false);
 	}
@@ -225,6 +225,7 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Tail"));
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
+	
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)

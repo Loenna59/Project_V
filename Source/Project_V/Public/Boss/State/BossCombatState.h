@@ -110,5 +110,4 @@ protected:
 	// Mouse Laser
 	UPROPERTY()
 	float MouseLaserPatternTime{3.0};
-
 };

@@ -23,7 +23,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void InitComponents();
+	void InitConstruct();
+	UFUNCTION()
+	void InitBeginPlay();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -60,7 +62,11 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float CombatDist {1000.0f};
+	float MaxHP{1000.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{500.0f};
+	float CurrentHP{CurrentHP = MaxHP};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float CombatDist {1200.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float MeleeAttackDist{1000.0f};
 };

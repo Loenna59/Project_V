@@ -17,7 +17,7 @@ AThunderJaw::AThunderJaw()
 
 	AIControllerClass = AThunderJawAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	InitComponents();
+	InitConstruct();
 }
 
 void AThunderJaw::BeginPlay()
@@ -25,35 +25,7 @@ void AThunderJaw::BeginPlay()
 	Super::BeginPlay();
 	// controller가 생성자에서 할당되지 않기에 Beginplay에서 casting해줌
 	
-	UMaterialInterface* BaseMat = GetMesh()->GetMaterial(1);
-	if (BaseMat)
-	{
-		EyeMatInst = UMaterialInstanceDynamic::Create(BaseMat,this);
-		GetMesh()->SetMaterial(1,EyeMatInst);
-	}
-
-	if (EyeMatInst)
-	{
-		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
-		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),500);
-	}
-	
-
-	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
-	if (LMachineGun)
-	{
-		LMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
-	}
-	
-	RMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
-	if (RMachineGun)
-	{
-		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
-	}
-
-	BossAIController = Cast<AThunderJawAIController>(GetController());
-	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
+	InitBeginPlay();
 }
 
 void AThunderJaw::Tick(float DeltaTime)
@@ -70,7 +42,7 @@ void AThunderJaw::Tick(float DeltaTime)
 	}
 }
 
-void AThunderJaw::InitComponents()
+void AThunderJaw::InitConstruct()
 {
 	
 	FSM = CreateDefaultSubobject<UThunderJawFSM>(TEXT("FSM"));
@@ -100,10 +72,41 @@ void AThunderJaw::InitComponents()
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
-
-	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 	
-	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+}
+
+void AThunderJaw::InitBeginPlay()
+{
+	UMaterialInterface* BaseMat = GetMesh()->GetMaterial(1);
+	if (BaseMat)
+	{
+		EyeMatInst = UMaterialInstanceDynamic::Create(BaseMat,this);
+		GetMesh()->SetMaterial(1,EyeMatInst);
+	}
+
+	if (EyeMatInst)
+	{
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),500);
+	}
+
+	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
+	if (LMachineGun)
+	{
+		LMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
+	}
+	
+	RMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
+	if (RMachineGun)
+	{
+		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
+	}
+
+	BossAIController = Cast<AThunderJawAIController>(GetController());
+	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
+	GetCharacterMovement()->MaxWalkSpeed = 500.0f;
 }
 
 UThunderJawFSM* AThunderJaw::GetFSMComponent()

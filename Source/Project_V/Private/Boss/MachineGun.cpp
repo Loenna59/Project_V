@@ -3,8 +3,10 @@
 
 #include "Boss/MachineGun.h"
 
+#include "Project_V.h"
 #include "Boss/MachineGunBullet.h"
 #include "Components/BoxComponent.h"
+#include "Player/Arrow.h"
 
 
 // Sets default values
@@ -35,8 +37,8 @@ void AMachineGun::InitComponents()
 	if (Root)
 	{
 		SetRootComponent(Root);
-		Root->SetRelativeScale3D(FVector(3.0));
-		Root->SetBoxExtent(FVector(18.0,10.0,10.0));
+		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
+		Root->SetBoxExtent(FVector(18.0,12.0,12.0));
 		Root->SetGenerateOverlapEvents(true);
 	}
 
@@ -86,8 +88,15 @@ void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 void AMachineGun::OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (CurrentHP <= 0)
+	PRINTLOG(TEXT("machine gun hit"));
+	auto* arrow = Cast<AArrow>(OtherActor);
+	if (arrow)
 	{
-		bIsBroken = true;
+		CurrentHP -= 10.0f;
+		if (CurrentHP <= 0)
+		{
+			bIsBroken = true;
+		}
 	}
+	
 }

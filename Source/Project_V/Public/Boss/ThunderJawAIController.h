@@ -64,7 +64,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DistanceFromTarget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DetectDist{1600.0};
+	float DetectDist{2000.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float LoseTargetTime{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

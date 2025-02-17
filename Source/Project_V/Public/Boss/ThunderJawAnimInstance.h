@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ThunderJawFSM.h"
 #include "Animation/AnimInstance.h"
 #include "ThunderJawAnimInstance.generated.h"
 
