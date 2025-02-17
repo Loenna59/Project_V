@@ -232,7 +232,8 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using Machine Gun"));
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
 	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
-	FVector dir = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
+	FVector Ldir = (Boss->GetAloy()->GetActorLocation() - Boss->GetLMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
+	FVector Rdir = (Boss->GetAloy()->GetActorLocation() - Boss->GetRMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -240,8 +241,8 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	if (MachineGunDelayCurrentTime > MachineGunDelay)
 	{
 		MachineGunDelayCurrentTime = 0;
-		Boss->GetLMachineGun()->CreateBullet(Lt,dir);
-		Boss->GetRMachineGun()->CreateBullet(Rt,dir);
+		Boss->GetLMachineGun()->CreateBullet(Lt,Ldir);
+		Boss->GetRMachineGun()->CreateBullet(Rt,Rdir);
 	}
 	
 	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),0.7);

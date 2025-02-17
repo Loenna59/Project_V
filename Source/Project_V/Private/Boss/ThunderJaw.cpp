@@ -24,12 +24,7 @@ void AThunderJaw::BeginPlay()
 {
 	Super::BeginPlay();
 	// controller가 생성자에서 할당되지 않기에 Beginplay에서 casting해줌
-	BossAIController = Cast<AThunderJawAIController>(GetController());
-	if (!BossAIController)
-	{
-		PRINTLOG(TEXT("BossAIController Cast Failed"));
-	}
-
+	
 	UMaterialInterface* BaseMat = GetMesh()->GetMaterial(1);
 	if (BaseMat)
 	{
@@ -43,7 +38,6 @@ void AThunderJaw::BeginPlay()
 		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),500);
 	}
 	
-	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
 	if (LMachineGun)
@@ -57,6 +51,8 @@ void AThunderJaw::BeginPlay()
 		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
 	}
 
+	BossAIController = Cast<AThunderJawAIController>(GetController());
+	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
@@ -84,6 +80,7 @@ void AThunderJaw::InitComponents()
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 		GetMesh()->SetRelativeLocation(FVector(0,0,-100.0));
 		GetMesh()->SetRelativeRotation(FRotator(0,-90,0));
+		GetMesh()->SetRelativeScale3D(FVector(3.0));
 	}
 
 	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Assets/SciFi_Beasts_Pack/SciFi_Beast05/Materials/Skin1/Mat_SciFi_Beast05_Armor_Skin1.Mat_SciFi_Beast05_Armor_Skin1'"));

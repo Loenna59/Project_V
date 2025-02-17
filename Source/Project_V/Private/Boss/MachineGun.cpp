@@ -35,6 +35,7 @@ void AMachineGun::InitComponents()
 	if (Root)
 	{
 		SetRootComponent(Root);
+		Root->SetRelativeScale3D(FVector(3.0));
 		Root->SetBoxExtent(FVector(18.0,10.0,10.0));
 		Root->SetGenerateOverlapEvents(true);
 	}

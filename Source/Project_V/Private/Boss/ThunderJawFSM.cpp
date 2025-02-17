@@ -59,9 +59,9 @@ void UThunderJawFSM::InitStatePool()
 void UThunderJawFSM::InitPatrolPoints()
 {
 	PatrolPoints.Add(FVector(965.0,1310.0,0.0));
-	PatrolPoints.Add(FVector(2335.0,1315.0,0.0));
-	PatrolPoints.Add(FVector(2345.0,2395.0,0.0));
-	PatrolPoints.Add(FVector(985.0,2405.0,0.0));
+	PatrolPoints.Add(FVector(3845.000000,1315.000000,0.000000));
+	PatrolPoints.Add(FVector(3885.000000,4075.000000,0.000000));
+	PatrolPoints.Add(FVector(985.000000,3935.000000,0.000000));
 }
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
