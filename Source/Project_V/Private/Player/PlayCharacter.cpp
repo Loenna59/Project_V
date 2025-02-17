@@ -182,12 +182,12 @@ void APlayCharacter::BeginPlay()
 
 	if ((bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory)))
 	{
-		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BowSocket"));
-		
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		bow->SpawnArrowInBow();
 		bIsCompleteReload = true;
 		//
+
+		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
 	}
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -493,12 +493,12 @@ void APlayCharacter::PickWeapon()
 {
 	if (holdingWeapon.IsValid())
 	{
-		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BowSocket"));
+		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
 		holdingWeapon = nullptr;
 	}
 	else
 	{
-		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_lSocket"));
+		bow->AttachSocket(GetMesh(), TEXT("hand_lSocket"), true);
 		holdingWeapon = bow;
 	}
 }

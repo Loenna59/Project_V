@@ -46,4 +46,6 @@ public:
 	void PlaceOrSpawnArrow();
 
 	bool Fire(FVector direction, float alpha);
+	
+	void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
 };

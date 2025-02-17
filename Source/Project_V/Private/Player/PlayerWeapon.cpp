@@ -126,3 +126,16 @@ bool APlayerWeapon::Fire(FVector direction, float alpha)
 	return true;
 }
 
+void APlayerWeapon::AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow)
+{
+	AttachToComponent(comp, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+
+	if (arrow.IsValid())
+	{
+		if (arrow->mesh)
+		{
+			arrow->mesh->SetVisibility(visibleArrow);
+		}
+	}
+}
+
