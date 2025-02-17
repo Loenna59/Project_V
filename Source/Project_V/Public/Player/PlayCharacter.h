@@ -44,14 +44,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* transitionCameraComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* weaponComp;
+	UPROPERTY(VisibleAnywhere)
+	class APlayerWeapon* bow;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class USceneComponent* arrowSlotComp;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<class AArrow> arrowFactory;
+	TSubclassOf<APlayerWeapon> bowFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float walkSpeed = 600;
@@ -82,6 +79,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float releaseMotionMultiplier = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	class UAnimMontage* equipWeaponMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
@@ -136,6 +136,8 @@ public:
 
 	void PlaceArrowOnBow();
 
+	void PickWeapon();
+	
 private:
 	const float maxFOV = 90;
 	const float minFOV = 40; 
@@ -169,6 +171,8 @@ private:
 
 	class UPlayerUI* ui;
 
+	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
+
 	float drawStrength = 0;
 
 	float currentBlendCameraAlpha;
@@ -182,9 +186,6 @@ private:
 	float targetMultiplier;
 
 	float currentHealth;
-
-	UPROPERTY()
-	TWeakObjectPtr<class AArrow> arrow;
 
 	FVector CalculateAnimToVector();
 

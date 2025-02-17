@@ -10,12 +10,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/Arrow.h"
+#include "Player/PlayerWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
@@ -142,28 +141,19 @@ APlayCharacter::APlayCharacter()
 		ia_fire = tmp_ia_fire.Object;
 	}
 
-	weaponComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	weaponComp->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_weapon(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_bow(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Bow.SKM_Bow'"));
-
-	if (tmp_bow.Succeeded())
+	if (tmp_weapon.Succeeded())
 	{
-		weaponComp->SetSkeletalMesh(tmp_bow.Object);
+		bowFactory = tmp_weapon.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<UAnimInstance> tmp_weaponAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Bow.ABP_Bow_C'"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tmp_montage(TEXT("/Script/Engine.AnimMontage'/Game/Blueprints/Player/Animation/Player_Bow_Hide_Montage.Player_Bow_Hide_Montage'"));
 
-	if (tmp_weaponAnim.Succeeded())
+	if (tmp_montage.Succeeded())
 	{
-		weaponComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		weaponComp->SetAnimInstanceClass(tmp_weaponAnim.Class);
+		equipWeaponMontage = tmp_montage.Object;
 	}
-
-	arrowSlotComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));
-	arrowSlotComp->SetupAttachment(weaponComp, TEXT("bowstring"));
-	arrowSlotComp->SetRelativeLocation(FVector(25, 0, 0));
-	arrowSlotComp->SetRelativeScale3D(FVector(1.1f));
 
 	targetFOV = maxFOV;
 	targetMultiplier = releaseMotionMultiplier;
@@ -189,13 +179,15 @@ void APlayCharacter::BeginPlay()
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
 
-	//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
-	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
-	spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	arrow = spawned_arrow;
-
-	bIsCompleteReload = true;
-	//
+	if (bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory))
+	{
+		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BowSocket"));
+		
+		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
+		bow->SpawnArrowInBow();
+		bIsCompleteReload = true;
+		//
+	}
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
@@ -376,6 +368,11 @@ void APlayCharacter::Dodge()
 
 void APlayCharacter::OnAnchor()
 {
+	if (!holdingWeapon.IsValid() && equipWeaponMontage)
+	{
+		PlayAnimMontage(equipWeaponMontage);
+	}
+	
 	ui->SetVisibleUI(CameraMode::Anchored);
 	
     cameraComp->SetActive(false);
@@ -394,11 +391,7 @@ void APlayCharacter::OnAnchor()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	bIsAnchored = true;
-
-	if (!arrow.IsValid())
-	{
-		SpawnArrow();
-	}
+	bow->SpawnArrowInBow();
 }
 
 void APlayCharacter::OnAnchorRelease()
@@ -425,16 +418,7 @@ void APlayCharacter::OnAnchorRelease()
 	bIsAnchored = false;
 	elapsedDrawingTime = 0;
 
-	if (arrow.IsValid())
-	{
-		PlaceArrowOnBow();
-	}
-	else
-	{
-		AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
-		spawned_arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
-		arrow = spawned_arrow;
-	}
+	bow->PlaceOrSpawnArrow();
 
 	bIsCompleteReload = true;
 }
@@ -468,13 +452,8 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 		{
 			return;
 		}
-		
-		if (arrow.IsValid())
-		{
-			arrow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
-			arrow = nullptr;
-			bIsCompleteReload = false;
-		}
+
+		bIsCompleteReload = bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
 		
 		bIsShot = true;
 		SetDrawStrength(0);
@@ -484,21 +463,33 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 
 void APlayCharacter::SpawnArrow()
 {
-	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(arrowFactory);
-	spawned_arrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("PickArrowSocket"));
-	arrow = spawned_arrow;
+	if (bow)
+	{
+		bow->SpawnArrow(GetMesh(), TEXT("PickArrowSocket"));
+	}
 }
 
 void APlayCharacter::PlaceArrowOnBow()
 {
-	if (arrow.IsValid())
+	if (bow)
 	{
-		arrow->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		arrow->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-		arrow->AttachToComponent(arrowSlotComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		bow->PlaceArrowOnBow();
+		bIsCompleteReload = true;
 	}
+}
 
-	bIsCompleteReload = true;
+void APlayCharacter::PickWeapon()
+{
+	if (holdingWeapon.IsValid())
+	{
+		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BowSocket"));
+		holdingWeapon = nullptr;
+	}
+	else
+	{
+		bow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_lSocket"));
+		holdingWeapon = bow;
+	}
 }
 
 FVector APlayCharacter::CalculateAnimToVector()

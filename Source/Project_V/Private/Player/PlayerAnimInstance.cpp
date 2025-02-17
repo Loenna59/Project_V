@@ -3,9 +3,9 @@
 
 #include "Player/PlayerAnimInstance.h"
 
-#include "Project_V.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
+#include "Player/PlayerWeapon.h"
 #include "Player/WeaponAnim.h"
 
 void UPlayerAnimInstance::NativeBeginPlay()
@@ -17,9 +17,9 @@ void UPlayerAnimInstance::NativeBeginPlay()
 
 	if (player)
 	{
-		if (player->weaponComp->IsValidLowLevel())
+		if (player->bow)
 		{
-			UAnimInstance* anim = player->weaponComp->GetAnimInstance();
+			UAnimInstance* anim = player->bow->GetAnimInstance();
 			if (anim)
 			{
 				weaponAnim = CastChecked<UWeaponAnim>(anim);
