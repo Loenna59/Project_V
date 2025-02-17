@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class UThunderJawAnimInstance* GetBossAnimInstance();
 	UFUNCTION(BlueprintCallable)
+	class UMaterialInstanceDynamic* GetEyeMatInst();
+	UFUNCTION(BlueprintCallable)
 	APlayCharacter* GetAloy();
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetLMachineGun();
@@ -47,6 +49,8 @@ protected:
 	AThunderJawAIController* BossAIController;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UThunderJawAnimInstance* BossAnimInstance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class UMaterialInstanceDynamic* EyeMatInst;
 	UPROPERTY()
 	APlayCharacter* Aloy;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")

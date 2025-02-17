@@ -29,6 +29,20 @@ void AThunderJaw::BeginPlay()
 	{
 		PRINTLOG(TEXT("BossAIController Cast Failed"));
 	}
+
+	UMaterialInterface* BaseMat = GetMesh()->GetMaterial(1);
+	if (BaseMat)
+	{
+		EyeMatInst = UMaterialInstanceDynamic::Create(BaseMat,this);
+		GetMesh()->SetMaterial(1,EyeMatInst);
+	}
+
+	if (EyeMatInst)
+	{
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),500);
+	}
+	
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
 	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
@@ -49,6 +63,15 @@ void AThunderJaw::BeginPlay()
 void AThunderJaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (LMachineGun->bIsBroken)
+	{
+		LMachineGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	}
+	if (RMachineGun->bIsBroken)
+	{
+		RMachineGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	}
 }
 
 void AThunderJaw::InitComponents()
@@ -63,11 +86,25 @@ void AThunderJaw::InitComponents()
 		GetMesh()->SetRelativeRotation(FRotator(0,-90,0));
 	}
 
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Assets/SciFi_Beasts_Pack/SciFi_Beast05/Materials/Skin1/Mat_SciFi_Beast05_Armor_Skin1.Mat_SciFi_Beast05_Armor_Skin1'"));
+	if (tempMat0.Succeeded())
+	{
+		GetMesh()->SetMaterial(0,tempMat0.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat1(TEXT("'/Game/Assets/SciFi_Beasts_Pack/SciFi_Beast05/Materials/Skin1/Mat_SciFi_Beast05_Body_Skin1.Mat_SciFi_Beast05_Body_Skin1'"));
+	if (tempMat1.Succeeded())
+	{
+		GetMesh()->SetMaterial(1,tempMat1.Object);
+	}
+
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("'/Game/Blueprints/Boss/Animation/ABP_ThunderJaw.ABP_ThunderJaw_C'"));
 	if (tempAnim.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
+
+	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 	
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
@@ -85,6 +122,11 @@ AThunderJawAIController* AThunderJaw::GetBossAIController()
 class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance()
 {
 	return BossAnimInstance;
+}
+
+class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst()
+{
+	return EyeMatInst;
 }
 
 APlayCharacter* AThunderJaw::GetAloy()

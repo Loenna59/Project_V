@@ -16,6 +16,8 @@
 void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
+	Boss->GetEyeMatInst()->SetVectorParameterValue(FName("EyeColor"),FLinearColor(1,0,0));
+	Boss->GetEyeMatInst()->SetScalarParameterValue(FName("EmissivePower"),1000);
 }
 
 void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
@@ -25,7 +27,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	// 몸을 돌리는 중이면 공격하지 않음
 	if (bIsRotateBody)
 	{
-		RotateToTarget(Boss,1.0);
+		RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
 		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
 		
 		// enemy의 정면까지 돌렸으면 false로 변경
@@ -69,11 +71,10 @@ void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	Super::Exit(Boss, FSM);
 }
 
-void UBossCombatState::RotateToTarget(AThunderJaw* Boss, float InterpSpeed)
+void UBossCombatState::RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed)
 {
 	// 타겟 위치로 몸을 돌리는 함수
-	
-	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), Boss->GetAloy()->GetActorLocation());
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), TargetLoc);
 	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
 	Boss->SetActorRotation(FRotator(0,NewYaw,0));
 }
@@ -149,7 +150,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int randomNum = FMath::RandRange(0,0);
+		int randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -208,7 +209,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		// 플레이어를 바라보면서 뒷걸음질을 하기 위해 움직이는 방향으로 회전하지 않게 막음
 		Boss->GetCharacterMovement()->bOrientRotationToMovement = false;
 		// 플레이어를 바라보게 몸을 돌려줌
-		RotateToTarget(Boss,1.0f);
+		RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0f);
 		Boss->AddMovementInput(-PerposeLocation);
 	}
 	else
@@ -243,7 +244,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		Boss->GetRMachineGun()->CreateBullet(Rt,dir);
 	}
 	
-	RotateToTarget(Boss,0.7);
+	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),0.7);
 
 	if (Boss->GetBossAIController()->FacingDot < 0.85)
 	{

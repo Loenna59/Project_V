@@ -72,8 +72,8 @@ void AThunderJawAIController::InitComponent()
 	SetPerceptionComponent(*AIPC);
 	
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = DetectRadius;
-	SightConfig->LoseSightRadius = DetectRadius + 1000.0f;
+	SightConfig->SightRadius = DetectDist;
+	SightConfig->LoseSightRadius = DetectDist + 1000;
 	SightConfig->PeripheralVisionAngleDegrees = 45.0f;
 	SightConfig->SetMaxAge(100.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;

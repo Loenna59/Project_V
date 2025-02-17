@@ -9,6 +9,8 @@
 void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
+	Boss->GetEyeMatInst()->SetVectorParameterValue(FName("EyeColor"),FLinearColor(1,0.844786,0.016844));
+	Boss->GetEyeMatInst()->SetScalarParameterValue(FName("EmissivePower"),40);
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Rage);
 }
 
