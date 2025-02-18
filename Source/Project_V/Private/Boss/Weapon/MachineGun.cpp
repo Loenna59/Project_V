@@ -3,8 +3,10 @@
 
 #include "Boss/Weapon/MachineGun.h"
 
+#include "Project_V.h"
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/BoxComponent.h"
+#include "Player/Arrow.h"
 
 
 // Sets default values
@@ -23,12 +25,24 @@ void AMachineGun::BeginPlay()
 
 	MaxHP = 100.0f;
 	CurrentHP = MaxHP;
+	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunOverlap);
 }
 
 // Called every frame
 void AMachineGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (bIsBroken)
+	{
+		Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
+		PRINTLOG(TEXT("detached"));
+		UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();
+		if (primComp)
+		{
+			primComp->SetSimulatePhysics(true);
+			primComp->SetCollisionEnabled(ECollisionEnabled::Type::PhysicsOnly);
+		}
+	}
 }
 
 void AMachineGun::InitComponents()
@@ -38,7 +52,7 @@ void AMachineGun::InitComponents()
 	{
 		SetRootComponent(Root);
 		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
-		Root->SetBoxExtent(FVector(18.0,12.0,12.0));
+		Root->SetBoxExtent(FVector(18.0,20.0,12.0));
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -80,5 +94,17 @@ void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 	if (bullet)
 	{
 		bullet->FireInDirection(direction);
+	}
+}
+
+void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto* arrow = Cast<AArrow>(OtherActor);
+	if (arrow)
+	{
+		DamageWeaponHP(50);
+		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
+		arrow->Destroy();
 	}
 }

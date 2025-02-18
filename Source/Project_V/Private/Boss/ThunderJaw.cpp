@@ -6,6 +6,7 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
 
@@ -80,13 +81,17 @@ void AThunderJaw::InitBeginPlay()
 	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
 	if (LMachineGun)
 	{
-		LMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
+		LMachineGun->AttachToComponent(GetMesh(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
+		LMachineGun->Root->SetCollisionProfileName("Enemy");
 	}
 	
 	RMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
 	if (RMachineGun)
 	{
 		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
+		RMachineGun->Root->SetCollisionProfileName("Enemy");
+
 	}
 
 	BossAIController = Cast<AThunderJawAIController>(GetController());
