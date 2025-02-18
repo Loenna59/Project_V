@@ -10,10 +10,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/FocusDome.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerWeapon.h"
 #include "UI/CrosshairUI.h"
@@ -135,6 +137,13 @@ APlayCharacter::APlayCharacter()
 		ia_fire = tmp_ia_fire.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_focus(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerFocusMode.IA_PlayerFocusMode'"));
+
+	if (tmp_ia_focus.Succeeded())
+	{
+		ia_focus = tmp_ia_focus.Object;
+	}
+
 	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_weapon(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
 	if (tmp_weapon.Succeeded())
@@ -154,6 +163,13 @@ APlayCharacter::APlayCharacter()
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		GetMesh()->SetAnimInstanceClass(tmp.Object);
+	}
+
+	ConstructorHelpers::FClassFinder<AFocusDome> tmp_dome(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_FocusDome.BP_FocusDome_C'"));
+
+	if (tmp_dome.Succeeded())
+	{
+		domeFactory = tmp_dome.Class;
 	}
 
 	targetFOV = maxFOV;
@@ -188,6 +204,12 @@ void APlayCharacter::BeginPlay()
 		//
 
 		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+	}
+
+	if ((focusDome = GetWorld()->SpawnActor<AFocusDome>(domeFactory)))
+	{
+		focusDome->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		focusDome->SetActorRelativeLocation(FVector(0, 0, -200));
 	}
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -273,6 +295,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
 		pi->BindAction(ia_fire, ETriggerEvent::Triggered, this, &APlayCharacter::OnPressedFire);
 		pi->BindAction(ia_fire, ETriggerEvent::Completed, this, &APlayCharacter::OnReleasedFire);
+		pi->BindAction(ia_focus, ETriggerEvent::Triggered, this, &APlayCharacter::OnFocusOrScan);
+		pi->BindAction(ia_focus, ETriggerEvent::Completed, this, &APlayCharacter::EndFocusOrScan);
 	}
 }
 
@@ -377,16 +401,9 @@ void APlayCharacter::Dodge()
 	}
 }
 
-void APlayCharacter::OnAnchor()
+void APlayCharacter::ChangeToAnchoredCamera()
 {
-	if (!holdingWeapon.IsValid() && equipWeaponMontage)
-	{
-		PlayAnimMontage(equipWeaponMontage);
-	}
-	
-	ui->SetVisibleUI(CameraMode::Anchored);
-	
-    cameraComp->SetActive(false);
+	cameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
 
 	transitionSpringArmComp->bUsePawnControlRotation = anchoredSpringArmComp->bUsePawnControlRotation;
@@ -400,15 +417,25 @@ void APlayCharacter::OnAnchor()
 	bUseControllerRotationYaw = true;
 	// bUseControllerRotationPitch = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void APlayCharacter::OnAnchor()
+{
+	if (!holdingWeapon.IsValid() && equipWeaponMontage)
+	{
+		PlayAnimMontage(equipWeaponMontage);
+	}
+	
+	ui->SetVisibleUI(CameraMode::Anchored);
+	
+    ChangeToAnchoredCamera();
 
 	bIsAnchored = true;
 	bow->SpawnArrowInBow();
 }
 
-void APlayCharacter::OnAnchorRelease()
+void APlayCharacter::ChangeToDefaultCamera()
 {
-	ui->SetVisibleUI(CameraMode::Default);
-	
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(true);
 
@@ -423,6 +450,13 @@ void APlayCharacter::OnAnchorRelease()
 	bUseControllerRotationYaw = false;
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void APlayCharacter::OnAnchorRelease()
+{
+	ui->SetVisibleUI(CameraMode::Default);
+	
+	ChangeToDefaultCamera();
 	
 	SetDrawStrength(0);
 	anchoredCameraComp->SetFieldOfView(maxFOV);
@@ -470,6 +504,31 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 		SetDrawStrength(0);
 		elapsedDrawingTime = 0;
 	}
+}
+
+void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
+{
+	if (!focusDome)
+	{
+		return;
+	}
+	
+	if (bIsFocusMode)
+	{
+		focusDome->Deactivate();
+		ChangeToDefaultCamera();
+		return;
+	}
+
+	focusDome->Activate();
+	ChangeToAnchoredCamera();
+	
+	//PrintLogFunc(TEXT("%f"), actionValue.Get<float>());
+}
+
+void APlayCharacter::EndFocusOrScan()
+{
+	bIsFocusMode = !bIsFocusMode;
 }
 
 void APlayCharacter::SpawnArrow()

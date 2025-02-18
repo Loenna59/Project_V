@@ -22,7 +22,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -47,8 +47,16 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class APlayerWeapon* bow;
 
+	UPROPERTY(VisibleAnywhere)
+	class AFocusDome* focusDome;
+	
+	class UPlayerUI* ui;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<APlayerWeapon> bowFactory;
+	TSubclassOf<class APlayerWeapon> bowFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class AFocusDome> domeFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float walkSpeed = 600;
@@ -102,6 +110,8 @@ public:
 
 	bool bIsShot = false;
 
+	bool bIsFocusMode = false;
+
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
 
@@ -132,11 +142,21 @@ public:
 	UFUNCTION()
 	void OnReleasedFire(const FInputActionValue& actionValue);
 
+	UFUNCTION()
+	void OnFocusOrScan(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void EndFocusOrScan();
+
 	void SpawnArrow();
 
 	void PlaceArrowOnBow();
 
 	void PickWeapon();
+
+	void ChangeToDefaultCamera();
+	
+	void ChangeToAnchoredCamera();
 	
 private:
 	const float maxFOV = 90;
@@ -169,7 +189,8 @@ private:
 	UPROPERTY()
 	class UInputAction* ia_fire;
 
-	class UPlayerUI* ui;
+	UPROPERTY()
+	class UInputAction* ia_focus;
 
 	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
 
@@ -186,6 +207,8 @@ private:
 	float targetMultiplier;
 
 	float currentHealth;
+
+	float focusPressingTime;
 
 	FVector CalculateAnimToVector();
 
