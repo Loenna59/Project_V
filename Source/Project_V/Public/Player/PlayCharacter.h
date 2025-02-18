@@ -92,6 +92,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	class UAnimMontage* equipWeaponMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float focusModeThreshold = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float drawingThreshold = 1;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
 

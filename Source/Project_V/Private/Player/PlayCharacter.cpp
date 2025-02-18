@@ -497,14 +497,14 @@ void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 		return;
 	}
 
-	
-	if (!bIsCompleteReload)
+	if (drawStrength < drawingThreshold)
 	{
 		return;
 	}
 
-	bIsCompleteReload = bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
-	
+	bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
+
+	bIsCompleteReload = false;
 	bIsShot = true;
 	SetDrawStrength(0);
 }
@@ -523,7 +523,7 @@ void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
 		return;
 	}
 
-	if (focusPressingTime > 1)
+	if (focusPressingTime > focusModeThreshold)
 	{
 		focusDome->Activate();
 		ChangeToAnchoredCamera();
@@ -536,7 +536,7 @@ void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
 
 void APlayCharacter::EndFocusOrScan()
 {
-	if (currentCameraMode != EPlayerCameraMode::Focus && focusPressingTime < 1)
+	if (currentCameraMode != EPlayerCameraMode::Focus && focusPressingTime < focusModeThreshold)
 	{
 		PrintLogFunc(TEXT("scan"));
 		focusPressingTime = 0;
