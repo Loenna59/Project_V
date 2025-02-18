@@ -32,17 +32,6 @@ void AMachineGun::BeginPlay()
 void AMachineGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bIsBroken)
-	{
-		Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
-		PRINTLOG(TEXT("detached"));
-		UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();
-		if (primComp)
-		{
-			primComp->SetSimulatePhysics(true);
-			primComp->SetCollisionEnabled(ECollisionEnabled::Type::PhysicsOnly);
-		}
-	}
 }
 
 void AMachineGun::InitComponents()
@@ -52,14 +41,14 @@ void AMachineGun::InitComponents()
 	{
 		SetRootComponent(Root);
 		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
-		Root->SetBoxExtent(FVector(18.0,20.0,12.0));
+		Root->SetBoxExtent(FVector(18.0,15.0,12.0));
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(0.3,0.1,0.2));
+		Mesh->SetRelativeScale3D(FVector(0.450000,0.200000,0.200000));
 	}
 
 	FirePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirePos"));
@@ -100,11 +89,25 @@ void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	PRINTLOG(TEXT("%s"),*OtherActor->GetName());
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)
 	{
 		DamageWeaponHP(50);
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
+
+		// detach from parent
+		if (bIsBroken)
+		{
+			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
+			Root->SetCollisionProfileName(FName("BlockAll"));
+			UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();
+			if (primComp)
+			{
+				primComp->SetSimulatePhysics(true);
+			}
+		}
+		
 		arrow->Destroy();
 	}
 }
