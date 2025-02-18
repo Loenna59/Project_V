@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Boss/Weapon/BossWeapon.h"
 #include "GameFramework/Actor.h"
 #include "MachineGun.generated.h"
 
 UCLASS()
-class PROJECT_V_API AMachineGun : public AActor
+class PROJECT_V_API AMachineGun : public ABossWeapon
 {
 	GENERATED_BODY()
 
@@ -24,8 +25,6 @@ protected:
 
 	UFUNCTION()
 	void InitComponents();
-	UFUNCTION()
-	void OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -37,11 +36,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	TSubclassOf<class AMachineGunBullet> BulletFactory;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MaxHP{100};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float CurrentHP{CurrentHP = MaxHP};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool bIsBroken{false};	
 };

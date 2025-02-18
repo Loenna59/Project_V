@@ -4,7 +4,7 @@
 #include "Boss/State/BossCombatState.h"
 
 #include "Project_V.h"
-#include "Boss/MachineGun.h"
+#include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
@@ -16,7 +16,7 @@
 void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	Boss->ChangeEyeColor(FLinearColor(1,0,0),1000);
+	Boss->ChangeEyeColor(FLinearColor(1,0,0),2000);
 }
 
 void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)

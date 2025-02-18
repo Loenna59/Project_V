@@ -1,12 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Boss/MachineGun.h"
+#include "Boss/Weapon/MachineGun.h"
 
-#include "Project_V.h"
-#include "Boss/MachineGunBullet.h"
+#include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/BoxComponent.h"
-#include "Player/Arrow.h"
 
 
 // Sets default values
@@ -22,7 +20,9 @@ AMachineGun::AMachineGun()
 void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
-	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunBeginOverlap);
+
+	MaxHP = 100.0f;
+	CurrentHP = MaxHP;
 }
 
 // Called every frame
@@ -39,7 +39,6 @@ void AMachineGun::InitComponents()
 		SetRootComponent(Root);
 		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
 		Root->SetBoxExtent(FVector(18.0,12.0,12.0));
-		Root->SetGenerateOverlapEvents(true);
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -71,7 +70,6 @@ void AMachineGun::InitComponents()
 	ConstructorHelpers::FClassFinder<AMachineGunBullet> tempBullet(TEXT("'/Game/Blueprints/Boss/BP_MachineGunBullet.BP_MachineGunBullet_C'"));
 	if (tempBullet.Succeeded())
 	{
-		
 		BulletFactory = tempBullet.Class;
 	}
 }
@@ -83,20 +81,4 @@ void AMachineGun::CreateBullet(FTransform transform, FVector direction)
 	{
 		bullet->FireInDirection(direction);
 	}
-}
-
-void AMachineGun::OnMachineGunBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	PRINTLOG(TEXT("machine gun hit"));
-	auto* arrow = Cast<AArrow>(OtherActor);
-	if (arrow)
-	{
-		CurrentHP -= 10.0f;
-		if (CurrentHP <= 0)
-		{
-			bIsBroken = true;
-		}
-	}
-	
 }

@@ -39,7 +39,7 @@ protected:
 	UFUNCTION()
 	void EvaluateTargetDistance(float DeltaTime);
 	UFUNCTION()
-	void CheckTargetThroughtStimulus();
+	void CheckTargetThroughStimulus();
 
 public:
 	UFUNCTION()

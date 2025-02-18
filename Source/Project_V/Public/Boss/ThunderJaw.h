@@ -72,5 +72,5 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float CombatDist {1200.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{1000.0f};
+	float MeleeAttackDist{800.0f};
 };

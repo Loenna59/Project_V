@@ -2,7 +2,7 @@
 #include "Boss/ThunderJaw.h"
 
 #include "Project_V.h"
-#include "Boss/MachineGun.h"
+#include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"

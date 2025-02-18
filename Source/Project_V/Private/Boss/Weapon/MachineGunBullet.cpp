@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Boss/MachineGunBullet.h"
+#include "Boss/Weapon/MachineGunBullet.h"
 
 #include "Project_V.h"
 #include "Components/BoxComponent.h"

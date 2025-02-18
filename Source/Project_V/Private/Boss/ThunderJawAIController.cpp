@@ -56,7 +56,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		EvaluateTargetDistance(DeltaTime);
 		
 		// stimulus age를 가져와서 target을 놓쳤는지 아닌지를 확인하는 코드
-		CheckTargetThroughtStimulus();
+		CheckTargetThroughStimulus();
 	}
 }
 
@@ -131,13 +131,13 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	if (DistanceFromTarget <= Boss->CombatDist)
 	{
 		LoseTargetTime = 0.0f;
-		bossFSM->ChangeBossState(EBossState::LookOut);
+		bossFSM->ChangeBossState(EBossState::Combat);
 	}
 	// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
 	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
-		//PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		// PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
 		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
 		{
 			LoseTargetTime += DeltaTime;
@@ -146,7 +146,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	}
 }
 
-void AThunderJawAIController::CheckTargetThroughtStimulus()
+void AThunderJawAIController::CheckTargetThroughStimulus()
 {
 	FActorPerceptionBlueprintInfo Info;
 	AIPC->GetActorsPerception(Boss->GetAloy(), Info);
