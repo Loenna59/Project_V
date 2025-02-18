@@ -3,7 +3,7 @@
 #include "Player/NotifyEndDodge.h"
 #include "Player/PlayCharacter.h"
 
-void UNotifyEndDodge::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UNotifyEndDodge::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation);
 

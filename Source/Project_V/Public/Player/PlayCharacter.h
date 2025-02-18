@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerCameraMode.h"
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
@@ -101,16 +102,12 @@ public:
 	FVector direction;
 
 	bool bIsDodge = false;
-	
-	bool bIsAnchored = false;
 
 	bool bIsCompleteReload = false;
 
 	bool bIsPlayingDodge = false;
 
 	bool bIsShot = false;
-
-	bool bIsFocusMode = false;
 
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -210,6 +207,10 @@ private:
 
 	float focusPressingTime;
 
+	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
+	
+	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
+
 	FVector CalculateAnimToVector();
 
 public:
@@ -218,9 +219,16 @@ public:
 		return drawStrength;
 	}
 
+	EPlayerCameraMode GetPlayerCameraMode() const
+	{
+		return currentCameraMode;
+	}
+
 	void SetDrawStrength(float strength);
 
 	void SetPlayingDodge(bool isPlaying);
 
 	void SetCurrentHealth(float health);
+
+	void SetPlayerCameraMode(EPlayerCameraMode mode);
 };

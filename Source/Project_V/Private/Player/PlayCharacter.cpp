@@ -17,6 +17,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/FocusDome.h"
 #include "Player/PlayerAnimInstance.h"
+#include "Player/PlayerCameraMode.h"
 #include "Player/PlayerWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerHUD.h"
@@ -217,7 +218,7 @@ void APlayCharacter::BeginPlay()
 	if (hud)
 	{
 		ui = hud->GetPlayerUI();
-		ui->SetVisibleUI(CameraMode::Default);
+		ui->SetVisibleUI(EPlayerCameraMode::Default);
 		SetCurrentHealth(maxHealth);
 	}
 
@@ -316,7 +317,7 @@ void APlayCharacter::Rotate(const FInputActionValue& actionValue)
 
 	float pitch = GetControlRotation().GetNormalized().Pitch;
 
-	if (bIsAnchored)
+	if (currentCameraMode != EPlayerCameraMode::Default)
 	{
 		// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
 
@@ -341,20 +342,35 @@ void APlayCharacter::ActionJump(const FInputActionValue& actionValue)
 
 void APlayCharacter::OnTriggerShift(const FInputActionValue& actionValue)
 {
-	if (bIsAnchored && drawStrength > 0)
+	bool value = actionValue.Get<bool>();
+	
+	if (currentCameraMode == EPlayerCameraMode::Anchored)
 	{
 		// zoom mode
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), slowDilation); 
 		GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
-		targetFOV = minFOV;
-		targetMultiplier = slowMotionMultiplier;
+		if (value)
+		{
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), slowDilation); 
+			targetFOV = minFOV;
+			targetMultiplier = slowMotionMultiplier;
+		}
+		else
+		{
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f); 
+			targetFOV = maxFOV;
+			targetMultiplier = releaseMotionMultiplier;
+		}
 	}
 	else
 	{
-		bool value = actionValue.Get<bool>();
 		float speed = value? sprintSpeed : walkSpeed;
 	
 		GetCharacterMovement()->MaxWalkSpeed = speed;
+	}
+
+	if (currentCameraMode == EPlayerCameraMode::Focus)
+	{
+		SetPlayerCameraMode(EPlayerCameraMode::Default);
 	}
 }
 
@@ -394,11 +410,7 @@ void APlayCharacter::Dodge()
 	}
 	
 	bIsDodge = dodgeAxis != FVector2D::ZeroVector;
-
-	if (bIsAnchored)
-	{
-		OnAnchorRelease();
-	}
+	ChangeToDefaultCamera();
 }
 
 void APlayCharacter::ChangeToAnchoredCamera()
@@ -426,12 +438,7 @@ void APlayCharacter::OnAnchor()
 		PlayAnimMontage(equipWeaponMontage);
 	}
 	
-	ui->SetVisibleUI(CameraMode::Anchored);
-	
-    ChangeToAnchoredCamera();
-
-	bIsAnchored = true;
-	bow->SpawnArrowInBow();
+	SetPlayerCameraMode(EPlayerCameraMode::Anchored);
 }
 
 void APlayCharacter::ChangeToDefaultCamera()
@@ -450,60 +457,56 @@ void APlayCharacter::ChangeToDefaultCamera()
 	bUseControllerRotationYaw = false;
 	// bUseControllerRotationPitch = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	anchoredCameraComp->SetFieldOfView(maxFOV);
 }
 
 void APlayCharacter::OnAnchorRelease()
 {
-	ui->SetVisibleUI(CameraMode::Default);
-	
-	ChangeToDefaultCamera();
-	
-	SetDrawStrength(0);
-	anchoredCameraComp->SetFieldOfView(maxFOV);
-	bIsAnchored = false;
-	elapsedDrawingTime = 0;
-
-	bow->PlaceOrSpawnArrow();
-
+	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	bIsCompleteReload = true;
 }
 
 void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
 {
-	if (bIsAnchored)
+	if (currentCameraMode != EPlayerCameraMode::Anchored)
 	{
-		if (!bIsCompleteReload)
-		{
-			return;
-		}
-		
-		elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
-
-		float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
-
-		//EaseOutQuad = 1 - (1 - t)^2
-		float quadT = 1 - FMath::Pow(1 - t, 2);
-		
-		// 시간에 따라 증가
-		SetDrawStrength(FMath::Lerp(0, targetDrawStrength, quadT));
+		return;
 	}
+	
+	if (!bIsCompleteReload)
+	{
+		return;
+	}
+	
+	elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
+
+	float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
+
+	//EaseOutQuad = 1 - (1 - t)^2
+	float quadT = 1 - FMath::Pow(1 - t, 2);
+	
+	// 시간에 따라 증가
+	SetDrawStrength(FMath::Lerp(0, targetDrawStrength, quadT));
 }
 
 void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
 {
-	if (bIsAnchored)
+	if (currentCameraMode != EPlayerCameraMode::Anchored)
 	{
-		if (!bIsCompleteReload)
-		{
-			return;
-		}
-
-		bIsCompleteReload = bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
-		
-		bIsShot = true;
-		SetDrawStrength(0);
-		elapsedDrawingTime = 0;
+		return;
 	}
+
+	
+	if (!bIsCompleteReload)
+	{
+		return;
+	}
+
+	bIsCompleteReload = bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
+	
+	bIsShot = true;
+	SetDrawStrength(0);
 }
 
 void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
@@ -513,22 +516,35 @@ void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
 		return;
 	}
 	
-	if (bIsFocusMode)
+	if (currentCameraMode == EPlayerCameraMode::Focus)
 	{
 		focusDome->Deactivate();
 		ChangeToDefaultCamera();
 		return;
 	}
 
-	focusDome->Activate();
-	ChangeToAnchoredCamera();
+	if (focusPressingTime > 1)
+	{
+		focusDome->Activate();
+		ChangeToAnchoredCamera();
+	}
+	
+	focusPressingTime += GetWorld()->DeltaTimeSeconds;
 	
 	//PrintLogFunc(TEXT("%f"), actionValue.Get<float>());
 }
 
 void APlayCharacter::EndFocusOrScan()
 {
-	bIsFocusMode = !bIsFocusMode;
+	if (currentCameraMode != EPlayerCameraMode::Focus && focusPressingTime < 1)
+	{
+		PrintLogFunc(TEXT("scan"));
+		focusPressingTime = 0;
+		return;
+	}
+	
+	focusPressingTime = 0;
+	SetPlayerCameraMode(currentCameraMode == EPlayerCameraMode::Focus? EPlayerCameraMode::Default : EPlayerCameraMode::Focus);
 }
 
 void APlayCharacter::SpawnArrow()
@@ -590,6 +606,7 @@ void APlayCharacter::SetDrawStrength(float strength)
 	{
 		targetFOV = maxFOV;
 		targetMultiplier = releaseMotionMultiplier;
+		elapsedDrawingTime = 0;
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f); 
 	}
 }
@@ -598,10 +615,21 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 {
 	bIsPlayingDodge = isPlaying;
 
-	if (!isPlaying)
+
+	if (isPlaying)
+	{
+		SetPlayerCameraMode(EPlayerCameraMode::Default);
+	}
+	else
 	{
 		prevDodgeAxis = FVector2D::ZeroVector;
 		dodgeAxis = FVector2D::ZeroVector;
+
+		if (prevCameraMode == EPlayerCameraMode::Focus)
+		{
+			return;
+		}
+		SetPlayerCameraMode(prevCameraMode);
 	}
 }
 
@@ -612,4 +640,31 @@ void APlayCharacter::SetCurrentHealth(float health)
 	{
 		ui->SetHealthUI(currentHealth, maxHealth);
 	}
+}
+
+void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
+{
+	prevCameraMode = currentCameraMode;
+	currentCameraMode = mode;
+
+	ui->SetVisibleUI(currentCameraMode);
+	
+	switch (currentCameraMode)
+	{
+	case EPlayerCameraMode::Default:
+		ChangeToDefaultCamera();
+		SetDrawStrength(0);
+		bow->PlaceOrSpawnArrow();
+		focusDome->Deactivate();
+		break;
+	case EPlayerCameraMode::Anchored:
+		ChangeToAnchoredCamera();
+		bow->SpawnArrowInBow();
+		focusDome->Deactivate();
+		break;
+	case EPlayerCameraMode::Focus:
+		ChangeToAnchoredCamera();
+		break;
+	}
+	
 }

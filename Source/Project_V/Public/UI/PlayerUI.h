@@ -4,14 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Player/PlayerCameraMode.h"
 #include "PlayerUI.generated.h"
-
-UENUM(BlueprintType)
-enum class CameraMode : uint8
-{
-	Default,
-	Anchored
-};
 
 /**
  * 
@@ -28,7 +22,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UPlayerHPUI* HealthUI;
 
-	void SetVisibleUI(CameraMode mode);
+	void SetVisibleUI(EPlayerCameraMode mode);
 
 	void SetHealthUI(float current, float max);
 };
