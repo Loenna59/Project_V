@@ -622,6 +622,8 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 	}
 	else
 	{
+		// 강제로 리로드 처리
+		bIsCompleteReload = true;
 		prevDodgeAxis = FVector2D::ZeroVector;
 		dodgeAxis = FVector2D::ZeroVector;
 
