@@ -42,6 +42,8 @@ public:
 	class AMachineGun* GetLMachineGun();
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetRMachineGun();
+	UFUNCTION()
+	void ChangeEyeColor(FLinearColor color, float emissivePower);
 
 	
 protected:

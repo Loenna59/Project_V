@@ -16,8 +16,7 @@
 void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	Boss->GetEyeMatInst()->SetVectorParameterValue(FName("EyeColor"),FLinearColor(1,0,0));
-	Boss->GetEyeMatInst()->SetScalarParameterValue(FName("EmissivePower"),1000);
+	Boss->ChangeEyeColor(FLinearColor(1,0,0),1000);
 }
 
 void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
@@ -56,7 +55,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 			}
 			else
 			{
-				Attack(Boss,DeltaTime);
+				Attack(Boss);
 			}
 		}
 		else if (Boss->GetBossAIController()->FacingDot <= 0)
@@ -79,7 +78,7 @@ void UBossCombatState::RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, floa
 	Boss->SetActorRotation(FRotator(0,NewYaw,0));
 }
 
-void UBossCombatState::Attack(AThunderJaw* Boss, float DeltaTime)
+void UBossCombatState::Attack(AThunderJaw* Boss)
 {
 	switch (UsingPattern)
 	{
@@ -126,14 +125,15 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	}
 
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
-	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
-		[this,WeakBoss]()
+	auto callBack = [this,WeakBoss]()
+	{
+		if (WeakBoss.IsValid())
 		{
-			if (WeakBoss.IsValid())
-			{
-				DelayEndBeforeChoosingPattern(WeakBoss.Get());
-			}
-		},PatternDelay,false);
+			DelayEndBeforeChoosingPattern(WeakBoss.Get());
+		}
+	};
+	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
+		FTimerDelegate::CreateLambda(callBack),PatternDelay,false);
 }
 
 void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
@@ -224,15 +224,17 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 void UBossCombatState::Tail(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Tail"));
+	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0f);
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
-	
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Machine Gun"));
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
+	Lt.SetScale3D(FVector(1.0));
 	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
+	Rt.SetScale3D(FVector(1.0));
 	FVector Ldir = (Boss->GetAloy()->GetActorLocation() - Boss->GetLMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
 	FVector Rdir = (Boss->GetAloy()->GetActorLocation() - Boss->GetRMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
 
@@ -246,7 +248,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		Boss->GetRMachineGun()->CreateBullet(Rt,Rdir);
 	}
 	
-	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),0.7);
+	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
 
 	if (Boss->GetBossAIController()->FacingDot < 0.85)
 	{

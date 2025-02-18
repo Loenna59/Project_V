@@ -10,6 +10,7 @@
 void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
+	Boss->ChangeEyeColor(FLinearColor(0,0.14,1),500);
 }
 
 void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)

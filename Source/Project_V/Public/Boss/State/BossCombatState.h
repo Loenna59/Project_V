@@ -34,7 +34,7 @@ protected:
 	void RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed);
 	
 	UFUNCTION()
-	void Attack(AThunderJaw* Boss, float DeltaTime);
+	void Attack(AThunderJaw* Boss);
 	UFUNCTION()
 	void ChooseRandomPattern(AThunderJaw* Boss);
 	UFUNCTION()

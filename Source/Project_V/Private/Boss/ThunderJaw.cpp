@@ -32,13 +32,19 @@ void AThunderJaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (LMachineGun->bIsBroken)
+	FVector socketLoc = GetMesh()->GetSocketLocation("tail5");
+	FHitResult hit;
+	
+	FVector end = socketLoc + FVector(0,0,-1000);
+	DrawDebugLine(GetWorld(),socketLoc,end,FColor::Red,false,-1,0,2);
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hit,socketLoc,end,ECC_Visibility,params);
+
+	if (bHit)
 	{
-		LMachineGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	}
-	if (RMachineGun->bIsBroken)
-	{
-		RMachineGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		PRINTLOG(TEXT("Test : %s"),*hit.GetActor()->GetName());
+
 	}
 }
 
@@ -84,13 +90,7 @@ void AThunderJaw::InitBeginPlay()
 		EyeMatInst = UMaterialInstanceDynamic::Create(BaseMat,this);
 		GetMesh()->SetMaterial(1,EyeMatInst);
 	}
-
-	if (EyeMatInst)
-	{
-		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),FLinearColor(0,0.14,1));
-		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),500);
-	}
-
+	
 	LMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
 	if (LMachineGun)
 	{
@@ -107,6 +107,7 @@ void AThunderJaw::InitBeginPlay()
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = 500.0f;
+	ChangeEyeColor(FLinearColor(0,0.14,1),500);
 }
 
 UThunderJawFSM* AThunderJaw::GetFSMComponent()
@@ -132,6 +133,15 @@ class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst()
 APlayCharacter* AThunderJaw::GetAloy()
 {
 	return Aloy;
+}
+
+void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
+{
+	if (EyeMatInst)
+	{
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
+	}
 }
 
 class AMachineGun* AThunderJaw::GetLMachineGun()

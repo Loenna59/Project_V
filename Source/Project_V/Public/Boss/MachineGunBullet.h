@@ -34,7 +34,7 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
-	float LifeTime{10.0f};
+	float LifeTime{5.0f};
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
 };
