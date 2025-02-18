@@ -32,20 +32,6 @@ void AThunderJaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector socketLoc = GetMesh()->GetSocketLocation("tail5");
-	FHitResult hit;
-	
-	FVector end = socketLoc + FVector(0,0,-1000);
-	DrawDebugLine(GetWorld(),socketLoc,end,FColor::Red,false,-1,0,2);
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hit,socketLoc,end,ECC_Visibility,params);
-
-	if (bHit)
-	{
-		PRINTLOG(TEXT("Test : %s"),*hit.GetActor()->GetName());
-
-	}
 }
 
 void AThunderJaw::InitConstruct()
@@ -106,7 +92,7 @@ void AThunderJaw::InitBeginPlay()
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
-	GetCharacterMovement()->MaxWalkSpeed = 500.0f;
+	GetCharacterMovement()->MaxWalkSpeed = BossSpeed;
 	ChangeEyeColor(FLinearColor(0,0.14,1),500);
 }
 
@@ -135,15 +121,6 @@ APlayCharacter* AThunderJaw::GetAloy()
 	return Aloy;
 }
 
-void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
-{
-	if (EyeMatInst)
-	{
-		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
-		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
-	}
-}
-
 class AMachineGun* AThunderJaw::GetLMachineGun()
 {
 	return LMachineGun;
@@ -154,6 +131,14 @@ class AMachineGun* AThunderJaw::GetRMachineGun()
 	return RMachineGun;
 }
 
+void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
+{
+	if (EyeMatInst)
+	{
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
+	}
+}
 
 
 

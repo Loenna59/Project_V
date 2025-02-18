@@ -70,6 +70,58 @@ void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	Super::Exit(Boss, FSM);
 }
 
+void UBossCombatState::InitComponents(AThunderJaw* Boss)
+{
+	UsingPattern = EAttackPattern::None;
+	PatternCurrentTime = 0;
+	PatternTime = 0;
+	ChargeFlag = false;
+	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
+}
+
+void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize)
+{
+	FCollisionQueryParams Params;
+	TArray<FHitResult> HitResults;
+
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		start,
+		end,
+		FQuat::Identity,
+		ECC_Visibility,
+		FCollisionShape::MakeBox(boxHalfSize),
+		Params);
+
+	FColor BoxColor = FColor::Green;
+	if (bHit)
+	{
+		for (const FHitResult hit : HitResults)
+		{
+			auto* player = Cast<APlayCharacter>(hit.GetActor());
+			if (player)
+			{
+				PRINTLOG(TEXT("player hit"));
+				BoxColor = FColor::Red;
+			}
+		}
+	}
+	else
+	{
+		BoxColor = FColor::Green;
+	}
+	
+	// 박스 디버깅
+	int NumSteps = 10;
+	for (int i = 0; i <= NumSteps; i++)
+	{
+		float Alpha = i / NumSteps;
+		FVector DebugLocation = FMath::Lerp(start, end, Alpha);
+
+		DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
+	}
+}
+
 void UBossCombatState::RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed)
 {
 	// 타겟 위치로 몸을 돌리는 함수
@@ -112,17 +164,7 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	}
 
 	bIsDelay = true;
-
-	// 패턴관련 변수 초기화
-	UsingPattern = EAttackPattern::None;
-	PatternCurrentTime = 0;
-	PatternTime = 0;
-
-	if (ChargeFlag)
-	{
-		ChargeFlag = false;
-		Boss->GetCharacterMovement()->MaxWalkSpeed /= 1.75;
-	}
+	InitComponents(Boss);
 
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
 	auto callBack = [this,WeakBoss]()
@@ -150,7 +192,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int randomNum = FMath::RandRange(0,1);
+		int32 randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -164,7 +206,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		int randomNum = FMath::RandRange(2,2);
+		int32 randomNum = FMath::RandRange(2,2);
 		if (randomNum == 2)
 		{
 			UsingPattern = EAttackPattern::MachineGun;
@@ -217,6 +259,12 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		// 돌진 전에 한 설정 되돌리기
 		Boss->GetCharacterMovement()->bOrientRotationToMovement = true;
 		Boss->AddMovementInput(PerposeLocation);
+
+		FVector HeadStart = Boss->GetMesh()->GetSocketLocation(TEXT("head1"));
+		FVector HeadEnd = Boss->GetMesh()->GetSocketLocation(TEXT("head1EndSocket"));
+		FVector BoxHalfSize(150,150,100);
+		MakeTraceBoxAndCheckHit(HeadStart,HeadEnd,BoxHalfSize);
+		
 		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
 	}
 }
@@ -225,6 +273,11 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Tail"));
 	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0f);
+
+	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
+	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
+	FVector BoxHalfSize = FVector(100,100,100);
+	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize);
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
 }
 
