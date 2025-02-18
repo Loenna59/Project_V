@@ -77,12 +77,12 @@ void AMachineGun::InitComponents()
 	}
 }
 
-void AMachineGun::CreateBullet(FTransform transform, FVector direction)
+void AMachineGun::CreateBullet(FTransform transform, FVector Target)
 {
 	AMachineGunBullet* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
 	if (bullet)
 	{
-		bullet->FireInDirection(direction);
+		bullet->FireToTarget(Target);
 	}
 }
 

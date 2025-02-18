@@ -131,7 +131,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	if (DistanceFromTarget <= Boss->CombatDist)
 	{
 		LoseTargetTime = 0.0f;
-		bossFSM->ChangeBossState(EBossState::LookOut);
+		bossFSM->ChangeBossState(EBossState::Combat);
 	}
 	// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
 	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)

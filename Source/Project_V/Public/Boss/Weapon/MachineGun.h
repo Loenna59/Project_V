@@ -17,7 +17,7 @@ public:
 	AMachineGun();
 
 	UFUNCTION()
-	void CreateBullet(FTransform transform, FVector direction);
+	void CreateBullet(FTransform transform, FVector Target);
 	
 protected:
 	virtual void BeginPlay() override;

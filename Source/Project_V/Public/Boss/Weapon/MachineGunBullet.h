@@ -24,9 +24,16 @@ protected:
 	UFUNCTION()
 	void OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	FVector2D GetRandomPointInCircle(float radius, FVector2D centerPoint);
+
+	UFUNCTION()
+	FVector GetRandomPointInCircleXY(float radius, FVector centerPoint);
+	
 public:
 	UFUNCTION()
-	void FireInDirection(const FVector& Direction);
+	void FireToTarget(const FVector& Target);
+	
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
@@ -34,7 +41,7 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
-	float LifeTime{5.0f};
+	float LifeTime{3.0f};
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
 };

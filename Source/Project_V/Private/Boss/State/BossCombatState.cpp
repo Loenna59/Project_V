@@ -284,12 +284,11 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Machine Gun"));
+	DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
 	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
 	Lt.SetScale3D(FVector(1.0));
 	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
 	Rt.SetScale3D(FVector(1.0));
-	FVector Ldir = (Boss->GetAloy()->GetActorLocation() - Boss->GetLMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
-	FVector Rdir = (Boss->GetAloy()->GetActorLocation() - Boss->GetRMachineGun()->FirePos->GetComponentLocation()).GetSafeNormal();
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -297,8 +296,8 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	if (MachineGunDelayCurrentTime > MachineGunDelay)
 	{
 		MachineGunDelayCurrentTime = 0;
-		Boss->GetLMachineGun()->CreateBullet(Lt,Ldir);
-		Boss->GetRMachineGun()->CreateBullet(Rt,Rdir);
+		Boss->GetLMachineGun()->CreateBullet(Lt,Boss->GetAloy()->GetActorLocation());
+		Boss->GetRMachineGun()->CreateBullet(Rt,Boss->GetAloy()->GetActorLocation());
 	}
 	
 	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
@@ -317,4 +316,31 @@ void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using MouseLaser"));
+}
+
+void UBossCombatState::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
+{
+	if (!World) return;
+
+	const float AngleStep = 2.0f * PI / 32;
+	FVector PrevPoint = Center + FVector(Radius, 0.0f, 0.0f);
+    
+	for (int32 i = 1; i <= 32; i++)
+	{
+		float Angle = AngleStep * i;
+		FVector NextPoint = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
+        
+		DrawDebugLine(
+			World,
+			PrevPoint,
+			NextPoint,
+			FColor::Red,
+			false,
+			-1.0f,
+			0,
+			1
+		);
+        
+		PrevPoint = NextPoint;
+	}
 }

@@ -86,10 +86,28 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		Destroy();
 	}
-	
 }
 
-void AMachineGunBullet::FireInDirection(const FVector& Direction)
+FVector2D AMachineGunBullet::GetRandomPointInCircle(float radius, FVector2D centerPoint)
 {
-	PMC->Velocity = Direction * PMC->InitialSpeed;
+	float RandomAngle = FMath::RandRange(0.0f,2.0f*PI);
+	float RandomRadius = radius * FMath::Sqrt(FMath::FRand());
+
+	float X = centerPoint.X + RandomRadius * FMath::Cos(RandomAngle);
+	float Y = centerPoint.Y + RandomRadius * FMath::Sin(RandomAngle);
+
+	return FVector2D(X,Y);
+}
+
+FVector AMachineGunBullet::GetRandomPointInCircleXY(float radius, FVector centerPoint)
+{
+	FVector2D random2D = GetRandomPointInCircle(radius,FVector2D(centerPoint.X,centerPoint.Y));
+	return FVector(random2D.X,random2D.Y,centerPoint.Z);
+}
+
+void AMachineGunBullet::FireToTarget(const FVector& Target)
+{
+	FVector randomPoint = GetRandomPointInCircleXY(300.0f,Target);
+	FVector randomDir = (randomPoint - GetActorLocation()).GetSafeNormal();
+	PMC->Velocity = randomDir * PMC->InitialSpeed;
 }
