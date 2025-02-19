@@ -51,16 +51,16 @@ APlayCharacter::APlayCharacter()
 	cameraComp->SetupAttachment(springArmComp);
 
 	springArmComp->bUsePawnControlRotation = true;
-	springArmComp->bEnableCameraLag = true;
-	springArmComp->bEnableCameraRotationLag = true;
-	springArmComp->CameraLagSpeed = 5.f;
-	springArmComp->CameraRotationLagSpeed = 5.f;
+	// springArmComp->bEnableCameraLag = true;
+	//springArmComp->bEnableCameraRotationLag = true;
+	springArmComp->CameraLagSpeed = 8.f;
+	springArmComp->CameraRotationLagSpeed = 8.f;
 
 	anchoredSpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("AnchoredSpringArmComp"));
 	
 	anchoredSpringArmComp->SetupAttachment(RootComponent);
 	anchoredSpringArmComp->SetRelativeLocation(FVector(0, 0, 80));
-	anchoredSpringArmComp->TargetArmLength = 100;
+	anchoredSpringArmComp->TargetArmLength = 80;
 	anchoredSpringArmComp->SocketOffset = FVector(0, 50, 0);
 	anchoredSpringArmComp->bUsePawnControlRotation = false;
 	anchoredSpringArmComp->ProbeSize = 12;
