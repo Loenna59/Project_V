@@ -18,12 +18,26 @@ class PROJECT_V_API UBossBaseState : public UObject
 public:
 	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	{
+		if (!Boss)
+		{
+			return;
+		}
 		FString str = UEnum::GetValueAsString(BossState);
 		PRINTLOG(TEXT("Enter State %s"), *str);
 	};
-	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) {};
+	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
+	{
+		if (!Boss)
+		{
+			return;
+		}
+	};
 	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	{
+		if (!Boss)
+		{
+			return;
+		}
 		FString str = UEnum::GetValueAsString(BossState);
 		PRINTLOG(TEXT("Exit State %s"), *str);
 	};

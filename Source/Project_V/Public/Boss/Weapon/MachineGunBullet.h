@@ -32,7 +32,7 @@ protected:
 	
 public:
 	UFUNCTION()
-	void FireToTarget(const FVector& Target);
+	void FireToTarget(const FVector& Target, float Radius);
 	
 
 protected:

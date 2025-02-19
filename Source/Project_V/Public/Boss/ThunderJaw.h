@@ -43,6 +43,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetRMachineGun();
 	UFUNCTION()
+	void MachineGunBronken(float LeftorRight);
+	UFUNCTION()
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
 
 	

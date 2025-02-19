@@ -105,9 +105,9 @@ FVector AMachineGunBullet::GetRandomPointInCircleXY(float radius, FVector center
 	return FVector(random2D.X,random2D.Y,centerPoint.Z);
 }
 
-void AMachineGunBullet::FireToTarget(const FVector& Target)
+void AMachineGunBullet::FireToTarget(const FVector& Target, float Radius)
 {
-	FVector randomPoint = GetRandomPointInCircleXY(300.0f,Target);
+	FVector randomPoint = GetRandomPointInCircleXY(Radius,Target);
 	FVector randomDir = (randomPoint - GetActorLocation()).GetSafeNormal();
 	PMC->Velocity = randomDir * PMC->InitialSpeed;
 }

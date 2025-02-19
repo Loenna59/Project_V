@@ -32,7 +32,6 @@ void AThunderJaw::BeginPlay()
 void AThunderJaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AThunderJaw::InitConstruct()
@@ -84,6 +83,8 @@ void AThunderJaw::InitBeginPlay()
 		LMachineGun->AttachToComponent(GetMesh(),
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("LMachineGunSocket"));
 		LMachineGun->Root->SetCollisionProfileName("Enemy");
+		LMachineGun->LeftorRight = -1;
+		LMachineGun->Boss = this;
 	}
 	
 	RMachineGun = GetWorld()->SpawnActor<AMachineGun>(AMachineGun::StaticClass());
@@ -91,6 +92,8 @@ void AThunderJaw::InitBeginPlay()
 	{
 		RMachineGun->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("RMachineGunSocket"));
 		RMachineGun->Root->SetCollisionProfileName("Enemy");
+		RMachineGun->LeftorRight = 1;
+		RMachineGun->Boss = this;
 
 	}
 
@@ -134,6 +137,18 @@ class AMachineGun* AThunderJaw::GetLMachineGun()
 class AMachineGun* AThunderJaw::GetRMachineGun()
 {
 	return RMachineGun;
+}
+
+void AThunderJaw::MachineGunBronken(float LeftorRight)
+{
+	if (LeftorRight == -1)
+	{
+		LMachineGun = nullptr;
+	}
+	else
+	{
+		RMachineGun = nullptr;
+	}
 }
 
 void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)

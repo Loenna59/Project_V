@@ -4,6 +4,7 @@
 #include "Boss/Weapon/MachineGun.h"
 
 #include "Project_V.h"
+#include "Boss/ThunderJaw.h"
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/BoxComponent.h"
 #include "Player/Arrow.h"
@@ -26,6 +27,7 @@ void AMachineGun::BeginPlay()
 	MaxHP = 100.0f;
 	CurrentHP = MaxHP;
 	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunOverlap);
+
 }
 
 // Called every frame
@@ -48,7 +50,7 @@ void AMachineGun::InitComponents()
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(0.450000,0.200000,0.200000));
+		Mesh->SetRelativeScale3D(FVector(0.350000,0.200000,0.200000));
 	}
 
 	FirePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirePos"));
@@ -82,7 +84,7 @@ void AMachineGun::CreateBullet(FTransform transform, FVector Target)
 	AMachineGunBullet* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
 	if (bullet)
 	{
-		bullet->FireToTarget(Target);
+		bullet->FireToTarget(Target, RandomSprayRadius);
 	}
 }
 
@@ -99,6 +101,8 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 		// detach from parent
 		if (bIsBroken)
 		{
+			
+			Boss->MachineGunBronken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));
 			UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();

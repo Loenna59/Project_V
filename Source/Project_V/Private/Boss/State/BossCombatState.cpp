@@ -23,6 +23,11 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 {
 	Super::Update(Boss, FSM, DeltaTime);
 
+	if (!Boss->GetAloy())
+	{
+		return;
+	}
+	
 	// 몸을 돌리는 중이면 공격하지 않음
 	if (bIsRotateBody)
 	{
@@ -234,6 +239,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		PerposeLocation = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
 
 		TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
+		
 		GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle,[this, WeakBoss]()
 		{
 			if (WeakBoss.IsValid())
@@ -266,6 +272,8 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		MakeTraceBoxAndCheckHit(HeadStart,HeadEnd,BoxHalfSize);
 		
 		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
+
+		
 	}
 }
 
@@ -276,19 +284,25 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
-	FVector BoxHalfSize = FVector(100,100,100);
+	FVector BoxHalfSize = FVector(200,200,200);
 	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize);
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
 {
+	// 임시방편 코드
+	// 머신건이 둘 다 부숴졌으면 return
+	// TODO
+	// 머신건이 전부 부숴졌으면 패턴 목록에서 지워라
+	if (!Boss->GetLMachineGun() && !Boss->GetRMachineGun())
+	{
+		PatternTime = 0;
+		return;
+	}
+	
 	PRINTLOG(TEXT("Using Machine Gun"));
 	DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
-	FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
-	Lt.SetScale3D(FVector(1.0));
-	FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
-	Rt.SetScale3D(FVector(1.0));
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -296,8 +310,18 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	if (MachineGunDelayCurrentTime > MachineGunDelay)
 	{
 		MachineGunDelayCurrentTime = 0;
-		Boss->GetLMachineGun()->CreateBullet(Lt,Boss->GetAloy()->GetActorLocation());
-		Boss->GetRMachineGun()->CreateBullet(Rt,Boss->GetAloy()->GetActorLocation());
+		if (Boss->GetLMachineGun())
+		{
+			FTransform Lt = Boss->GetLMachineGun()->FirePos->GetComponentTransform();
+			Lt.SetScale3D(FVector(1.0));
+			Boss->GetLMachineGun()->CreateBullet(Lt,Boss->GetAloy()->GetActorLocation());
+		}
+		if (Boss->GetRMachineGun())
+		{
+			FTransform Rt = Boss->GetRMachineGun()->FirePos->GetComponentTransform();
+			Rt.SetScale3D(FVector(1.0));
+			Boss->GetRMachineGun()->CreateBullet(Rt,Boss->GetAloy()->GetActorLocation());
+		}
 	}
 	
 	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
