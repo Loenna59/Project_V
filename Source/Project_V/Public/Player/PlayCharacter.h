@@ -60,6 +60,9 @@ public:
 	TSubclassOf<class AFocusDome> domeFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float strollSpeed = 400;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float walkSpeed = 600;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)

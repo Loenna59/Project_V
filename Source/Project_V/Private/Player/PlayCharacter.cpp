@@ -658,14 +658,23 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		SetDrawStrength(0);
 		bow->PlaceOrSpawnArrow();
 		focusDome->Deactivate();
+		if (GetCharacterMovement()->MaxWalkSpeed < sprintSpeed)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+		}
 		break;
 	case EPlayerCameraMode::Anchored:
 		ChangeToAnchoredCamera();
 		bow->SpawnArrowInBow();
 		focusDome->Deactivate();
+		if (GetCharacterMovement()->MaxWalkSpeed < sprintSpeed)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+		}
 		break;
 	case EPlayerCameraMode::Focus:
 		ChangeToAnchoredCamera();
+		GetCharacterMovement()->MaxWalkSpeed = strollSpeed;
 		break;
 	}
 	
