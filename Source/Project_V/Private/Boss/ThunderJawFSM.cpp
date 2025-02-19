@@ -2,13 +2,13 @@
 
 #include "Boss/ThunderJawFSM.h"
 
+#include "NavigationSystem.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/State/BossCombatState.h"
 #include "Boss/State/BossBaseState.h"
 #include "Boss/State/BossIdleState.h"
 #include "Boss/State/BossLookOutState.h"
 #include "Boss/State/BossPatrolState.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 
 UThunderJawFSM::UThunderJawFSM()
@@ -20,10 +20,9 @@ UThunderJawFSM::UThunderJawFSM()
 void UThunderJawFSM::BeginPlay()
 {
 	Super::BeginPlay();
-
 	Boss = Cast<AThunderJaw>(GetOwner());
+
 	InitStatePool();
-	InitPatrolPoints();
 	
 	CurrentState = StatePool[EBossState::Patrol];
 	CurrentState->Enter(Boss,this);
@@ -54,14 +53,6 @@ void UThunderJawFSM::InitStatePool()
 	// LookOut State
 	StatePool.Add(EBossState::LookOut, NewObject<UBossLookOutState>(this,UBossLookOutState::StaticClass()));
 	StatePool[EBossState::LookOut]->BossState = EBossState::LookOut;
-}
-
-void UThunderJawFSM::InitPatrolPoints()
-{
-	PatrolPoints.Add(FVector(965.0,1310.0,0.0));
-	PatrolPoints.Add(FVector(3845.000000,1315.000000,0.000000));
-	PatrolPoints.Add(FVector(3885.000000,4075.000000,0.000000));
-	PatrolPoints.Add(FVector(985.000000,3935.000000,0.000000));
 }
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
@@ -95,29 +86,18 @@ UBossBaseState* UThunderJawFSM::GetPrevState()
 	return PrevState;
 }
 
-void UThunderJawFSM::ChangePatrolTargetPoint()
+bool UThunderJawFSM::GetRandomLocationFromNavMesh(FVector CenterLocation, float Radius, FVector& Dest)
 {
-	if (ArrivedTargetPoint)
+	auto NavSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation Loc;
+	bool bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
+	float Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
+	while (Dist < Radius / 2.0)
 	{
-		ArrivedTargetPoint = false;
-		if (CurrentTargetPoint >= PatrolPoints.Num() - 1)
-		{
-			CurrentTargetPoint = 0;
-		}
-		else
-		{
-			CurrentTargetPoint += 1;
-		}
+		bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
+		Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
 	}
+	Dest = Loc.Location;
+	return bResult;
 }
-
-void UThunderJawFSM::AdjustSpeed(float NewSpeed)
-{
-	if (Boss)
-	{
-		Boss->GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
-	}
-}
-
-
 

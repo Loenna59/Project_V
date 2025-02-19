@@ -197,7 +197,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int32 randomNum = FMath::RandRange(0,1);
+		int32 randomNum = FMath::RandRange(1,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -284,7 +284,7 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
-	FVector BoxHalfSize = FVector(200,200,200);
+	FVector BoxHalfSize = FVector(300,300,200);
 	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize);
 	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
 }

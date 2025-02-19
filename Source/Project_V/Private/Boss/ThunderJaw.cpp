@@ -1,6 +1,7 @@
 
 #include "Boss/ThunderJaw.h"
 
+#include "NavigationInvokerComponent.h"
 #include "Project_V.h"
 #include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJawAIController.h"
@@ -64,8 +65,10 @@ void AThunderJaw::InitConstruct()
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
-	
+
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	
+	NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 }
 
 void AThunderJaw::InitBeginPlay()
