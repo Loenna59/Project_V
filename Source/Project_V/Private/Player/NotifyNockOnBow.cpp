@@ -5,7 +5,7 @@
 
 #include "Player/PlayCharacter.h"
 
-void UNotifyNockOnBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UNotifyNockOnBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation);
 

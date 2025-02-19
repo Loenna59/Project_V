@@ -51,7 +51,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 		else
 		{
-            isAnchoredBow = player->bIsAnchored;
+            isAnchoredBow = player->GetPlayerCameraMode() == EPlayerCameraMode::Anchored;
 		}
 
 		if (!isAnchoredBow)

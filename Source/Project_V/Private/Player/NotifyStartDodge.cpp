@@ -5,7 +5,7 @@
 
 #include "Player/PlayCharacter.h"
 
-void UNotifyStartDodge::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UNotifyStartDodge::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation);
 
