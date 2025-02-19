@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UPlayerHPUI* HealthUI;
 
+	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
+	class UFocusModeUI* FocusModeUI;
+
 	void SetVisibleUI(EPlayerCameraMode mode);
 
 	void SetHealthUI(float current, float max);

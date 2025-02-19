@@ -17,7 +17,7 @@ APlayerWeapon::APlayerWeapon()
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmp_bow(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Bow.SKM_Bow'"));
 
 	if (tmp_bow.Succeeded())
-	{
+	{             
 		mesh->SetSkeletalMesh(tmp_bow.Object);
 	}
 
