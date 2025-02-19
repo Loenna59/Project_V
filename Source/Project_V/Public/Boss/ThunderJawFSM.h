@@ -42,7 +42,6 @@ public:
 	UFUNCTION()
 	bool GetRandomLocationFromNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
 
-
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
@@ -57,5 +56,8 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
 	FVector RandomLocation;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	bool bIsArriveDestLoc{false};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	bool bIsRotateEnd{false};
 };

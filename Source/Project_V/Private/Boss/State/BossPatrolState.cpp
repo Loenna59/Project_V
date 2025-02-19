@@ -6,6 +6,8 @@
 #include "NavigationSystem.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
+#include "Boss/ThunderJawAnimInstance.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Player/PlayCharacter.h"
 
@@ -38,14 +40,36 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 		//PRINTLOG(TEXT("Didn't Find Target"));
 		// 랜덤위치 설정하고 그리로 이동
 		// 1. 랜덤위치로 이동
-		auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
 		// 2. 랜덤위치로 도착하면?
 		// -> 랜덤위치 다시 설정
-		if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
-			result == EPathFollowingRequestResult::Type::Failed)
+
+		if (!FSM->bIsArriveDestLoc)
 		{
-			FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), 2000.0f,FSM->RandomLocation);
+			auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
+			if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
+				result == EPathFollowingRequestResult::Type::Failed)
+			{
+				//PRINTLOG(TEXT("change random loc"));
+				FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), 2000.0f,FSM->RandomLocation);
+				FSM->bIsArriveDestLoc = true;
+				FSM->bIsRotateEnd = false;
+			}
 		}
+
+		if (!FSM->bIsRotateEnd)
+		{
+			Boss->GetBossAIController()->StopMovement();
+			RotateToTarget(Boss,FSM,1.0f);
+			Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
+		}
+		else
+		{
+			FSM->bIsRotateEnd = true;
+			FSM->bIsArriveDestLoc = false;
+		}
+	
+		
+		
 	}
 }
 
@@ -54,3 +78,17 @@ void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	Super::Exit(Boss, FSM);
 	Boss->GetBossAIController()->StopMovement();
 }
+
+void UBossPatrolState::RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, float InterpSpeed)
+{
+	// 타겟 위치로 몸을 돌리는 함수
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), FSM->RandomLocation);
+	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
+	Boss->SetActorRotation(FRotator(0,NewYaw,0));
+	// 현재 회전값과 목표 회전값의 차이 계산
+	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(Boss->GetActorRotation().Yaw, LookAtRot.Yaw));
+	// 임계값보다 작으면 회전 완료로 간주
+	FSM->bIsRotateEnd = YawDifference <= 20.0;
+}
+
+

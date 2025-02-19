@@ -34,8 +34,6 @@ protected:
 	void InitComponents(AThunderJaw* Boss);
 	UFUNCTION()
 	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize);
-	UFUNCTION()
-	void RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed);
 	
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss);

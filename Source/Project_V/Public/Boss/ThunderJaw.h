@@ -46,7 +46,8 @@ public:
 	void MachineGunBronken(float LeftorRight);
 	UFUNCTION()
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
-
+	UFUNCTION()
+	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")

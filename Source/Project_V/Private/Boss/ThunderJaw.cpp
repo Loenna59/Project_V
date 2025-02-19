@@ -9,6 +9,7 @@
 #include "Boss/ThunderJawFSM.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
 
 
@@ -161,6 +162,14 @@ void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
 		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
 		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
 	}
+}
+
+void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
+{
+	// 타겟 위치로 몸을 돌리는 함수
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLoc);
+	float NewYaw = UKismetMathLibrary::FInterpTo(GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
+	SetActorRotation(FRotator(0,NewYaw,0));
 }
 
 

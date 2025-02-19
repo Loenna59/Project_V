@@ -31,7 +31,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	// 몸을 돌리는 중이면 공격하지 않음
 	if (bIsRotateBody)
 	{
-		RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
+		Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
 		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
 		
 		// enemy의 정면까지 돌렸으면 false로 변경
@@ -125,14 +125,6 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 
 		DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
 	}
-}
-
-void UBossCombatState::RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed)
-{
-	// 타겟 위치로 몸을 돌리는 함수
-	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), TargetLoc);
-	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
-	Boss->SetActorRotation(FRotator(0,NewYaw,0));
 }
 
 void UBossCombatState::Attack(AThunderJaw* Boss)
@@ -257,7 +249,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		// 플레이어를 바라보면서 뒷걸음질을 하기 위해 움직이는 방향으로 회전하지 않게 막음
 		Boss->GetCharacterMovement()->bOrientRotationToMovement = false;
 		// 플레이어를 바라보게 몸을 돌려줌
-		RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0f);
+		Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);
 		Boss->AddMovementInput(-PerposeLocation);
 	}
 	else
@@ -280,7 +272,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 void UBossCombatState::Tail(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using Tail"));
-	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0f);
+	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);
 
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
@@ -324,7 +316,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		}
 	}
 	
-	RotateToTarget(Boss,Boss->GetAloy()->GetActorLocation(),1.0);
+	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
 
 	if (Boss->GetBossAIController()->FacingDot < 0.85)
 	{
