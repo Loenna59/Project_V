@@ -23,7 +23,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void InitComponents();
+	void InitConstruct();
+	UFUNCTION()
+	void InitBeginPlay();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -40,11 +42,18 @@ public:
 	class AMachineGun* GetLMachineGun();
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetRMachineGun();
-
+	UFUNCTION()
+	void MachineGunBronken(float LeftorRight);
+	UFUNCTION()
+	void ChangeEyeColor(FLinearColor color, float emissivePower);
+	UFUNCTION()
+	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class UNavigationInvokerComponent* NavInvoker;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	AThunderJawAIController* BossAIController;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -60,7 +69,13 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float CombatDist {1000.0f};
+	float MaxHP{1000.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{500.0f};
+	float CurrentHP{CurrentHP = MaxHP};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float BossSpeed{500.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float CombatDist {1200.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float MeleeAttackDist{800.0f};
 };

@@ -31,8 +31,6 @@ protected:
 	
 	UFUNCTION()
 	void InitStatePool();
-	UFUNCTION()
-	void InitPatrolPoints();
 
 public:
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
@@ -42,9 +40,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="ThunderJaw State")
 	UBossBaseState* GetPrevState();
 	UFUNCTION()
-	void ChangePatrolTargetPoint();
-	UFUNCTION()
-	void AdjustSpeed(float NewSpeed);
+	bool GetRandomLocationFromNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
+
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ThunderJaw State")
@@ -58,9 +55,9 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
-	TArray<FVector> PatrolPoints;
+	FVector RandomLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
-	int CurrentTargetPoint{0};
+	bool bIsArriveDestLoc{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
-	bool ArrivedTargetPoint{false};
+	bool bIsRotateEnd{false};
 };

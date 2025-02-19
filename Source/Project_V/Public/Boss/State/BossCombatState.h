@@ -31,10 +31,12 @@ public:
 
 protected:
 	UFUNCTION()
-	void RotateToTarget(AThunderJaw* Boss, FVector TargetLoc, float InterpSpeed);
+	void InitComponents(AThunderJaw* Boss);
+	UFUNCTION()
+	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize);
 	
 	UFUNCTION()
-	void Attack(AThunderJaw* Boss, float DeltaTime);
+	void Attack(AThunderJaw* Boss);
 	UFUNCTION()
 	void ChooseRandomPattern(AThunderJaw* Boss);
 	UFUNCTION()
@@ -55,6 +57,9 @@ protected:
 	void DiscLauncher(AThunderJaw* Boss);
 	UFUNCTION()
 	void MouseLaser(AThunderJaw* Boss);
+	
+	UFUNCTION()
+	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 
 protected:
 	UPROPERTY()
@@ -110,5 +115,4 @@ protected:
 	// Mouse Laser
 	UPROPERTY()
 	float MouseLaserPatternTime{3.0};
-
 };

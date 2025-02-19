@@ -40,8 +40,13 @@ void AThunderJawAIController::BeginPlay()
 void AThunderJawAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!Boss)
+	{
+		return;
+	}
+	
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->CombatDist, 20,FColor::Red);
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),SightConfig->SightRadius, 20,FColor::Green);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),DetectDist, 20,FColor::Green);
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
 
 	if (DetectedTarget)
@@ -56,7 +61,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		EvaluateTargetDistance(DeltaTime);
 		
 		// stimulus age를 가져와서 target을 놓쳤는지 아닌지를 확인하는 코드
-		CheckTargetThroughtStimulus();
+		CheckTargetThroughStimulus();
 	}
 }
 
@@ -88,6 +93,10 @@ void AThunderJawAIController::InitComponent()
 
 void AThunderJawAIController::MoveToPlayer()
 {
+	if (!Boss->GetAloy())
+	{
+		return;
+	}
 	MoveToActor(Boss->GetAloy(), 200.0f);
 }
 
@@ -109,6 +118,11 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 
 void AThunderJawAIController::UpdateDistanceFromTarget()
 {
+	if (!Boss->GetAloy())
+	{
+		return;
+	}
+	
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	// 평지여서 2D로 해놓음, 나중에 평지가 아니게 되면 바꿔야함
@@ -118,6 +132,11 @@ void AThunderJawAIController::UpdateDistanceFromTarget()
 
 void AThunderJawAIController::UpdateFacingDot()
 {
+	if (!Boss->GetAloy())
+	{
+		return;
+	}
+	
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();
@@ -127,6 +146,11 @@ void AThunderJawAIController::UpdateFacingDot()
 void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 {
 	auto* bossFSM = Boss->GetFSMComponent();
+	if (!bossFSM)
+	{
+		return;
+	}
+	
 	// 공격모드 거리까지 올 때
 	if (DistanceFromTarget <= Boss->CombatDist)
 	{
@@ -137,7 +161,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
-		//PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		// PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
 		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
 		{
 			LoseTargetTime += DeltaTime;
@@ -146,8 +170,13 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	}
 }
 
-void AThunderJawAIController::CheckTargetThroughtStimulus()
+void AThunderJawAIController::CheckTargetThroughStimulus()
 {
+	if (!Boss->GetAloy())
+	{
+		return;
+	}
+	
 	FActorPerceptionBlueprintInfo Info;
 	AIPC->GetActorsPerception(Boss->GetAloy(), Info);
 	
@@ -155,7 +184,6 @@ void AThunderJawAIController::CheckTargetThroughtStimulus()
 	{
 		if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 		{
-			StopMovement();
 			if (Stimulus.GetAge() > SightConfig->GetMaxAge() ||
 				LoseTargetTime > SightConfig->GetMaxAge())
 			{
