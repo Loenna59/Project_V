@@ -18,7 +18,7 @@ AFocusDome::AFocusDome()
 	{
 		sphere->SetStaticMesh(tmp_mesh.Object);
 	}
-
+	
 	ConstructorHelpers::FObjectFinder<UMaterialInstance> tmp_material(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Materials/M_FocusMode_Inst.M_FocusMode_Inst'"));
 
 	if (tmp_material.Succeeded())
@@ -56,6 +56,11 @@ void AFocusDome::Tick(float DeltaTime)
 		sphere->SetRelativeScale3D(FVector(currentScale));
 		sphere->SetVisibility(currentScale > minimalizeScale);
 	}
+
+	// APawn* player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	//
+	// sphere->SetVectorParameterValueOnMaterials(TEXT("Player Position"), player->GetActorLocation());
+	// sphere->SetVectorParameterValueOnMaterials(TEXT("Player Forward Vector"), player->GetActorForwardVector());
 }
 
 void AFocusDome::Activate()

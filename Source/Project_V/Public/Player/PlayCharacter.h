@@ -100,6 +100,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float drawingThreshold = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float idleTimerDuration = 10;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
@@ -221,6 +224,8 @@ private:
 	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
 
 	FVector CalculateAnimToVector();
+
+	FTimerHandle timerHandle;
 
 public:
 	float GetDrawStrength() const

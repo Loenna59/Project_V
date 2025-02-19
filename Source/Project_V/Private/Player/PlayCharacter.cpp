@@ -182,7 +182,7 @@ void APlayCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* pc = CastChecked<APlayerController>(Controller);
+	APlayerController* pc = Cast<APlayerController>(Controller);
 
 	if (pc)
 	{
@@ -651,6 +651,8 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 
 	ui->SetVisibleUI(currentCameraMode);
 	
+	TWeakObjectPtr<APlayCharacter> weakThis = this;
+	
 	switch (currentCameraMode)
 	{
 	case EPlayerCameraMode::Default:
@@ -662,8 +664,33 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 		}
+		
+		GetWorldTimerManager().SetTimer(
+			timerHandle,
+			[weakThis] ()
+			{
+				if (!weakThis.IsValid())
+				{
+					return;
+				}
+				
+				if (!weakThis->holdingWeapon.IsValid())
+				{
+					return;
+				}
+
+				weakThis->PlayAnimMontage(weakThis->equipWeaponMontage);
+			},
+			idleTimerDuration,
+			false
+		);
 		break;
 	case EPlayerCameraMode::Anchored:
+		if (timerHandle.IsValid())
+		{
+			GetWorldTimerManager().ClearTimer(timerHandle);
+			timerHandle.Invalidate();
+		}
 		ChangeToAnchoredCamera();
 		bow->SpawnArrowInBow();
 		focusDome->Deactivate();
