@@ -47,7 +47,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 	
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),CombatDist, 20,FColor::Red);
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),DetectDist, 20,FColor::Green);
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),MeleeAttackDist, 20,FColor::Blue);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
 
 	if (DetectedTarget)
 	{

@@ -17,7 +17,8 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 {
 	Super::Update(Boss, FSM, DeltaTime);
 	// TODO
-	// 
+	// 마지막으로 감지된 곳을 저장한 후 해당 장소 위주로 패트롤
+	// 패트롤 하다 timer를 통해 Radar패턴 실행
 }
 
 void UBossLookOutState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)

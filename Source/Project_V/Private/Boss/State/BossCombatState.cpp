@@ -187,7 +187,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	PRINTLOG(TEXT("ChooseRandomPattern"));
 	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
 
-	if (Dist <= Boss->GetBossAIController()->MeleeAttackDist)
+	if (Dist <= Boss->MeleeAttackDist)
 	{
 		int32 randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
@@ -318,7 +318,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	
 	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
 
-	if (Boss->GetBossAIController()->FacingDot < 0.85)
+	if (Boss->GetBossAIController()->FacingDot < 0.75)
 	{
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 	}

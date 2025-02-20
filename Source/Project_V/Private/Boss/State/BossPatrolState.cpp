@@ -49,8 +49,7 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 			if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
 				result == EPathFollowingRequestResult::Type::Failed)
 			{
-				//PRINTLOG(TEXT("change random loc"));
-				FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), 2000.0f,FSM->RandomLocation);
+				FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), Boss->PatrolDist,FSM->RandomLocation);
 				FSM->bIsArriveDestLoc = true;
 				FSM->bIsRotateEnd = false;
 			}

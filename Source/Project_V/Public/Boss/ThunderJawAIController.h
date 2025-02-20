@@ -64,11 +64,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float DistanceFromTarget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	float DetectDist{2000.0};
+	float DetectDist{3600.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float CombatDist {1200.0f};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{800.0f};
+	float CombatDist {1800.0f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float LoseTargetTime{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
