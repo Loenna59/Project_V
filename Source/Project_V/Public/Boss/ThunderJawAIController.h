@@ -28,6 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
+	
 	UFUNCTION()
 	void InitComponent();
 	UFUNCTION()
@@ -42,6 +43,7 @@ protected:
 	void CheckTargetThroughStimulus();
 
 public:
+
 	UFUNCTION()
 	void MoveToPlayer();
 
@@ -60,9 +62,9 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	bool DetectedTarget;
+	bool DetectedTarget{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	float DistanceFromTarget;
+	float DistanceFromTarget{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float DetectDist{3600.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
@@ -70,5 +72,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float LoseTargetTime{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	float FacingDot;
+	float FacingDot{0.0};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	bool bDebugMode{false};	
 };

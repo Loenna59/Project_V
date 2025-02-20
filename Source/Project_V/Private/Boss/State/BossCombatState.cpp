@@ -9,7 +9,6 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
 
 
@@ -35,7 +34,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 		
 		// enemy의 정면까지 돌렸으면 false로 변경
-		if (Boss->GetBossAIController()->FacingDot > 0.9)
+		if (Boss->GetBossAIController()->FacingDot > 0.8)
 		{
 			bIsRotateBody = false;
 			StartChoosingPatternCycle(Boss);
@@ -120,7 +119,7 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 	int NumSteps = 10;
 	for (int i = 0; i <= NumSteps; i++)
 	{
-		float Alpha = i / NumSteps;
+		float Alpha = (float)i / NumSteps;
 		FVector DebugLocation = FMath::Lerp(start, end, Alpha);
 
 		DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
@@ -153,10 +152,10 @@ void UBossCombatState::Attack(AThunderJaw* Boss)
 
 void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("startpattern"));
+	PRINTLOG(TEXT("Start Pattern"));
 	if (GetWorld()->GetTimerManager().IsTimerActive(PatternTimerHandle))
 	{
-		PRINTLOG(TEXT("timer exist"));
+		PRINTLOG(TEXT("Timer Exist"));
 		GetWorld()->GetTimerManager().ClearTimer(PatternTimerHandle);
 	}
 
@@ -192,11 +191,13 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 		int32 randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
+			PRINTLOG(TEXT("Using Charge"));
 			UsingPattern = EAttackPattern::Charge;
 			PatternTime = recoilTime + ChargeTime;
 		}
 		else if (randomNum == 1)
 		{
+			PRINTLOG(TEXT("Using Tail"));
 			UsingPattern = EAttackPattern::Tail;
 			PatternTime = TailPatternTime;
 		}
@@ -206,6 +207,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 		int32 randomNum = FMath::RandRange(2,2);
 		if (randomNum == 2)
 		{
+			PRINTLOG(TEXT("Using MachineGun"));
 			UsingPattern = EAttackPattern::MachineGun;
 			PatternTime = MachineGunPatternTime;		
 		}
@@ -242,7 +244,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		},recoilTime,false);
 	}
 	
-	PRINTLOG(TEXT("Using Charge"));
+	//PRINTLOG(TEXT("Using Charge"));
 
 	if (!ChargeStart)
 	{
@@ -271,7 +273,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 
 void UBossCombatState::Tail(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("Using Tail"));
+	//PRINTLOG(TEXT("Using Tail"));
 	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);
 
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
@@ -293,7 +295,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		return;
 	}
 	
-	PRINTLOG(TEXT("Using Machine Gun"));
+	//PRINTLOG(TEXT("Using Machine Gun"));
 	DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생

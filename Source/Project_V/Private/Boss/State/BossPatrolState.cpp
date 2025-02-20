@@ -21,6 +21,17 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 {
 	Super::Update(Boss, FSM, DeltaTime);
 	
+	Patrol(Boss,FSM);
+}
+
+void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
+{
+	Super::Exit(Boss, FSM);
+	Boss->GetBossAIController()->StopMovement();
+}
+
+void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
+{
 	auto NavSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	FVector dest = Boss->GetAloy()->GetActorLocation();
 	FPathFindingQuery query;
@@ -37,7 +48,6 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	// 도착지를 못찾았으면 실행
 	if (answer.Result != ENavigationQueryResult::Type::Success)
 	{
-		//PRINTLOG(TEXT("Didn't Find Target"));
 		// 랜덤위치 설정하고 그리로 이동
 		// 1. 랜덤위치로 이동
 		// 2. 랜덤위치로 도착하면?
@@ -69,12 +79,6 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	}
 }
 
-void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
-{
-	Super::Exit(Boss, FSM);
-	Boss->GetBossAIController()->StopMovement();
-}
-
 void UBossPatrolState::RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, float InterpSpeed)
 {
 	// 타겟 위치로 몸을 돌리는 함수
@@ -84,7 +88,7 @@ void UBossPatrolState::RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, fl
 	// 현재 회전값과 목표 회전값의 차이 계산
 	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(Boss->GetActorRotation().Yaw, LookAtRot.Yaw));
 	// 임계값보다 작으면 회전 완료로 간주
-	FSM->bIsRotateEnd = YawDifference <= 20.0;
+	FSM->bIsRotateEnd = YawDifference <= 18.0;
 }
 
 

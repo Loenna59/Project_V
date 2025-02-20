@@ -3,13 +3,13 @@
 
 #include "Boss/ThunderJawAIController.h"
 
-#include "AnimationEditorViewportClient.h"
 #include "Project_V.h"
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Damage.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Player/PlayCharacter.h"
 
@@ -44,10 +44,14 @@ void AThunderJawAIController::Tick(float DeltaTime)
 	{
 		return;
 	}
-	
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),CombatDist, 20,FColor::Red);
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),DetectDist, 20,FColor::Green);
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
+
+	if (bDebugMode)
+	{
+		DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),CombatDist, 20,FColor::Red);
+		DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),DetectDist, 20,FColor::Green);
+		DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
+	}
+		
 
 	if (DetectedTarget)
 	{
@@ -84,6 +88,7 @@ void AThunderJawAIController::InitComponent()
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	
 	
 	AIPC->ConfigureSense(*SightConfig);
 	AIPC->SetDominantSense(SightConfig->GetSenseImplementation());
@@ -136,7 +141,8 @@ void AThunderJawAIController::UpdateFacingDot()
 	{
 		return;
 	}
-	
+
+	PRINTLOG(TEXT("FacingDot : %f"), FacingDot);
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();
@@ -194,6 +200,5 @@ void AThunderJawAIController::CheckTargetThroughStimulus()
 		}
 	}
 }
-
 
 

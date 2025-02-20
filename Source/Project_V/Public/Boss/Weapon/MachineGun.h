@@ -25,11 +25,11 @@ protected:
 
 	UFUNCTION()
 	void InitComponents();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	class AThunderJaw* Boss;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UBoxComponent* Root;
