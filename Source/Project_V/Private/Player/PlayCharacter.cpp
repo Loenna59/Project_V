@@ -237,11 +237,7 @@ void APlayCharacter::BeginPlay()
 void APlayCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	direction = FTransform(GetControlRotation()).TransformVector(direction);
-	AddMovementInput(direction);
-
-	direction = FVector::ZeroVector;
+	
 	bIsDodge = false;
 	bIsShot = false;
 
@@ -304,9 +300,7 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void APlayCharacter::Move(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
-	
-	direction.X = value.X;
-	direction.Y = value.Y;
+	AddMovementInput(FTransform(GetControlRotation()).TransformVector(FVector(value.X, value.Y, 0)));
 }
 
 void APlayCharacter::Rotate(const FInputActionValue& actionValue)
