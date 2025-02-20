@@ -28,6 +28,22 @@ AFocusDome::AFocusDome()
 
 	sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	auto sphere2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere2"));
+	sphere2->SetupAttachment(sphere);
+	sphere2->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (tmp_mesh.Succeeded())
+	{
+		sphere2->SetStaticMesh(tmp_mesh.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tmp_material2(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Assets/StylizedDomeShader/Materials/Dome/MaterialInstance/Mi_StylizedDome_20.Mi_StylizedDome_20'"));
+
+	if (tmp_material2.Succeeded())
+	{
+		sphere2->SetMaterial(0, tmp_material2.Object);
+	}
+
 	destScale = minimalizeScale;
 }
 

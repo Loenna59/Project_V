@@ -111,7 +111,7 @@ public:
 	
 	FVector2D dodgeAxis;
 	
-	FVector direction;
+	// FVector direction;
 
 	bool bIsDodge = false;
 
