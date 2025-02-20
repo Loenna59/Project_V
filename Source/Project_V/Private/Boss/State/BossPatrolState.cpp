@@ -14,7 +14,7 @@
 void UBossPatrolState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	Boss->ChangeEyeColor(FLinearColor(0,0.14,1),500);
+	Boss->ChangeEyeColor(FLinearColor(0,0.14,1),2000);
 }
 
 void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
@@ -60,16 +60,13 @@ void UBossPatrolState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 		{
 			Boss->GetBossAIController()->StopMovement();
 			RotateToTarget(Boss,FSM,1.0f);
-			Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
+			Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 		}
 		else
 		{
 			FSM->bIsRotateEnd = true;
 			FSM->bIsArriveDestLoc = false;
 		}
-	
-		
-		
 	}
 }
 

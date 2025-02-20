@@ -74,8 +74,4 @@ public:
 	float CurrentHP{CurrentHP = MaxHP};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float BossSpeed{500.0f};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float CombatDist {1200.0f};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MeleeAttackDist{800.0f};
 };

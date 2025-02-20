@@ -28,7 +28,14 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
-	void OnPlayMontage(EBossMontage montage);
+	void OnPlayTurnMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayRageMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayChargeMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayTailMontage();
+	
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")

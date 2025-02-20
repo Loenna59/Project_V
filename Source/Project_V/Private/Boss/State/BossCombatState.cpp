@@ -32,7 +32,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	if (bIsRotateBody)
 	{
 		Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
-		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 		
 		// enemy의 정면까지 돌렸으면 false로 변경
 		if (Boss->GetBossAIController()->FacingDot > 0.9)
@@ -187,9 +187,9 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	PRINTLOG(TEXT("ChooseRandomPattern"));
 	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
 
-	if (Dist <= Boss->MeleeAttackDist)
+	if (Dist <= Boss->GetBossAIController()->MeleeAttackDist)
 	{
-		int32 randomNum = FMath::RandRange(1,1);
+		int32 randomNum = FMath::RandRange(0,1);
 		if (randomNum == 0)
 		{
 			UsingPattern = EAttackPattern::Charge;
@@ -263,7 +263,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		FVector BoxHalfSize(150,150,100);
 		MakeTraceBoxAndCheckHit(HeadStart,HeadEnd,BoxHalfSize);
 		
-		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Charge);
+		Boss->GetBossAnimInstance()->OnPlayChargeMontage();
 
 		
 	}
@@ -278,7 +278,7 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
 	FVector BoxHalfSize = FVector(300,300,200);
 	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize);
-	Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Tail);
+	Boss->GetBossAnimInstance()->OnPlayTailMontage();
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
@@ -320,7 +320,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 
 	if (Boss->GetBossAIController()->FacingDot < 0.85)
 	{
-		Boss->GetBossAnimInstance()->OnPlayMontage(EBossMontage::Turn);
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 	}
 }
 

@@ -45,9 +45,9 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		return;
 	}
 	
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->CombatDist, 20,FColor::Red);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),CombatDist, 20,FColor::Red);
 	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),DetectDist, 20,FColor::Green);
-	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),Boss->MeleeAttackDist, 20,FColor::Blue);
+	DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),MeleeAttackDist, 20,FColor::Blue);
 
 	if (DetectedTarget)
 	{
@@ -152,13 +152,13 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	}
 	
 	// 공격모드 거리까지 올 때
-	if (DistanceFromTarget <= Boss->CombatDist)
+	if (DistanceFromTarget <= CombatDist)
 	{
 		LoseTargetTime = 0.0f;
 		bossFSM->ChangeBossState(EBossState::Combat);
 	}
 	// 공격모드 거리보단 멀고 감지거리보다는 가까울 때
-	else if (DistanceFromTarget > Boss->CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
+	else if (DistanceFromTarget > CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
 		// PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
