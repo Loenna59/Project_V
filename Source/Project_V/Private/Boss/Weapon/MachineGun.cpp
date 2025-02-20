@@ -5,6 +5,7 @@
 
 #include "Project_V.h"
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/BoxComponent.h"
@@ -99,6 +100,7 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 	{
 		DamageWeaponHP(50);
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
+		Boss->GetBossAIController()->DetectedTarget = true;
 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
 		// detach from parent
 		if (bIsBroken)
