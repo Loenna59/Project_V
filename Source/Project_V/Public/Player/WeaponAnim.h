@@ -20,4 +20,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FTransform bone;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsPlayingMontage;
 };

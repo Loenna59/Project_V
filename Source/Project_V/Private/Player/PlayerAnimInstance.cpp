@@ -79,7 +79,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			weaponAnim->bone = player->GetMesh()->GetBoneTransform(TEXT("index_03_r"));
 			weaponAnim->bIsAnchored = !isShot && isAnchoredBow;
+			weaponAnim->bIsPlayingMontage = Montage_IsPlaying(player->equipWeaponMontage);
 		}
+
 	}
 }
 
