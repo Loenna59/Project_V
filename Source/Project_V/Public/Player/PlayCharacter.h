@@ -27,6 +27,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY()
+	class UPlayerAnimInstance* anim;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPlayerMovement* movementComp;
+
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* springArmComp;
 
@@ -63,15 +69,6 @@ public:
 	float strollSpeed = 400;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float walkSpeed = 600;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float sprintSpeed = 1200;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float dodgeSpeed = 800;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	double minPinchDegrees = 50;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
@@ -91,10 +88,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float releaseMotionMultiplier = 10.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	class UAnimMontage* equipWeaponMontage;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float focusModeThreshold = 0.5f;
 
@@ -107,37 +101,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
 
-	FVector2D prevDodgeAxis;
-	
-	FVector2D dodgeAxis;
-	
-	// FVector direction;
-
-	bool bIsDodge = false;
-
 	bool bIsCompleteReload = false;
 
-	bool bIsPlayingDodge = false;
-
 	bool bIsShot = false;
-
-	UFUNCTION()
-	void Move(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void Rotate(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void ActionJump(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void OnTriggerShift(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void BeginDodge(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void Dodge();
 
 	UFUNCTION()
 	void OnAnchor();
@@ -173,24 +139,6 @@ private:
 	
 	UPROPERTY()
 	class UInputMappingContext* imc;
-
-	UPROPERTY()
-	class UInputAction* ia_move;
-
-	UPROPERTY()
-	class UInputAction* ia_rotate;
-
-	UPROPERTY()
-	class UInputAction* ia_jump;
-
-	UPROPERTY()
-	class UInputAction* ia_shift;
-
-	UPROPERTY()
-	class UInputAction* ia_movePressed;
-
-	UPROPERTY()
-	class UInputAction* ia_doubleTap;
 
 	UPROPERTY()
 	class UInputAction* ia_anchored;
@@ -245,4 +193,6 @@ public:
 	void SetCurrentHealth(float health);
 
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
+
+	void SetCameraSlowMode(bool bActive);
 };

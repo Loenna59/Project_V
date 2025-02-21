@@ -63,9 +63,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isShot;
-	
-	UFUNCTION(BlueprintCallable, Category=Dodge)
-	void OnMoveDodge();
 
 	void SetWeaponAnim(UAnimInstance* anim);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPlayEquip();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartDodge(FVector direction);
 };

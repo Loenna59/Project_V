@@ -42,26 +42,21 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (player)
 	{
 		// dodgeDirection = FTransform(player->GetControlRotation()).TransformVector(FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0));
-		dodgeDirection = FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0);
+		// dodgeDirection = FVector(player->dodgeAxis.X, player->dodgeAxis.Y, 0);
 	
-		if (player->bIsDodge)
-		{
-			isDodged = true;
-			isAnchoredBow = false;
-		}
-		else
-		{
+		// if (player->bIsDodge)
+		// {
+		// 	isDodged = true;
+		// 	isAnchoredBow = false;
+		// }
+		// else
+		// {
             isAnchoredBow = player->GetPlayerCameraMode() == EPlayerCameraMode::Anchored;
-		}
+		// }
 
 		if (!isAnchoredBow)
 		{
 			isShot = false;
-		}	
-
-		if (isPlayingDodge)
-		{
-			OnMoveDodge();
 		}
 
 		drawStrength = player->GetDrawStrength();
@@ -79,33 +74,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			weaponAnim->bone = player->GetMesh()->GetBoneTransform(TEXT("index_03_r"));
 			weaponAnim->bIsAnchored = !isShot && isAnchoredBow;
-			weaponAnim->bIsPlayingMontage = Montage_IsPlaying(player->equipWeaponMontage);
+			// weaponAnim->bIsPlayingMontage = Montage_IsPlaying(player->equipWeaponMontage);
 		}
 
 	}
-}
-
-void UPlayerAnimInstance::OnMoveDodge()
-{
-	dodgeDirection = FTransform(player->GetControlRotation()).TransformVector(dodgeDirection).GetSafeNormal();
-	
-	FVector p0 = player->GetActorLocation();
-	FVector vt = player->dodgeSpeed * GetWorld()->DeltaTimeSeconds * dodgeDirection;
-
-	FVector forwardVector = player->GetActorForwardVector();
-
-	float dotProduct = FVector::DotProduct(forwardVector, dodgeDirection);
-	float radians = FMath::Acos(dotProduct);
-	float degrees = FMath::RadiansToDegrees(radians);
-
-	if (degrees > 1.f)
-	{
-		FRotator targetRotation = FRotationMatrix::MakeFromX(dodgeDirection).Rotator();
-		FRotator r0 = player->GetControlRotation();
-
-		FRotator newRotation = FMath::RInterpTo(r0, targetRotation, GetWorld()->DeltaTimeSeconds, 360.f);
-		player->SetActorRotation(newRotation);
-	}
-
-	player->SetActorLocation(p0 + vt);
 }
