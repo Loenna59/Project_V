@@ -4,7 +4,9 @@
 #include "Boss/State/BossLookOutState.h"
 
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
+#include "Navigation/PathFollowingComponent.h"
 
 void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
@@ -16,9 +18,33 @@ void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
 {
 	Super::Update(Boss, FSM, DeltaTime);
-	// TODO
-	// 마지막으로 감지된 곳을 저장한 후 해당 장소 위주로 패트롤
-	// 패트롤 하다 timer를 통해 Radar패턴 실행
+
+	DrawDebugBox(GetWorld(),Boss->GetBossAIController()->DetectedLocation,FVector(50),FColor::Red);
+	DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Green);
+	
+
+	// detect된 위치로 이동
+	if (!bIsArrivedDetectedArea)
+	{
+		auto result = Boss->GetBossAIController()->MoveToLocation(Boss->GetBossAIController()->DetectedLocation);
+		// 해당 위치로 도착했으면
+		if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
+			result == EPathFollowingRequestResult::Type::Failed)
+		{
+			// 해당 위치를 기준으로 정찰
+			FSM->GetRandomLocationFromNavMesh(Boss->GetBossAIController()->DetectedLocation, Boss->PatrolDist,FSM->RandomLocation);
+			bIsArrivedDetectedArea = true;
+		}
+	}
+	else
+	{
+		auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
+		if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
+			result == EPathFollowingRequestResult::Type::Failed)
+		{
+			FSM->GetRandomLocationFromNavMesh(Boss->GetBossAIController()->DetectedLocation, Boss->PatrolDist,FSM->RandomLocation);
+		}
+	}
 }
 
 void UBossLookOutState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)

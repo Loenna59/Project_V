@@ -61,8 +61,11 @@ protected:
 
 
 public:
+	// target이 sight안의 LookOut 경계에 들어옴
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	bool DetectedTarget{false};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	FVector DetectedLocation;	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float DistanceFromTarget{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")

@@ -92,12 +92,16 @@ bool UThunderJawFSM::GetRandomLocationFromNavMesh(FVector CenterLocation, float 
 	FNavLocation Loc;
 	bool bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
 	float Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
+
+
 	while (Dist < Radius / 2.0)
 	{
 		bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
 		Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
 	}
+	
 	Dest = Loc.Location;
+	PRINTLOG(TEXT("randomLoc : %f,%f,%f"),Dest.X,Dest.Y,Dest.Z);
 	return bResult;
 }
 

@@ -107,6 +107,13 @@ void AThunderJawAIController::MoveToPlayer()
 
 void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
+	
+	auto CurrentBossState = Boss->GetFSMComponent()->GetCurrentState()->BossState;
+	if (CurrentBossState == EBossState::Combat)
+	{
+		return;
+	}
+	
 	if (Stimulus.Type== UAISense::GetSenseID<UAISense_Sight>())
 	{
 		if (Stimulus.WasSuccessfullySensed())
@@ -114,8 +121,12 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 			auto* player = Cast<APlayCharacter>(Actor);
 			if (player)
 			{
+				// 플레이어가 감지됨
+				// 경계모드로 변환 된 상태이면 감지됐던 장소를 저장
 				PRINTLOG(TEXT("Target is in Sight"));
 				DetectedTarget = true;
+				DetectedLocation = player->GetActorLocation();
+				PRINTLOG(TEXT("DetectedLocation : %f,%f,%f"),DetectedLocation.X,DetectedLocation.Y,DetectedLocation.Z);
 			}
 		}
 	}
@@ -142,7 +153,7 @@ void AThunderJawAIController::UpdateFacingDot()
 		return;
 	}
 
-	PRINTLOG(TEXT("FacingDot : %f"), FacingDot);
+	//PRINTLOG(TEXT("FacingDot : %f"), FacingDot);
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();

@@ -67,8 +67,6 @@ void AThunderJaw::InitConstruct()
 	}
 
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
-	
-	NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 }
 
 void AThunderJaw::InitBeginPlay()
