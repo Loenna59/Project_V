@@ -2,9 +2,7 @@
 
 
 #include "Player/NotifyStartDodge.h"
-
 #include "Player/PlayCharacter.h"
-#include "Player/Component/PlayerMovement.h"
 
 void UNotifyStartDodge::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {

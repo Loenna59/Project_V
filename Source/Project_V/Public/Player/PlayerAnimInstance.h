@@ -70,5 +70,14 @@ public:
 	void OnPlayEquip();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnStartDodge(FVector direction);
+	void OnStartDodge();
+
+	UFUNCTION()
+	void OnFire();
+
+	UFUNCTION()
+	void OnModifyWaistRotation(const FRotator& rotation);
+
+	UFUNCTION()
+	void OnSetDrawStrength(float strength);
 };

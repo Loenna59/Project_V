@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/PlayCharacter.h"
 
 #include "EnhancedInputComponent.h"
@@ -19,6 +18,7 @@
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
 #include "Player/PlayerWeapon.h"
+#include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerMovement.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerHUD.h"
@@ -83,20 +83,6 @@ APlayCharacter::APlayCharacter()
 		imc = tmp_imc.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_anchored(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerAnchored.IA_PlayerAnchored'"));
-
-	if (tmp_ia_anchored.Succeeded())
-	{
-		ia_anchored = tmp_ia_anchored.Object;
-	}
-
-	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_fire(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerFire.IA_PlayerFire'"));
-
-	if (tmp_ia_fire.Succeeded())
-	{
-		ia_fire = tmp_ia_fire.Object;
-	}
-
 	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_focus(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerFocusMode.IA_PlayerFocusMode'"));
 
 	if (tmp_ia_focus.Succeeded())
@@ -129,6 +115,7 @@ APlayCharacter::APlayCharacter()
 	targetMultiplier = releaseMotionMultiplier;
 
 	movementComp = CreateDefaultSubobject<UPlayerMovement>(TEXT("PlayerMovement"));
+	combatComp = CreateDefaultSubobject<UPlayerCombat>(TEXT("PlayerCombat"));
 }
 
 // Called when the game starts or when spawned
@@ -155,7 +142,7 @@ void APlayCharacter::BeginPlay()
 	{
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		bow->SpawnArrowInBow();
-		bIsCompleteReload = true;
+		combatComp->bIsCompleteReload = true;
 		//
 
 		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
@@ -182,6 +169,8 @@ void APlayCharacter::BeginPlay()
 	{
 		anim->SetWeaponAnim(bow->GetAnimInstance());
 	}
+
+	combatComp->AddHandler(this, &APlayCharacter::ReleaseCombat);
 }
 
 // Called every frame
@@ -232,11 +221,7 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	if (pi)
 	{
 		movementComp->SetupInputBinding(pi);
-		
-		pi->BindAction(ia_anchored, ETriggerEvent::Started, this, &APlayCharacter::OnAnchor);
-		pi->BindAction(ia_anchored, ETriggerEvent::Completed, this, &APlayCharacter::OnAnchorRelease);
-		pi->BindAction(ia_fire, ETriggerEvent::Triggered, this, &APlayCharacter::OnPressedFire);
-		pi->BindAction(ia_fire, ETriggerEvent::Completed, this, &APlayCharacter::OnReleasedFire);
+		combatComp->SetupInputBinding(pi);
 		pi->BindAction(ia_focus, ETriggerEvent::Triggered, this, &APlayCharacter::OnFocusOrScan);
 		pi->BindAction(ia_focus, ETriggerEvent::Completed, this, &APlayCharacter::EndFocusOrScan);
 	}
@@ -260,14 +245,12 @@ void APlayCharacter::ChangeToAnchoredCamera()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
-void APlayCharacter::OnAnchor()
+void APlayCharacter::ReleaseCombat()
 {
-	if (!holdingWeapon.IsValid())
-	{
-		anim->OnPlayEquip();
-	}
-	
-	SetPlayerCameraMode(EPlayerCameraMode::Anchored);
+	PrintLogFunc(TEXT("ReleaseCombat"));
+	targetFOV = maxFOV;
+	targetMultiplier = releaseMotionMultiplier;
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 }
 
 void APlayCharacter::ChangeToDefaultCamera()
@@ -288,54 +271,6 @@ void APlayCharacter::ChangeToDefaultCamera()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	anchoredCameraComp->SetFieldOfView(maxFOV);
-}
-
-void APlayCharacter::OnAnchorRelease()
-{
-	SetPlayerCameraMode(EPlayerCameraMode::Default);
-	bIsCompleteReload = true;
-}
-
-void APlayCharacter::OnPressedFire(const FInputActionValue& actionValue)
-{
-	if (currentCameraMode != EPlayerCameraMode::Anchored)
-	{
-		return;
-	}
-	
-	if (!bIsCompleteReload)
-	{
-		return;
-	}
-	
-	elapsedDrawingTime += GetWorld()->DeltaTimeSeconds;
-
-	float t = FMath::Clamp(elapsedDrawingTime / drawDuration, 0, 1);
-
-	//EaseOutQuad = 1 - (1 - t)^2
-	float quadT = 1 - FMath::Pow(1 - t, 2);
-	
-	// 시간에 따라 증가
-	SetDrawStrength(FMath::Lerp(0, targetDrawStrength, quadT));
-}
-
-void APlayCharacter::OnReleasedFire(const FInputActionValue& actionValue)
-{
-	if (currentCameraMode != EPlayerCameraMode::Anchored)
-	{
-		return;
-	}
-
-	if (drawStrength < drawingThreshold)
-	{
-		return;
-	}
-
-	bow->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
-
-	bIsCompleteReload = false;
-	bIsShot = true;
-	SetDrawStrength(0);
 }
 
 void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
@@ -389,7 +324,7 @@ void APlayCharacter::PlaceArrowOnBow()
 	if (bow)
 	{
 		bow->PlaceArrowOnBow();
-		bIsCompleteReload = true;
+		combatComp->bIsCompleteReload = true;
 	}
 }
 
@@ -407,39 +342,6 @@ void APlayCharacter::PickWeapon()
 	}
 }
 
-FVector APlayCharacter::CalculateAnimToVector()
-{
-	FVector start = anchoredCameraComp->GetComponentLocation();
-	FVector end = start + anchoredCameraComp->GetForwardVector() * 10000;
-
-	TArray<AActor*> ignores;
-	ignores.Add(this);
-
-	FHitResult hitResult;
-
-	bool isHit = UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, TraceTypeQuery1, false, ignores, EDrawDebugTrace::None, hitResult, true);
-
-	return isHit? hitResult.Location : hitResult.TraceEnd;
-}
-
-void APlayCharacter::SetDrawStrength(float strength)
-{
-	drawStrength = strength;
-
-	if (ui)
-	{
-		ui->Crosshair->UpdateCircle(strength);
-	}
-
-	if (drawStrength < 0.01f)
-	{
-		targetFOV = maxFOV;
-		targetMultiplier = releaseMotionMultiplier;
-		elapsedDrawingTime = 0;
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f); 
-	}
-}
-
 void APlayCharacter::SetPlayingDodge(bool isPlaying)
 {
 	movementComp->bIsPlayingDodge = isPlaying;
@@ -451,7 +353,7 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 	else
 	{
 		// 강제로 리로드 처리
-		bIsCompleteReload = true;
+		combatComp->bIsCompleteReload = true;
 		movementComp->EndDodge();
 
 		if (prevCameraMode == EPlayerCameraMode::Focus)
@@ -484,7 +386,7 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 	{
 	case EPlayerCameraMode::Default:
 		ChangeToDefaultCamera();
-		SetDrawStrength(0);
+		combatComp->SetDrawStrength(0);
 		bow->PlaceOrSpawnArrow();
 		focusDome->Deactivate();
 		movementComp->AutoChangeWalkState();

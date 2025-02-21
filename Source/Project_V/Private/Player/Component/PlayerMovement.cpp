@@ -124,8 +124,7 @@ void UPlayerMovement::Rotate(const FInputActionValue& actionValue)
 
 	if (me->GetPlayerCameraMode() != EPlayerCameraMode::Default)
 	{
-		// PrintLogFunc(TEXT("Pitch = %f, Yaw = %f"), GetControlRotation().GetNormalized().Pitch, GetControlRotation().GetNormalized().Yaw);
-
+		
 		if (value.Y > 0 && pitch < -45.f)
 		{
 			return;
@@ -135,6 +134,8 @@ void UPlayerMovement::Rotate(const FInputActionValue& actionValue)
 		{
 			return;
 		}
+		
+		anim->OnModifyWaistRotation(me->GetControlRotation());
 	}
 	
 	me->AddControllerPitchInput(value.Y);
@@ -193,7 +194,7 @@ void UPlayerMovement::StartDodge()
 	}
 	
 	me->ChangeToDefaultCamera();
-	anim->OnStartDodge(FVector(dodgeValue.X, dodgeValue.Y, 0));
+	anim->OnStartDodge();
 }
 
 void UPlayerMovement::PlayingDodge()

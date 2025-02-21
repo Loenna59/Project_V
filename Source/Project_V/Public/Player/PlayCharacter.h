@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEventCameraModeChanged, EPlayerCameraMode, mode);
+
 UCLASS()
 class PROJECT_V_API APlayCharacter : public ACharacter
 {
@@ -32,6 +34,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class UPlayerMovement* movementComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPlayerCombat* combatComp;
 
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* springArmComp;
@@ -75,12 +80,6 @@ public:
 	float cameraTransitionSpeedMultiplier = 5.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float targetDrawStrength = 100.0f; // 활시위 최대값
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float drawDuration = 1.f; // 활시위가 최대로 당길 때 까지 걸리는 시간
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float slowDilation = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
@@ -93,29 +92,12 @@ public:
 	float focusModeThreshold = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float drawingThreshold = 1;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float idleTimerDuration = 10;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
 
-	bool bIsCompleteReload = false;
-
 	bool bIsShot = false;
-
-	UFUNCTION()
-	void OnAnchor();
-
-	UFUNCTION()
-	void OnAnchorRelease();
-
-	UFUNCTION()
-	void OnPressedFire(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void OnReleasedFire(const FInputActionValue& actionValue);
 
 	UFUNCTION()
 	void OnFocusOrScan(const FInputActionValue& actionValue);
@@ -132,6 +114,11 @@ public:
 	void ChangeToDefaultCamera();
 	
 	void ChangeToAnchoredCamera();
+
+	UFUNCTION()
+	void ReleaseCombat();
+	
+	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
 	
 private:
 	const float maxFOV = 90;
@@ -141,23 +128,11 @@ private:
 	class UInputMappingContext* imc;
 
 	UPROPERTY()
-	class UInputAction* ia_anchored;
-
-	UPROPERTY()
-	class UInputAction* ia_fire;
-
-	UPROPERTY()
 	class UInputAction* ia_focus;
-
-	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
-
-	float drawStrength = 0;
 
 	float currentBlendCameraAlpha;
 	
 	float targetBlendCameraAlpha;
-
-	float elapsedDrawingTime; // 활 시위 경과 시간
 
 	float targetFOV;
 
@@ -171,22 +146,13 @@ private:
 	
 	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
 
-	FVector CalculateAnimToVector();
-
 	FTimerHandle timerHandle;
 
 public:
-	float GetDrawStrength() const
-	{
-		return drawStrength;
-	}
-
 	EPlayerCameraMode GetPlayerCameraMode() const
 	{
 		return currentCameraMode;
 	}
-
-	void SetDrawStrength(float strength);
 
 	void SetPlayingDodge(bool isPlaying);
 
