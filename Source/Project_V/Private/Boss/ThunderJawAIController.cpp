@@ -125,6 +125,7 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 				// 경계모드로 변환 된 상태이면 감지됐던 장소를 저장
 				PRINTLOG(TEXT("Target is in Sight"));
 				DetectedTarget = true;
+				Boss->GetFSMComponent()->bIsArrivedDetectedLocation = false;
 				DetectedLocation = player->GetActorLocation();
 				PRINTLOG(TEXT("DetectedLocation : %f,%f,%f"),DetectedLocation.X,DetectedLocation.Y,DetectedLocation.Z);
 			}

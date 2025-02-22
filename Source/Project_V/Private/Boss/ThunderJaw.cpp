@@ -6,6 +6,7 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"
+#include "Boss/Weapon/DiscLauncher.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -98,6 +99,24 @@ void AThunderJaw::InitBeginPlay()
 
 	}
 
+	LDiscLauncher = GetWorld()->SpawnActor<ADiscLauncher>(ADiscLauncher::StaticClass());
+	if (LDiscLauncher)
+	{
+		LDiscLauncher->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("LDiscLauncherSocket"));
+		LDiscLauncher->Root->SetCollisionProfileName("Enemy");
+		LDiscLauncher->LeftorRight = -1;
+		LDiscLauncher->Boss = this;
+	}
+	
+	RDiscLauncher = GetWorld()->SpawnActor<ADiscLauncher>(ADiscLauncher::StaticClass());
+	if (RDiscLauncher)
+	{
+		RDiscLauncher->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RDiscLauncherSocket"));
+		RDiscLauncher->Root->SetCollisionProfileName("Enemy");
+		RDiscLauncher->LeftorRight = 1;
+		RDiscLauncher->Boss = this;
+	}
+
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
@@ -140,7 +159,19 @@ class AMachineGun* AThunderJaw::GetRMachineGun()
 	return RMachineGun;
 }
 
-void AThunderJaw::MachineGunBronken(float LeftorRight)
+class ADiscLauncher* AThunderJaw::GetLDiscLauncher()
+{
+	return LDiscLauncher;
+}
+
+class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
+{
+	return RDiscLauncher;
+}
+
+
+
+void AThunderJaw::MachineGunBroken(float LeftorRight)
 {
 	if (LeftorRight == -1)
 	{
@@ -149,6 +180,18 @@ void AThunderJaw::MachineGunBronken(float LeftorRight)
 	else
 	{
 		RMachineGun = nullptr;
+	}
+}
+
+void AThunderJaw::DiscLauncherBroken(float LeftorRight)
+{
+	if (LeftorRight == -1)
+	{
+		LDiscLauncher = nullptr;
+	}
+	else
+	{
+		RDiscLauncher = nullptr;
 	}
 }
 

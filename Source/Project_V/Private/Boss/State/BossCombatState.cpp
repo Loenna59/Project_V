@@ -8,6 +8,8 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
+#include "Boss/Weapon/DiscLauncher.h"
+#include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
 
@@ -79,6 +81,8 @@ void UBossCombatState::InitComponents(AThunderJaw* Boss)
 	UsingPattern = EAttackPattern::None;
 	PatternCurrentTime = 0;
 	PatternTime = 0;
+	MachineGunDelayCurrentTime = 0;
+	DiscLauncherDelayCurrentTime = 0;
 	ChargeFlag = false;
 	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
 }
@@ -204,7 +208,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		int32 randomNum = FMath::RandRange(2,2);
+		int32 randomNum = FMath::RandRange(3,3);
 		if (randomNum == 2)
 		{
 			PRINTLOG(TEXT("Using MachineGun"));
@@ -329,6 +333,25 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("Using DiscLauncher"));
+
+	DiscLauncherDelayCurrentTime += GetWorld()->GetDeltaSeconds();
+	if (DiscLauncherDelayCurrentTime > DiscLauncherDelay)
+	{
+		DiscLauncherDelayCurrentTime = 0;
+		if (Boss->GetLDiscLauncher())
+		{
+			FTransform Lt = Boss->GetLDiscLauncher()->FirePos->GetComponentTransform();
+			Lt.SetScale3D(FVector(1.0));
+			Boss->GetLDiscLauncher()->CreateDisc(Lt);
+		}
+
+		if (Boss->GetRDiscLauncher())
+		{
+			FTransform Rt = Boss->GetRDiscLauncher()->FirePos->GetComponentTransform();
+			Rt.SetScale3D(FVector(1.0));
+			Boss->GetRDiscLauncher()->CreateDisc(Rt);
+		}
+	}
 }
 
 void UBossCombatState::MouseLaser(AThunderJaw* Boss)

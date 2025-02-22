@@ -33,14 +33,16 @@ void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 
 void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
-	if (!FSM->bIsArriveDestLoc)
+	// 랜덤 위치 패트롤
+	// spline 깔아놓고 따라가도록 설정할 예정
+	if (!FSM->bIsArriveRandomLocation)
 	{
 		auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
 		if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
 			result == EPathFollowingRequestResult::Type::Failed)
 		{
 			FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), Boss->PatrolDist,FSM->RandomLocation);
-			FSM->bIsArriveDestLoc = true;
+			FSM->bIsArriveRandomLocation = true;
 			FSM->bIsRotateEnd = false;
 		}
 	}
@@ -54,7 +56,7 @@ void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	else
 	{
 		FSM->bIsRotateEnd = true;
-		FSM->bIsArriveDestLoc = false;
+		FSM->bIsArriveRandomLocation = false;
 	}
 
 	DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Red);

@@ -24,7 +24,7 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 	
 
 	// detect된 위치로 이동
-	if (!bIsArrivedDetectedArea)
+	if (!FSM->bIsArrivedDetectedLocation)
 	{
 		auto result = Boss->GetBossAIController()->MoveToLocation(Boss->GetBossAIController()->DetectedLocation);
 		// 해당 위치로 도착했으면
@@ -33,7 +33,7 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 		{
 			// 해당 위치를 기준으로 정찰
 			FSM->GetRandomLocationFromNavMesh(Boss->GetBossAIController()->DetectedLocation, Boss->PatrolDist,FSM->RandomLocation);
-			bIsArrivedDetectedArea = true;
+			FSM->bIsArrivedDetectedLocation = true;
 		}
 	}
 	else
@@ -50,4 +50,5 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 void UBossLookOutState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
+	Boss->GetBossAIController()->StopMovement();
 }

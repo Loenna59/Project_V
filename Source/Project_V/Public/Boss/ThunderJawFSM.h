@@ -57,7 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
 	FVector RandomLocation{FVector::Zero()};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
-	bool bIsArriveDestLoc{false};
+	bool bIsArriveRandomLocation{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
 	bool bIsRotateEnd{false};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	bool bIsArrivedDetectedLocation{false};
 };

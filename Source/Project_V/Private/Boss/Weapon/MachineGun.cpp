@@ -8,6 +8,7 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/MachineGunBullet.h"
+#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/Arrow.h"
@@ -17,7 +18,7 @@
 AMachineGun::AMachineGun()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	InitComponents();
 }
@@ -31,12 +32,6 @@ void AMachineGun::BeginPlay()
 	CurrentHP = MaxHP;
 	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunOverlap);
 
-}
-
-// Called every frame
-void AMachineGun::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AMachineGun::InitComponents()
@@ -56,7 +51,7 @@ void AMachineGun::InitComponents()
 		Mesh->SetRelativeScale3D(FVector(0.350000,0.200000,0.200000));
 	}
 
-	FirePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirePos"));
+	FirePos = CreateDefaultSubobject<UArrowComponent>(TEXT("FirePos"));
 	if (FirePos)
 	{
 		FirePos->SetupAttachment(Root);
@@ -106,7 +101,7 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 		if (bIsBroken)
 		{
 			
-			Boss->MachineGunBronken(LeftorRight);
+			Boss->MachineGunBroken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));
 			UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();

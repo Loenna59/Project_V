@@ -42,8 +42,15 @@ public:
 	class AMachineGun* GetLMachineGun();
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetRMachineGun();
+	UFUNCTION(BlueprintCallable)
+	class ADiscLauncher* GetLDiscLauncher();
+	UFUNCTION(BlueprintCallable)
+	class ADiscLauncher* GetRDiscLauncher();
+	
 	UFUNCTION()
-	void MachineGunBronken(float LeftorRight);
+	void MachineGunBroken(float LeftorRight);
+	UFUNCTION()
+	void DiscLauncherBroken(float LeftorRight);
 	UFUNCTION()
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
 	UFUNCTION()
@@ -66,6 +73,11 @@ protected:
 	class AMachineGun* LMachineGun;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AMachineGun* RMachineGun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class ADiscLauncher* LDiscLauncher;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class ADiscLauncher* RDiscLauncher;
+	
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
