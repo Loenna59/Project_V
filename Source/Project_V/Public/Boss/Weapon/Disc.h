@@ -16,7 +16,7 @@ public:
 	ADisc();
 
 	UFUNCTION()
-	void FlyToPerposeLocation();
+	void MoveToTargetLocation();
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -30,7 +30,13 @@ public:
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UArrowComponent* FirePos;
-		
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
+	FVector TargetLocation;
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
+	float AcceptanceRadius{50.0f};
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
+	bool bIsArrive{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
-	float speed{3000.0f};
+	float Speed{3000.0f};
 };

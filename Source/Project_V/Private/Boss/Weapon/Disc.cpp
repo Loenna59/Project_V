@@ -22,7 +22,7 @@ ADisc::ADisc()
 void ADisc::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	TargetLocation = GetActorLocation() + (GetActorForwardVector() * 3000.0f);
 }
 
 // Called every frame
@@ -30,7 +30,7 @@ void ADisc::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FlyToPerposeLocation();
+	MoveToTargetLocation();
 }
 
 void ADisc::InitComponents()
@@ -57,10 +57,21 @@ void ADisc::InitComponents()
 	}
 }
 
-void ADisc::FlyToPerposeLocation()
+void ADisc::MoveToTargetLocation()
 {
+	if (bIsArrive)
+	{
+		return;
+	}
+	
+	float dist = FVector::Distance(TargetLocation,GetActorLocation());
+	if (dist <= AcceptanceRadius)
+	{
+		bIsArrive = true;
+		return;
+	}
 	FVector p0 = GetActorLocation();
-	FVector direction = GetActorForwardVector();
-	FVector vt = direction * speed * GetWorld()->GetDeltaSeconds();
+	FVector direction = (TargetLocation - GetActorLocation()).GetSafeNormal();
+	FVector vt = direction * Speed * GetWorld()->GetDeltaSeconds();
 	SetActorLocation(p0 + vt);
 }
