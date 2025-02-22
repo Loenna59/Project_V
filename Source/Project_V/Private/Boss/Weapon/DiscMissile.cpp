@@ -18,12 +18,14 @@ ADiscMissile::ADiscMissile()
 	InitComponents();
 }
 
+
 // Called when the game starts or when spawned
 void ADiscMissile::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Root->OnComponentBeginOverlap.AddDynamic(this,&ADiscMissile::OnDiscMissileBeginOverlap);
+	PRINTLOG(TEXT("Spawned missile"));
 }
 
 // Called every frame
@@ -46,18 +48,18 @@ void ADiscMissile::InitComponents()
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeLocation(FVector(-30,0,0));
-		Mesh->SetRelativeRotation(FRotator(-90,0,0));
-		Mesh->SetRelativeScale3D(FVector(0.15,0.15,0.75));
+		Mesh->SetRelativeLocation(FVector(0,0,-5));
+		Mesh->SetRelativeRotation(FRotator(0,90,0));
+		Mesh->SetRelativeScale3D(FVector(1,1,1));
 	}
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/StarterContent/Shapes/Shape_NarrowCapsule.Shape_NarrowCapsule'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/Assets/Missile/Missile.Missile'"));
 	if (tempMesh.Succeeded())
 	{
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Blueprints/Boss/Material/M_MachineGunBullet.M_MachineGunBullet'"));
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Assets/Missile/Material_006__texture_png_png.Material_006__texture_png_png'"));
 	if (tempMat.Succeeded())
 	{
 		Mesh->SetMaterial(0,tempMat.Object);
@@ -67,8 +69,8 @@ void ADiscMissile::InitComponents()
 	if (PMC)
 	{
 		PMC->SetUpdatedComponent(Root);
-		PMC->InitialSpeed = 5000.0f;
-		PMC->MaxSpeed = 5000.0f;
+		PMC->InitialSpeed = 8000.0f;
+		PMC->MaxSpeed = 8000.0f;
 		PMC->bRotationFollowsVelocity = true;
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
@@ -82,8 +84,11 @@ void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
-		PRINTLOG(TEXT("hit missile"));
 		Destroy();
 	}
 }
 
+void ADiscMissile::SetFireDirection(const FVector& Direction)
+{
+	PMC->Velocity = Direction * PMC->InitialSpeed;
+}

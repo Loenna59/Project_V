@@ -24,7 +24,7 @@ protected:
 	UFUNCTION()
 	void MoveToPerposeLocation();
 	UFUNCTION()
-	void LockOnTarget();
+	void LaunchMissileToTarget();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UBoxComponent* Root;
@@ -34,8 +34,10 @@ public:
 	class UArrowComponent* FirePos;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
-	TSubclassOf<AActor> LockOnTrailFactory;	
-
+	TSubclassOf<AActor> TrailFactory;	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
+	TSubclassOf<AActor> MissileFactory;
+	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
 	FVector PerposeLocation;
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
@@ -46,4 +48,6 @@ public:
 	bool bIsArrive{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	float Speed{3000.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
+	float LockOnTime{2.0};
 };

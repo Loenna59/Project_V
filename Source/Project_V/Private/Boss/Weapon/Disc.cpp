@@ -4,6 +4,7 @@
 #include "Boss/Weapon/Disc.h"
 
 #include "Project_V.h"
+#include "Boss/Weapon/DiscMissile.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -60,7 +61,13 @@ void ADisc::InitComponents()
 	ConstructorHelpers::FClassFinder<AActor> tempTrail(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Boss/BP_LockOnTrail.BP_LockOnTrail_C'"));
 	if (tempTrail.Succeeded())
 	{
-		LockOnTrailFactory = tempTrail.Class;
+		TrailFactory = tempTrail.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<ADiscMissile> tempMissile(TEXT("'/Game/Blueprints/Boss/BP_DiscMissile.BP_DiscMissile_C'"));
+	if (tempMissile.Succeeded())
+	{
+		MissileFactory = tempMissile.Class;
 	}
 }
 
@@ -76,7 +83,7 @@ void ADisc::MoveToPerposeLocation()
 	{
 		bIsArrive = true;
 		TargetLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-		LockOnTarget();
+		LaunchMissileToTarget();
 		return;
 	}
 	
@@ -86,17 +93,37 @@ void ADisc::MoveToPerposeLocation()
 	SetActorLocation(p0 + vt);
 }
 
-void ADisc::LockOnTarget()
+void ADisc::LaunchMissileToTarget()
 {
-	PRINTLOG(TEXT("LockOnTarget"));
+	PRINTLOG(TEXT("LaunchMissileToTarget"));
 	float length = FVector::Distance(TargetLocation,GetActorLocation());
 	FRotator trailRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),TargetLocation);
-	AActor* trail = GetWorld()->SpawnActor<AActor>(LockOnTrailFactory);
+	AActor* trail = GetWorld()->SpawnActor<AActor>(TrailFactory);
 	if (trail)
 	{
 		trail->SetActorLocation(GetActorLocation());
 		trail->SetActorRotation(trailRotation);
 		trail->SetActorScale3D(FVector(length,1,1));
+
+		FTimerHandle TrailDestroyTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TrailDestroyTimerHandle,[this,trail]()
+		{
+			trail->Destroy();
+			this->Destroy();
+		},LockOnTime,false);
 	}
+
+	FTimerHandle MissileSpawnTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(MissileSpawnTimerHandle,[this]()
+	{
+		FTransform t = FirePos->GetComponentTransform();
+		t.SetScale3D(FVector(1.0));
+		auto* missile = GetWorld()->SpawnActor<ADiscMissile>(MissileFactory,t);
+		if (missile)
+		{
+			FVector dir = (TargetLocation - GetActorLocation()).GetSafeNormal();
+			missile->SetFireDirection(dir);
+		}
+	},LockOnTime + 0.1,false);
 	
 }

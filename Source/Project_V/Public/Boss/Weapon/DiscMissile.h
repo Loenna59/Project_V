@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	ADiscMissile();
 
+	UFUNCTION()
+	void SetFireDirection(const FVector& Direction);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,4 +36,5 @@ public:
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
+
 };
