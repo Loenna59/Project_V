@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Boss/Weapon/MachineGunBullet.h"
+#include "Boss/Weapon/DiscMissile.h"
 
 #include "Project_V.h"
 #include "Components/BoxComponent.h"
@@ -10,7 +10,7 @@
 
 
 // Sets default values
-AMachineGunBullet::AMachineGunBullet()
+ADiscMissile::ADiscMissile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -19,23 +19,20 @@ AMachineGunBullet::AMachineGunBullet()
 }
 
 // Called when the game starts or when spawned
-void AMachineGunBullet::BeginPlay()
+void ADiscMissile::BeginPlay()
 {
 	Super::BeginPlay();
-	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGunBullet::OnBulletBeginOverlap);
 
-	FTimerHandle deathTimer;
-	auto dieCallBack = [this]()->void{Destroy();};
-	GetWorldTimerManager().SetTimer(deathTimer, FTimerDelegate::CreateLambda(dieCallBack), LifeTime, false);
+	Root->OnComponentBeginOverlap.AddDynamic(this,&ADiscMissile::OnDiscMissileBeginOverlap);
 }
 
 // Called every frame
-void AMachineGunBullet::Tick(float DeltaTime)
+void ADiscMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AMachineGunBullet::InitComponents()
+void ADiscMissile::InitComponents()
 {
 	Root = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
 	if (Root)
@@ -79,36 +76,14 @@ void AMachineGunBullet::InitComponents()
 	}
 }
 
-void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
+		PRINTLOG(TEXT("hit missile"));
 		Destroy();
 	}
 }
 
-FVector2D AMachineGunBullet::GetRandomPointInCircle(float radius, FVector2D centerPoint)
-{
-	float RandomAngle = FMath::RandRange(0.0f,2.0f*PI);
-	float RandomRadius = radius * FMath::Sqrt(FMath::FRand());
-
-	float X = centerPoint.X + RandomRadius * FMath::Cos(RandomAngle);
-	float Y = centerPoint.Y + RandomRadius * FMath::Sin(RandomAngle);
-
-	return FVector2D(X,Y);
-}
-
-FVector AMachineGunBullet::GetRandomPointInCircleXY(float radius, FVector centerPoint)
-{
-	FVector2D random2D = GetRandomPointInCircle(radius,FVector2D(centerPoint.X,centerPoint.Y));
-	return FVector(random2D.X,random2D.Y,centerPoint.Z);
-}
-
-void AMachineGunBullet::FireToTarget(const FVector& Target, float Radius)
-{
-	FVector randomPoint = GetRandomPointInCircleXY(Radius,Target);
-	FVector randomDir = (randomPoint - GetActorLocation()).GetSafeNormal();
-	PMC->Velocity = randomDir * PMC->InitialSpeed;
-}
