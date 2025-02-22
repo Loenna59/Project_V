@@ -15,14 +15,16 @@ public:
 	// Sets default values for this actor's properties
 	ADisc();
 
-	UFUNCTION()
-	void MoveToTargetLocation();
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void InitComponents();
+	UFUNCTION()
+	void MoveToPerposeLocation();
+	UFUNCTION()
+	void LockOnTarget();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UBoxComponent* Root;
@@ -31,8 +33,13 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UArrowComponent* FirePos;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
+	TSubclassOf<AActor> LockOnTrailFactory;	
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
-	FVector TargetLocation;
+	FVector PerposeLocation;
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
+	FVector TargetLocation;	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")
 	float AcceptanceRadius{50.0f};
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Settings")

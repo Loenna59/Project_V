@@ -217,11 +217,13 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 		}
 		else if (randomNum == 3)
 		{
+			PRINTLOG(TEXT("Using DiscLauncher"));
 			UsingPattern = EAttackPattern::DiscLauncher;
 			PatternTime = DiscLauncherPatternTime;
 		}
 		else if (randomNum == 4)
 		{
+			PRINTLOG(TEXT("Using MachineGun"));
 			UsingPattern = EAttackPattern::MouseLaser;
 			PatternTime = MouseLaserPatternTime;
 		}
@@ -332,8 +334,6 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("Using DiscLauncher"));
-
 	DiscLauncherDelayCurrentTime += GetWorld()->GetDeltaSeconds();
 	if (DiscLauncherDelayCurrentTime > DiscLauncherDelay)
 	{

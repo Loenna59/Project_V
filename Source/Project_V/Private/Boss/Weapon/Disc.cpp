@@ -3,8 +3,10 @@
 
 #include "Boss/Weapon/Disc.h"
 
+#include "Project_V.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Math/UnitConversion.h"
 
 
@@ -22,15 +24,14 @@ ADisc::ADisc()
 void ADisc::BeginPlay()
 {
 	Super::BeginPlay();
-	TargetLocation = GetActorLocation() + (GetActorForwardVector() * 3000.0f);
+	PerposeLocation = GetActorLocation() + (GetActorForwardVector() * 3000.0f);
 }
 
 // Called every frame
 void ADisc::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	MoveToTargetLocation();
+	MoveToPerposeLocation();
 }
 
 void ADisc::InitComponents()
@@ -55,23 +56,47 @@ void ADisc::InitComponents()
 		FirePos->SetupAttachment(Root);
 		FirePos->SetRelativeLocation(FVector(50,0,0));
 	}
+
+	ConstructorHelpers::FClassFinder<AActor> tempTrail(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Boss/BP_LockOnTrail.BP_LockOnTrail_C'"));
+	if (tempTrail.Succeeded())
+	{
+		LockOnTrailFactory = tempTrail.Class;
+	}
 }
 
-void ADisc::MoveToTargetLocation()
+void ADisc::MoveToPerposeLocation()
 {
 	if (bIsArrive)
 	{
 		return;
 	}
 	
-	float dist = FVector::Distance(TargetLocation,GetActorLocation());
+	float dist = FVector::Distance(PerposeLocation,GetActorLocation());
 	if (dist <= AcceptanceRadius)
 	{
 		bIsArrive = true;
+		TargetLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+		LockOnTarget();
 		return;
 	}
+	
 	FVector p0 = GetActorLocation();
-	FVector direction = (TargetLocation - GetActorLocation()).GetSafeNormal();
+	FVector direction = (PerposeLocation - GetActorLocation()).GetSafeNormal();
 	FVector vt = direction * Speed * GetWorld()->GetDeltaSeconds();
 	SetActorLocation(p0 + vt);
+}
+
+void ADisc::LockOnTarget()
+{
+	PRINTLOG(TEXT("LockOnTarget"));
+	float length = FVector::Distance(TargetLocation,GetActorLocation());
+	FRotator trailRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),TargetLocation);
+	AActor* trail = GetWorld()->SpawnActor<AActor>(LockOnTrailFactory);
+	if (trail)
+	{
+		trail->SetActorLocation(GetActorLocation());
+		trail->SetActorRotation(trailRotation);
+		trail->SetActorScale3D(FVector(length,1,1));
+	}
+	
 }
