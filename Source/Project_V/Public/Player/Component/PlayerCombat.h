@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "PlayerBaseComponent.h"
-#include "Player/PlayerWeapon.h"
 #include "PlayerCombat.generated.h"
 
 
