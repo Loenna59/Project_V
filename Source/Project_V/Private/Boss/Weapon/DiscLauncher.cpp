@@ -89,13 +89,16 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 	{
 		DamageWeaponHP(50);
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
+
+		// 경계중이거나 정찰중일 때 맞으면 combat state로 전환
 		Boss->GetBossAIController()->DetectedTarget = true;
 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
+		
 		// detach from parent
 		if (bIsBroken)
 		{
 			
-			Boss->MachineGunBroken(LeftorRight);
+			Boss->DiscLauncherBroken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));
 			UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();

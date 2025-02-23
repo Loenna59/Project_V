@@ -301,8 +301,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		return;
 	}
 	
-	//PRINTLOG(TEXT("Using Machine Gun"));
-	DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
+	Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -359,29 +358,3 @@ void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using MouseLaser"));
 }
 
-void UBossCombatState::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
-{
-	if (!World) return;
-
-	const float AngleStep = 2.0f * PI / 32;
-	FVector PrevPoint = Center + FVector(Radius, 0.0f, 0.0f);
-    
-	for (int32 i = 1; i <= 32; i++)
-	{
-		float Angle = AngleStep * i;
-		FVector NextPoint = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
-        
-		DrawDebugLine(
-			World,
-			PrevPoint,
-			NextPoint,
-			FColor::Red,
-			false,
-			-1.0f,
-			0,
-			1
-		);
-        
-		PrevPoint = NextPoint;
-	}
-}

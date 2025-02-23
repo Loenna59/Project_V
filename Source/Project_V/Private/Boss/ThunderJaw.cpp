@@ -212,6 +212,33 @@ void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
 	SetActorRotation(FRotator(0,NewYaw,0));
 }
 
+void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
+{
+	if (!World) return;
+
+	const float AngleStep = 2.0f * PI / 32;
+	FVector PrevPoint = Center + FVector(Radius, 0.0f, 0.0f);
+    
+	for (int32 i = 1; i <= 32; i++)
+	{
+		float Angle = AngleStep * i;
+		FVector NextPoint = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
+        
+		DrawDebugLine(
+			World,
+			PrevPoint,
+			NextPoint,
+			FColor::Red,
+			false,
+			-1.0f,
+			0,
+			1
+		);
+        
+		PrevPoint = NextPoint;
+	}
+}
+
 
 
 

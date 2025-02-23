@@ -25,6 +25,10 @@ protected:
 	void MoveToPerposeLocation();
 	UFUNCTION()
 	void LaunchMissileToTarget();
+	UFUNCTION()
+	FVector2D GetRandomPointInCircle(float radius, FVector2D centerPoint);
+	UFUNCTION()
+	FVector GetRandomPointInCircleXY(float radius, FVector centerPoint);
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UBoxComponent* Root;

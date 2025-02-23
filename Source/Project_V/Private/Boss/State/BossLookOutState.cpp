@@ -23,6 +23,11 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 	DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Green);
 	
 
+	if (Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
+	{
+		return;
+	}
+	
 	// detect된 위치로 이동
 	if (!FSM->bIsArrivedDetectedLocation)
 	{

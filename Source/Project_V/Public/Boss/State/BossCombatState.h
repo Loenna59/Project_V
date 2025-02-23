@@ -58,8 +58,7 @@ protected:
 	UFUNCTION()
 	void MouseLaser(AThunderJaw* Boss);
 	
-	UFUNCTION()
-	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
+	
 
 protected:
 	UPROPERTY()

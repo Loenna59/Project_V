@@ -55,6 +55,9 @@ public:
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
+
+	UFUNCTION()
+	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")

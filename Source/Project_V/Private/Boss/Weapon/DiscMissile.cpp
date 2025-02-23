@@ -40,7 +40,7 @@ void ADiscMissile::InitComponents()
 	if (Root)
 	{
 		SetRootComponent(Root);
-		Root->SetBoxExtent(FVector(30.000000,10.000000,10.000000));
+		Root->SetBoxExtent(FVector(30.000000,20.000000,20.000000));
 		Root->SetGenerateOverlapEvents(true);
 	}
 
@@ -84,6 +84,7 @@ void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
+		PRINTLOG(TEXT("Player Hit Missile"));
 		Destroy();
 	}
 }

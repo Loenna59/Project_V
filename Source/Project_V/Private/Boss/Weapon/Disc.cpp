@@ -25,7 +25,8 @@ ADisc::ADisc()
 void ADisc::BeginPlay()
 {
 	Super::BeginPlay();
-	PerposeLocation = GetActorLocation() + (GetActorForwardVector() * 3000.0f);
+	FVector centerPoint = GetActorLocation() + (GetActorForwardVector() * 3000.0f);
+	PerposeLocation = GetRandomPointInCircleXY(1000.0f,centerPoint);
 }
 
 // Called every frame
@@ -77,6 +78,7 @@ void ADisc::MoveToPerposeLocation()
 	{
 		return;
 	}
+
 	
 	float dist = FVector::Distance(PerposeLocation,GetActorLocation());
 	if (dist <= AcceptanceRadius)
@@ -126,4 +128,21 @@ void ADisc::LaunchMissileToTarget()
 		}
 	},LockOnTime + 0.1,false);
 	
+}
+
+FVector2D ADisc::GetRandomPointInCircle(float radius, FVector2D centerPoint)
+{
+	float RandomAngle = FMath::RandRange(0.0f,2.0f*PI);
+	float RandomRadius = radius * FMath::Sqrt(FMath::FRand());
+
+	float X = centerPoint.X + RandomRadius * FMath::Cos(RandomAngle);
+	float Y = centerPoint.Y + RandomRadius * FMath::Sin(RandomAngle);
+
+	return FVector2D(X,Y);
+}
+
+FVector ADisc::GetRandomPointInCircleXY(float radius, FVector centerPoint)
+{
+	FVector2D random2D = GetRandomPointInCircle(radius,FVector2D(centerPoint.X,centerPoint.Y));
+	return FVector(random2D.X,random2D.Y,centerPoint.Z);
 }
