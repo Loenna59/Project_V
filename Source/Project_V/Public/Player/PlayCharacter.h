@@ -142,4 +142,8 @@ public:
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
 
 	bool IsNotAnchoredMode();
+
+	void OnAnchoredMode();
+
+	void Fire(FVector velocity, float alpha);
 };

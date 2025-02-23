@@ -42,10 +42,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float drawingThreshold = 1;
-	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
 
@@ -68,8 +64,6 @@ public:
 			onEventCheckCameraMode.BindUObject(obj, func);
 		}
 	}
-
-	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
 	
 	UPROPERTY()
 	class UInputAction* ia_anchored;

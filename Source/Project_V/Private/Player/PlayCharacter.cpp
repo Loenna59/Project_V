@@ -361,3 +361,22 @@ bool APlayCharacter::IsNotAnchoredMode()
 {
 	return currentCameraMode != EPlayerCameraMode::Anchored;
 }
+
+void APlayCharacter::OnAnchoredMode()
+{
+	if (!holdingWeapon.IsValid())
+	{
+		anim->OnPlayEquip();
+	}
+	
+	SetPlayerCameraMode(EPlayerCameraMode::Anchored);
+}
+
+void APlayCharacter::Fire(FVector velocity, float alpha)
+{
+	if (holdingWeapon.IsValid())
+	{
+		holdingWeapon->Fire(velocity, alpha);
+		anim->OnFire();
+	}
+}

@@ -17,7 +17,7 @@ UPlayerCombat::UPlayerCombat()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_anchored(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerAnchored.IA_PlayerAnchored'"));
 
@@ -40,7 +40,6 @@ void UPlayerCombat::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	holdingWeapon = me->holdingWeapon;
 	cameraComp = me->anchoredCameraComp;
 }
 
@@ -81,22 +80,9 @@ void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
 	}
 }
 
-// Called every frame
-void UPlayerCombat::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UPlayerCombat::OnAnchor()
 {
-	if (!holdingWeapon.IsValid())
-	{
-		anim->OnPlayEquip();
-	}
-	
-	me->SetPlayerCameraMode(EPlayerCameraMode::Anchored); 
+	me->OnAnchoredMode(); 
 }
 
 void UPlayerCombat::OnAnchorRelease()
@@ -140,13 +126,9 @@ void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 		return;
 	}
 
-	if (holdingWeapon.IsValid())
-	{
-		holdingWeapon->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
-	}
+	me->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
 
 	bIsCompleteReload = false;
-	anim->OnFire();
 	SetDrawStrength(0);
 }
 
