@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Player/PlayerCameraMode.h"
 #include "PlayerBaseComponent.generated.h"
-
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UPlayerBaseComponent : public UActorComponent
@@ -28,4 +28,6 @@ protected:
 	
 public:
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) {}
+
+	virtual void OnChangedCameraMode(EPlayerCameraMode mode) {}
 };

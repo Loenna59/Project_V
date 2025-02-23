@@ -3,26 +3,12 @@
 
 #include "Player/Component/PlayerMovement.h"
 #include "EnhancedInputComponent.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
-#include "InputMappingContext.h"
-#include "Project_V.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/HUD.h"
-#include "Kismet/GameplayStatics.h"
-#include "Player/FocusDome.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
-#include "Player/PlayerWeapon.h"
-#include "UI/CrosshairUI.h"
-#include "UI/PlayerHUD.h"
-#include "UI/PlayerUI.h"
-
 
 // Sets default values for this component's properties
 UPlayerMovement::UPlayerMovement()
@@ -108,6 +94,33 @@ void UPlayerMovement::SetupInputBinding(class UEnhancedInputComponent* input)
 	input->BindAction(ia_doubleTap, ETriggerEvent::Completed, this, &UPlayerMovement::StartDodge);
 }
 
+void UPlayerMovement::OnChangedCameraMode(EPlayerCameraMode mode)
+{
+	Super::OnChangedCameraMode(mode);
+
+	switch (mode)
+	{
+	case EPlayerCameraMode::Default:
+		movementComp->bOrientRotationToMovement = true;
+		if (movementComp->MaxWalkSpeed < sprintSpeed)
+		{
+			movementComp->MaxWalkSpeed = walkSpeed;
+		}
+		break;
+	case EPlayerCameraMode::Anchored:
+		movementComp->bOrientRotationToMovement = false;
+		if (movementComp->MaxWalkSpeed < sprintSpeed)
+		{
+			movementComp->MaxWalkSpeed = walkSpeed;
+		}
+		break;
+	case EPlayerCameraMode::Focus:
+		movementComp->bOrientRotationToMovement = false;
+		movementComp->MaxWalkSpeed = strollSpeed;
+		break;
+	}
+}
+
 void UPlayerMovement::Move(const FInputActionValue& actionValue)
 {
 	FVector2D value = actionValue.Get<FVector2D>();
@@ -156,7 +169,7 @@ void UPlayerMovement::OnTriggerShift(const FInputActionValue& actionValue)
 	{
 		// zoom mode
 		movementComp->MaxWalkSpeed = walkSpeed;
-		me->SetCameraSlowMode(value);
+		onEventCameraSlowMode.Execute(value);
 	}
 	else
 	{
@@ -192,8 +205,8 @@ void UPlayerMovement::StartDodge()
 	{
 		return;
 	}
-	
-	me->ChangeToDefaultCamera();
+
+	onEventCameraModeChanged.Execute(EPlayerCameraMode::Default);
 	anim->OnStartDodge();
 }
 
@@ -227,12 +240,3 @@ void UPlayerMovement::EndDodge()
 {
 	bIsPlayingDodge = false;
 }
-
-void UPlayerMovement::AutoChangeWalkState()
-{
-	if (movementComp->MaxWalkSpeed < sprintSpeed)
-	{
-		movementComp->MaxWalkSpeed = walkSpeed;
-	}
-}
-

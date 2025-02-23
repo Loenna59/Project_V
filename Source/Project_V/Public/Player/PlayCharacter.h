@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "PlayCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEventCameraModeChanged, EPlayerCameraMode, mode);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEventCameraModeChanged, EPlayerCameraMode)
 
 UCLASS()
 class PROJECT_V_API APlayCharacter : public ACharacter
@@ -21,6 +21,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	FOnEventCameraModeChanged onEventCameraModeChanged;
 
 public:	
 	// Called every frame
@@ -37,6 +39,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class UPlayerCombat* combatComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPlayerCameraSwitcher* cameraSwitcher;
 
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* springArmComp;
@@ -71,22 +76,7 @@ public:
 	TSubclassOf<class AFocusDome> domeFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float strollSpeed = 400;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	double minPinchDegrees = 50;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float cameraTransitionSpeedMultiplier = 5.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float slowDilation = 0.5f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float slowMotionMultiplier = 5.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float releaseMotionMultiplier = 10.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float focusModeThreshold = 0.5f;
@@ -110,45 +100,36 @@ public:
 	void PlaceArrowOnBow();
 
 	void PickWeapon();
-
-	void ChangeToDefaultCamera();
-	
-	void ChangeToAnchoredCamera();
-
-	UFUNCTION()
-	void ReleaseCombat();
 	
 	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
+
+	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
+	
+	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
 	
 private:
-	const float maxFOV = 90;
-	const float minFOV = 40; 
-	
 	UPROPERTY()
 	class UInputMappingContext* imc;
 
 	UPROPERTY()
 	class UInputAction* ia_focus;
 
-	float currentBlendCameraAlpha;
-	
-	float targetBlendCameraAlpha;
-
-	float targetFOV;
-
-	float targetMultiplier;
-
 	float currentHealth;
 
 	float focusPressingTime;
 
-	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
-	
-	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
-
 	FTimerHandle timerHandle;
 
 public:
+	template<typename UserClass>
+	void AddEventHandler(UserClass* obj, void (UserClass::* func)(EPlayerCameraMode mode))
+	{
+		if (obj && func)
+		{
+			onEventCameraModeChanged.AddUObject(obj, func);
+		}
+	}
+
 	EPlayerCameraMode GetPlayerCameraMode() const
 	{
 		return currentCameraMode;
@@ -160,5 +141,5 @@ public:
 
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
 
-	void SetCameraSlowMode(bool bActive);
+	bool IsNotAnchoredMode();
 };

@@ -5,7 +5,6 @@
 
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
@@ -40,8 +39,7 @@ UPlayerCombat::UPlayerCombat()
 void UPlayerCombat::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
+	
 	holdingWeapon = me->holdingWeapon;
 	cameraComp = me->anchoredCameraComp;
 }
@@ -71,6 +69,18 @@ void UPlayerCombat::SetupInputBinding(class UEnhancedInputComponent* input)
 	input->BindAction(ia_fire, ETriggerEvent::Completed, this, &UPlayerCombat::OnReleasedFire);
 }
 
+void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
+{
+	Super::OnChangedCameraMode(mode);
+
+	switch (mode)
+	{
+	case EPlayerCameraMode::Default:
+		SetDrawStrength(0);
+		break;
+	}
+}
+
 // Called every frame
 void UPlayerCombat::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -97,7 +107,7 @@ void UPlayerCombat::OnAnchorRelease()
 
 void UPlayerCombat::OnPressedFire(const FInputActionValue& actionValue)
 {
-	if (me->GetPlayerCameraMode() != EPlayerCameraMode::Anchored)
+	if (onEventCheckCameraMode.Execute())
 	{
 		return;
 	}
@@ -120,7 +130,7 @@ void UPlayerCombat::OnPressedFire(const FInputActionValue& actionValue)
 
 void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 {
-	if (me->GetPlayerCameraMode() != EPlayerCameraMode::Anchored)
+	if (onEventCheckCameraMode.Execute())
 	{
 		return;
 	}
@@ -153,7 +163,7 @@ void UPlayerCombat::SetDrawStrength(float strength)
 
 	if (drawStrength < 0.01f)
 	{
-		onEventReleased.Broadcast();
+		onEventReleased.Broadcast(false);
 		elapsedDrawingTime = 0;
 	}
 }

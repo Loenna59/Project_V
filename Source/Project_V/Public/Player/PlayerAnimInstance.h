@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Animation/AnimNodeReference.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**

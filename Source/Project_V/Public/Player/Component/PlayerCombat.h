@@ -8,7 +8,8 @@
 #include "PlayerCombat.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE(FOnEventReleased);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEventReleased, bool);
+DECLARE_DELEGATE_RetVal(bool, FOnEventCheckCameraMode)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UPlayerCombat : public UPlayerBaseComponent
@@ -21,6 +22,7 @@ public:
 
 protected:
 	FOnEventReleased onEventReleased;
+	FOnEventCheckCameraMode onEventCheckCameraMode;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -46,13 +48,24 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
+
+	virtual void OnChangedCameraMode(EPlayerCameraMode mode) override;
 	
 	template<typename UserClass>
-	void AddHandler(UserClass* obj, void (UserClass::* func)())
+	void AddHandler(UserClass* obj, void (UserClass::* func)(bool active))
 	{
 		if (obj && func)
 		{
 			onEventReleased.AddUObject(obj, func);
+		}
+	}
+
+	template<typename UserClass>
+	void AddHandler(UserClass* obj, bool (UserClass::* func)())
+	{
+		if (obj && func)
+		{
+			onEventCheckCameraMode.BindUObject(obj, func);
 		}
 	}
 

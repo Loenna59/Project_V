@@ -9,18 +9,16 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/FocusDome.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
 #include "Player/PlayerWeapon.h"
+#include "Player/Component/PlayerCameraSwitcher.h"
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerMovement.h"
-#include "UI/CrosshairUI.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
 
@@ -111,11 +109,9 @@ APlayCharacter::APlayCharacter()
 		domeFactory = tmp_dome.Class;
 	}
 
-	targetFOV = maxFOV;
-	targetMultiplier = releaseMotionMultiplier;
-
 	movementComp = CreateDefaultSubobject<UPlayerMovement>(TEXT("PlayerMovement"));
 	combatComp = CreateDefaultSubobject<UPlayerCombat>(TEXT("PlayerCombat"));
+	cameraSwitcher = CreateDefaultSubobject<UPlayerCameraSwitcher>(TEXT("CameraSwitcher"));
 }
 
 // Called when the game starts or when spawned
@@ -170,7 +166,17 @@ void APlayCharacter::BeginPlay()
 		anim->SetWeaponAnim(bow->GetAnimInstance());
 	}
 
-	combatComp->AddHandler(this, &APlayCharacter::ReleaseCombat);
+	AddEventHandler(movementComp, &UPlayerMovement::OnChangedCameraMode);
+	AddEventHandler(combatComp, &UPlayerCombat::OnChangedCameraMode);
+	AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
+
+	cameraSwitcher->SetCameraSlowMode(false);
+
+	combatComp->AddHandler(this, &APlayCharacter::IsNotAnchoredMode);
+	combatComp->AddHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
+
+	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
+	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 }
 
 // Called every frame
@@ -179,36 +185,6 @@ void APlayCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	bIsShot = false;
-
-	if (currentBlendCameraAlpha != targetBlendCameraAlpha)
-	{
-		float alpha = targetBlendCameraAlpha > 0?
-			currentBlendCameraAlpha + DeltaTime * cameraTransitionSpeedMultiplier :
-			currentBlendCameraAlpha - DeltaTime * cameraTransitionSpeedMultiplier;
-		
-		currentBlendCameraAlpha = FMath::Clamp(alpha, 0, 1);
-		transitionSpringArmComp->TargetArmLength = FMath::Lerp(springArmComp->TargetArmLength, anchoredSpringArmComp->TargetArmLength, currentBlendCameraAlpha);
-		transitionSpringArmComp->SetWorldLocation(FMath::Lerp(springArmComp->GetComponentLocation(), anchoredSpringArmComp->GetComponentLocation(), currentBlendCameraAlpha));
-		transitionSpringArmComp->SocketOffset = FMath::Lerp(springArmComp->SocketOffset, anchoredSpringArmComp->SocketOffset, currentBlendCameraAlpha);
-
-		if (currentBlendCameraAlpha == 0)
-		{
-			transitionCameraComp->SetActive(false);
-			cameraComp->SetActive(true);
-		}
-
-		if (currentBlendCameraAlpha == 1)
-		{
-			transitionCameraComp->SetActive(false);
-			anchoredCameraComp->SetActive(true);
-		}
-	}
-
-	if (anchoredCameraComp->FieldOfView != targetFOV)
-	{
-		float fov = FMath::Lerp(anchoredCameraComp->FieldOfView, targetFOV, DeltaTime * targetMultiplier);
-		anchoredCameraComp->SetFieldOfView(FMath::Clamp(fov, minFOV, maxFOV));
-	}
 }
 
 // Called to bind functionality to input
@@ -227,52 +203,6 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
-void APlayCharacter::ChangeToAnchoredCamera()
-{
-	cameraComp->SetActive(false);
-	transitionCameraComp->SetActive(true);
-
-	transitionSpringArmComp->bUsePawnControlRotation = anchoredSpringArmComp->bUsePawnControlRotation;
-	transitionSpringArmComp->bEnableCameraLag = anchoredSpringArmComp->bEnableCameraLag;
-	transitionSpringArmComp->bEnableCameraRotationLag = anchoredSpringArmComp->bEnableCameraRotationLag;
-	transitionSpringArmComp->CameraLagSpeed = anchoredSpringArmComp->CameraLagSpeed;
-	transitionSpringArmComp->CameraRotationLagSpeed = anchoredSpringArmComp->CameraRotationLagSpeed;
-	
-	targetBlendCameraAlpha = 1.f;
-
-	bUseControllerRotationYaw = true;
-	// bUseControllerRotationPitch = true;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-}
-
-void APlayCharacter::ReleaseCombat()
-{
-	PrintLogFunc(TEXT("ReleaseCombat"));
-	targetFOV = maxFOV;
-	targetMultiplier = releaseMotionMultiplier;
-	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
-}
-
-void APlayCharacter::ChangeToDefaultCamera()
-{
-	anchoredCameraComp->SetActive(false);
-	transitionCameraComp->SetActive(true);
-
-	transitionSpringArmComp->bUsePawnControlRotation = springArmComp->bUsePawnControlRotation;
-	transitionSpringArmComp->bEnableCameraLag = springArmComp->bEnableCameraLag;
-	transitionSpringArmComp->bEnableCameraRotationLag = springArmComp->bEnableCameraRotationLag;
-	transitionSpringArmComp->CameraLagSpeed = springArmComp->CameraLagSpeed;
-	transitionSpringArmComp->CameraRotationLagSpeed = springArmComp->CameraRotationLagSpeed;
-
-	targetBlendCameraAlpha = 0.f;
-
-	bUseControllerRotationYaw = false;
-	// bUseControllerRotationPitch = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-
-	anchoredCameraComp->SetFieldOfView(maxFOV);
-}
-
 void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
 {
 	if (!focusDome)
@@ -283,26 +213,24 @@ void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
 	if (currentCameraMode == EPlayerCameraMode::Focus)
 	{
 		focusDome->Deactivate();
-		ChangeToDefaultCamera();
+		cameraSwitcher->OnChangedCameraMode(EPlayerCameraMode::Default);
 		return;
 	}
 
 	if (focusPressingTime > focusModeThreshold)
 	{
 		focusDome->Activate();
-		ChangeToAnchoredCamera();
+		cameraSwitcher->OnChangedCameraMode(EPlayerCameraMode::Focus);
 	}
 	
 	focusPressingTime += GetWorld()->DeltaTimeSeconds;
-	
-	//PrintLogFunc(TEXT("%f"), actionValue.Get<float>());
 }
 
 void APlayCharacter::EndFocusOrScan()
 {
 	if (currentCameraMode != EPlayerCameraMode::Focus && focusPressingTime < focusModeThreshold)
 	{
-		PrintLogFunc(TEXT("scan"));
+		//PrintLogFunc(TEXT("scan"));
 		focusPressingTime = 0;
 		return;
 	}
@@ -355,11 +283,12 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 		// 강제로 리로드 처리
 		combatComp->bIsCompleteReload = true;
 		movementComp->EndDodge();
-
+		
 		if (prevCameraMode == EPlayerCameraMode::Focus)
 		{
 			return;
 		}
+
 		SetPlayerCameraMode(prevCameraMode);
 	}
 }
@@ -377,19 +306,19 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 {
 	prevCameraMode = currentCameraMode;
 	currentCameraMode = mode;
-
-	ui->SetVisibleUI(currentCameraMode);
+	
+	onEventCameraModeChanged.Broadcast(mode);
+	
+	ui->SetVisibleUI(mode);
 	
 	TWeakObjectPtr<APlayCharacter> weakThis = this;
-	
-	switch (currentCameraMode)
+
+	switch (mode)
 	{
 	case EPlayerCameraMode::Default:
-		ChangeToDefaultCamera();
-		combatComp->SetDrawStrength(0);
+		bUseControllerRotationYaw = false;
 		bow->PlaceOrSpawnArrow();
 		focusDome->Deactivate();
-		movementComp->AutoChangeWalkState();
 		
 		GetWorldTimerManager().SetTimer(
 			timerHandle,
@@ -412,35 +341,23 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		);
 		break;
 	case EPlayerCameraMode::Anchored:
+		bUseControllerRotationYaw = true;
 		if (timerHandle.IsValid())
 		{
 			GetWorldTimerManager().ClearTimer(timerHandle);
 			timerHandle.Invalidate();
 		}
-		ChangeToAnchoredCamera();
 		bow->SpawnArrowInBow();
 		focusDome->Deactivate();
-		movementComp->AutoChangeWalkState();
 		break;
 	case EPlayerCameraMode::Focus:
-		ChangeToAnchoredCamera();
-		GetCharacterMovement()->MaxWalkSpeed = strollSpeed;
+		bUseControllerRotationYaw = true;
 		break;
 	}
+	
 }
 
-void APlayCharacter::SetCameraSlowMode(bool bActive)
+bool APlayCharacter::IsNotAnchoredMode()
 {
-	if (bActive)
-	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), slowDilation); 
-		targetFOV = minFOV;
-		targetMultiplier = slowMotionMultiplier;
-	}
-	else
-	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f); 
-		targetFOV = maxFOV;
-		targetMultiplier = releaseMotionMultiplier;
-	}
+	return currentCameraMode != EPlayerCameraMode::Anchored;
 }

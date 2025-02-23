@@ -3,14 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/PlayCharacter.h"
 #include "Player/Component/PlayerBaseComponent.h"
 #include "PlayerMovement.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnEventCameraSlowMode, bool);
+DECLARE_DELEGATE_OneParam(FOnEventChangedCameraMode, EPlayerCameraMode);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UPlayerMovement : public UPlayerBaseComponent
 {
 	GENERATED_BODY()
+
+	FOnEventChangedCameraMode onEventCameraModeChanged;
+	FOnEventCameraSlowMode onEventCameraSlowMode;
 
 public:
 	// Sets default values for this component's properties
@@ -24,6 +30,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float dodgeSpeed = 800;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float strollSpeed = 400;
 
 	UPROPERTY()
 	class UInputAction* ia_move;
@@ -44,6 +53,8 @@ public:
 	class UInputAction* ia_doubleTap;
 
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
+
+	virtual void OnChangedCameraMode(EPlayerCameraMode mode) override;
 
 	UFUNCTION()
 	void Move(const FInputActionValue& actionValue);
@@ -68,11 +79,26 @@ public:
 
 	UFUNCTION()
 	void EndDodge();
-	
-	UFUNCTION()
-	void AutoChangeWalkState();
 
 	bool bIsPlayingDodge = false;
+
+	template<typename UserClass>
+	void AddEventHandler(UserClass* obj, void (UserClass::* func)(EPlayerCameraMode mode))
+	{
+		if (obj && func)
+		{
+			onEventCameraModeChanged.BindUObject(obj, func);
+		}
+	}
+
+	template<typename UserClass>
+	void AddEventHandler(UserClass* obj, void (UserClass::* func)(bool value))
+	{
+		if (obj && func)
+		{
+			onEventCameraSlowMode.BindUObject(obj, func);
+		}
+	}
 	
 protected:
 	FVector2D dodgeValue;
