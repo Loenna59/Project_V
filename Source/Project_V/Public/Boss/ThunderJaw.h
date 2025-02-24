@@ -56,6 +56,8 @@ public:
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
 
+	UFUNCTION(BlueprintCallable)
+	void SetVisibilityBoss();
 	UFUNCTION()
 	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 	
@@ -92,5 +94,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{1000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float PatrolDist{2000.0f};	
+	float PatrolDist{2000.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bIsLSEnd{false};
 };

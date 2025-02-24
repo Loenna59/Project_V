@@ -218,6 +218,27 @@ void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
 	SetActorRotation(FRotator(0,NewDestYaw,0));
 }
 
+void AThunderJaw::SetVisibilityBoss()
+{
+	if (bIsLSEnd)
+	{
+		SetActorHiddenInGame(false);
+		
+		LMachineGun->SetActorHiddenInGame(false);
+		RMachineGun->SetActorHiddenInGame(false);
+		LDiscLauncher->SetActorHiddenInGame(false);
+		RDiscLauncher->SetActorHiddenInGame(false);
+	}
+	else
+	{
+		SetActorHiddenInGame(true);
+		LMachineGun->SetActorHiddenInGame(true);
+		RMachineGun->SetActorHiddenInGame(true);
+		LDiscLauncher->SetActorHiddenInGame(true);
+		RDiscLauncher->SetActorHiddenInGame(true);
+	}
+}
+
 void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 {
 	if (!World) return;

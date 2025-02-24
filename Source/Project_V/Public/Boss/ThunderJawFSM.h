@@ -15,6 +15,7 @@ enum class EBossState : uint8
 	Patrol,
 	Combat,
 	LookOut,
+	Damage,
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

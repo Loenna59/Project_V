@@ -45,6 +45,11 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		return;
 	}
 
+	if (!Boss->bIsLSEnd)
+	{
+		return;
+	}
+
 	if (bDebugMode)
 	{
 		DrawDebugSphere(GetWorld(),Boss->GetActorLocation(),CombatDist, 20,FColor::Red);
