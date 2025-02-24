@@ -97,10 +97,9 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 		Boss->GetBossAIController()->DetectedTarget = true;
 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
-		// detach from parent
+		// Detach from parent
 		if (bIsBroken)
 		{
-			
 			Boss->MachineGunBroken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));

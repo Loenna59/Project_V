@@ -17,4 +17,5 @@ public:
 	virtual void Enter(AThunderJaw* Boss, UThunderJawFSM* FSM) override;
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) override;
 	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) override;
+
 };

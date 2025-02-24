@@ -333,6 +333,12 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
+	if (!Boss->GetLMachineGun() && !Boss->GetRMachineGun())
+	{
+		PatternTime = 0;
+		return;
+	}
+	
 	DiscLauncherDelayCurrentTime += GetWorld()->GetDeltaSeconds();
 
 	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);

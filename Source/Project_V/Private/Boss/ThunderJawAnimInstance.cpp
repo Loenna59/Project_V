@@ -4,8 +4,6 @@
 #include "Boss/ThunderJawAnimInstance.h"
 
 #include "Boss/ThunderJaw.h"
-#include "Boss/ThunderJawAIController.h"
-#include "Player/PlayCharacter.h"
 
 void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {

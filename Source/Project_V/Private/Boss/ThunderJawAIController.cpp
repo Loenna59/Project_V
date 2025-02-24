@@ -7,6 +7,7 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
+#include "Boss/State/BossCombatState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -113,8 +114,7 @@ void AThunderJawAIController::MoveToPlayer()
 void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	
-	auto CurrentBossState = Boss->GetFSMComponent()->GetCurrentState()->BossState;
-	if (CurrentBossState == EBossState::Combat)
+	if (Boss->GetFSMComponent()->GetCurrentState()->BossState == EBossState::Combat)
 	{
 		return;
 	}
@@ -158,7 +158,7 @@ void AThunderJawAIController::UpdateFacingDot()
 	{
 		return;
 	}
-	PRINTLOGTOSCREEN(TEXT("FacingDot : %f"), FacingDot);
+	//PRINTLOGTOSCREEN(TEXT("FacingDot : %f"), FacingDot);
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();
@@ -168,7 +168,7 @@ void AThunderJawAIController::UpdateFacingDot()
 void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 {
 	auto* bossFSM = Boss->GetFSMComponent();
-	if (!bossFSM)
+	if (bossFSM->GetCurrentState()->BossState == EBossState::Combat || bossFSM->GetCurrentState()->BossState == EBossState::Damage)
 	{
 		return;
 	}

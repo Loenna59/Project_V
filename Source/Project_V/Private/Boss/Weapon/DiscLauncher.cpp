@@ -97,7 +97,6 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 		// detach from parent
 		if (bIsBroken)
 		{
-			
 			Boss->DiscLauncherBroken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));

@@ -173,13 +173,16 @@ class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
 
 void AThunderJaw::MachineGunBroken(float LeftorRight)
 {
+	
 	if (LeftorRight == -1)
 	{
 		LMachineGun = nullptr;
+		FSM->ChangeBossState(EBossState::Damage);
 	}
 	else
 	{
 		RMachineGun = nullptr;
+		FSM->ChangeBossState(EBossState::Damage);
 	}
 }
 
@@ -188,10 +191,12 @@ void AThunderJaw::DiscLauncherBroken(float LeftorRight)
 	if (LeftorRight == -1)
 	{
 		LDiscLauncher = nullptr;
+		FSM->ChangeBossState(EBossState::Damage);
 	}
 	else
 	{
 		RDiscLauncher = nullptr;
+		FSM->ChangeBossState(EBossState::Damage);
 	}
 }
 
