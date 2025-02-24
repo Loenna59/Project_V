@@ -14,4 +14,14 @@ class PROJECT_V_API ATripcaster : public APlayerWeapon
 public:
 	// Sets default values for this actor's properties
 	ATripcaster();
+
+	virtual FName GetGripSocket() const override
+	{
+		return TEXT("CasterGripSocket");
+	}
+
+	virtual EWeaponType GetWeaponType() const override
+	{
+		return EWeaponType::Caster;
+	}
 };

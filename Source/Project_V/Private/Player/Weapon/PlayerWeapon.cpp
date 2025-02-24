@@ -3,7 +3,7 @@
 
 #include "Player/Weapon/PlayerWeapon.h"
 
-#include "Player/Weapon/Arrow.h"
+#include "Player/Weapon/PlayerProjectile.h"
 
 UAnimInstance* APlayerWeapon::GetAnimInstance()
 {
@@ -24,8 +24,8 @@ void APlayerWeapon::SpawnArrowInBow()
 		return;
 	}
 	
-	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(projectileFactory);
-	projectile = spawned_arrow;
+	APlayerProjectile* spawned_proj = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
+	projectile = spawned_proj;
 	PlaceArrowOnBow();
 }
 
@@ -36,9 +36,9 @@ void APlayerWeapon::SpawnArrow(USceneComponent* parent, FName socketName)
 		return;
 	}
 
-	AArrow* spawned_arrow = GetWorld()->SpawnActor<AArrow>(projectileFactory);
-	spawned_arrow->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
-	projectile = spawned_arrow;
+	APlayerProjectile* spawned_proj = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
+	spawned_proj->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+	projectile = spawned_proj;
 }
 
 void APlayerWeapon::PlaceArrowOnBow()
@@ -86,6 +86,14 @@ void APlayerWeapon::AttachSocket(USceneComponent* comp, FName socketName, bool v
 		{
 			projectile->mesh->SetVisibility(visibleArrow);
 		}
+	}
+}
+
+void APlayerWeapon::SetVisibility(bool visible)
+{
+	if (mesh)
+	{
+		mesh->SetVisibility(visible);
 	}
 }
 

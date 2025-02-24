@@ -61,8 +61,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* transitionCameraComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APlayerWeapon* bow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class APlayerWeapon* tripcaster;
 
 	UPROPERTY(VisibleAnywhere)
 	class AFocusDome* focusDome;
@@ -71,6 +74,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class APlayerWeapon> bowFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class APlayerWeapon> tripcasterFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class AFocusDome> domeFactory;
@@ -100,8 +106,13 @@ public:
 	void PlaceArrowOnBow();
 
 	void PickWeapon();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeWeapon(APlayerWeapon* weapon);
 	
 	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
+	
+	TWeakObjectPtr<APlayerWeapon> currentWeapon;
 
 	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
 	

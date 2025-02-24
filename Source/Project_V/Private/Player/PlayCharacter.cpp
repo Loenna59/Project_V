@@ -88,11 +88,18 @@ APlayCharacter::APlayCharacter()
 		ia_focus = tmp_ia_focus.Object;
 	}
 
-	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_weapon(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
+	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
-	if (tmp_weapon.Succeeded())
+	if (tmp_bow.Succeeded())
 	{
-		bowFactory = tmp_weapon.Class;
+		bowFactory = tmp_bow.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_tripcaster(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Tripcaster.BP_Tripcaster_C'"));
+
+	if (tmp_tripcaster.Succeeded())
+	{
+		tripcasterFactory = tmp_tripcaster.Class;
 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> tmp(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player_C'"));
@@ -138,10 +145,15 @@ void APlayCharacter::BeginPlay()
 	{
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		bow->SpawnArrowInBow();
-		combatComp->bIsCompleteReload = true;
-		//
-
 		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+	}
+
+	if ((tripcaster = GetWorld()->SpawnActor<APlayerWeapon>(tripcasterFactory)))
+	{
+		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
+		tripcaster->SpawnArrowInBow();
+		tripcaster->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		tripcaster->SetVisibility(false);
 	}
 
 	if ((focusDome = GetWorld()->SpawnActor<AFocusDome>(domeFactory)))
@@ -177,6 +189,8 @@ void APlayCharacter::BeginPlay()
 
 	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
 	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
+
+	ChangeWeapon(bow);
 }
 
 // Called every frame
@@ -241,17 +255,17 @@ void APlayCharacter::EndFocusOrScan()
 
 void APlayCharacter::SpawnArrow()
 {
-	if (bow)
+	if (currentWeapon.IsValid())
 	{
-		bow->SpawnArrow(GetMesh(), TEXT("PickArrowSocket"));
+		currentWeapon->SpawnArrow(GetMesh(), TEXT("PickArrowSocket"));
 	}
 }
 
 void APlayCharacter::PlaceArrowOnBow()
 {
-	if (bow)
+	if (currentWeapon.IsValid())
 	{
-		bow->PlaceArrowOnBow();
+		currentWeapon->PlaceArrowOnBow();
 		combatComp->bIsCompleteReload = true;
 	}
 }
@@ -260,14 +274,34 @@ void APlayCharacter::PickWeapon()
 {
 	if (holdingWeapon.IsValid())
 	{
-		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		currentWeapon->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
 		holdingWeapon = nullptr;
 	}
 	else
 	{
-		bow->AttachSocket(GetMesh(), TEXT("hand_lSocket"), true);
-		holdingWeapon = bow;
+		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetGripSocket(), true);
+		holdingWeapon = currentWeapon;
 	}
+}
+
+void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
+{
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		currentWeapon->SetVisibility(false);
+	}
+	
+	if (holdingWeapon.IsValid())
+	{
+		holdingWeapon = nullptr;
+	}
+
+	anim->weaponType = weapon->GetWeaponType();
+	weapon->SetVisibility(true);
+	currentWeapon = weapon;
+
+	combatComp->bIsCompleteReload = true;
 }
 
 void APlayCharacter::SetPlayingDodge(bool isPlaying)
@@ -317,7 +351,10 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 	{
 	case EPlayerCameraMode::Default:
 		bUseControllerRotationYaw = false;
-		bow->PlaceOrSpawnArrow();
+		if (currentWeapon.IsValid())
+		{
+			currentWeapon->PlaceOrSpawnArrow();
+		}
 		focusDome->Deactivate();
 		
 		GetWorldTimerManager().SetTimer(
@@ -347,7 +384,10 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 			GetWorldTimerManager().ClearTimer(timerHandle);
 			timerHandle.Invalidate();
 		}
-		bow->SpawnArrowInBow();
+		if (currentWeapon.IsValid())
+		{
+			currentWeapon->SpawnArrowInBow();
+		}
 		focusDome->Deactivate();
 		break;
 	case EPlayerCameraMode::Focus:

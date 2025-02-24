@@ -2,7 +2,7 @@
 
 
 #include "Player/Weapon/Tripcaster.h"
-
+#include "Player/Weapon/PlayerProjectile.h"
 
 // Sets default values
 ATripcaster::ATripcaster()
@@ -26,6 +26,13 @@ ATripcaster::ATripcaster()
 	{
 		mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		mesh->SetAnimInstanceClass(temp_anim.Class);
+	}
+
+	ConstructorHelpers::FClassFinder<APlayerProjectile> temp_proj (TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Wire.BP_Wire_C'"));
+
+	if (temp_proj.Succeeded())
+	{
+		projectileFactory = temp_proj.Class;
 	}
 
 	arrowSlot = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));

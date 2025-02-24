@@ -2,6 +2,7 @@
 
 
 #include "Player/Weapon/Bow.h"
+#include "Player/Weapon/PlayerProjectile.h"
 
 
 // Sets default values
@@ -26,6 +27,13 @@ ABow::ABow()
 	{
 		mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		mesh->SetAnimInstanceClass(temp_anim.Class);
+	}
+
+	ConstructorHelpers::FClassFinder<APlayerProjectile> temp_proj (TEXT("/Script/Engine.BlueprintGeneratedClass'/Game/Blueprints/Player/BP_Arrow.BP_Arrow_C'"));
+
+	if (temp_proj.Succeeded())
+	{
+		projectileFactory = temp_proj.Class;
 	}
 
 	arrowSlot = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));

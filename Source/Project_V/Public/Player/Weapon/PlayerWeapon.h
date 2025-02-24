@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Player/PlayerAnimInstance.h"
 #include "PlayerWeapon.generated.h"
 
 UCLASS()
@@ -12,7 +13,6 @@ class PROJECT_V_API APlayerWeapon : public AActor
 	GENERATED_BODY()
 	
 public:
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class USkeletalMeshComponent* mesh;
 
@@ -38,4 +38,16 @@ public:
 	virtual bool Fire(FVector direction, float alpha);
 	
 	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
+
+	virtual void SetVisibility(bool visible);
+
+	virtual FName GetGripSocket() const
+	{
+		return TEXT("BowGripSocket");
+	}
+
+	virtual EWeaponType GetWeaponType() const
+	{
+		return EWeaponType::Base;
+	}
 };
