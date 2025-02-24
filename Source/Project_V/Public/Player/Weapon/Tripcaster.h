@@ -33,6 +33,8 @@ public:
 
 	virtual void SetVisibility(bool visible) override;
 
+	virtual void RevertProjectile() override;
+
 	virtual FName GetGripSocket() const override
 	{
 		return TEXT("CasterGripSocket");

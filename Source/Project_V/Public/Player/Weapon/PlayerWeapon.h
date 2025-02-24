@@ -55,4 +55,6 @@ public:
 	{
 		return EWeaponType::Base;
 	}
+
+	virtual void RevertProjectile() {}
 };

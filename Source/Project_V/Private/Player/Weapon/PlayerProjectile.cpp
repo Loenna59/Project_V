@@ -51,7 +51,6 @@ void APlayerProjectile::BeginPlay()
 
 	moveComp->InitialSpeed = initialSpeed;
 	moveComp->MaxSpeed = maxSpeed;
-	mesh->OnComponentBeginOverlap.AddDynamic(this, &APlayerProjectile::OnOverlapped);
 }
 
 void APlayerProjectile::Fire(FVector to, float alpha)

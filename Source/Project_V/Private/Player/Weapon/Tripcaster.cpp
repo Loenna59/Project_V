@@ -63,12 +63,9 @@ void ATripcaster::SpawnArrowInBow()
 	{
 		APlayerProjectile* spawned_proj2 = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
 		projectile = spawned_proj2;
-		if (projectile.IsValid())
+		if (projectile->mesh)
 		{
-			if (projectile->mesh)
-			{
-				projectile->mesh->SetVisibility(false);
-			}
+			projectile->mesh->SetVisibility(false);
 		}
 	}
 
@@ -81,6 +78,7 @@ void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
 	{
 		if (projectile.IsValid())
 		{
+			projectile->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
 			if (projectile->mesh)
 			{
 				projectile->mesh->SetVisibility(true);
@@ -99,14 +97,10 @@ void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
 	if (!projectile.IsValid())
 	{
 		APlayerProjectile* spawned_proj = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
-		spawned_proj->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
 		projectile = spawned_proj;
-		if (projectile.IsValid())
+		if (projectile->mesh)
 		{
-			if (projectile->mesh)
-			{
-				projectile->mesh->SetVisibility(false);
-			}
+			projectile->mesh->SetVisibility(false);
 		}
 	}
 }
@@ -166,4 +160,24 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 void ATripcaster::SetVisibility(bool visible)
 {
 	Super::SetVisibility(visible);
+}
+
+void ATripcaster::RevertProjectile()
+{
+	if (wire.IsValid())
+	{
+		wire->Link(nullptr);
+		
+		wire->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		wire->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+		wire->AttachToComponent(arrowSlot, FAttachmentTransformRules::SnapToTargetIncludingScale);
+
+		if (projectile.IsValid())
+		{
+			if (projectile->mesh)
+			{
+				projectile->mesh->SetVisibility(false);
+			}
+		}
+	}
 }

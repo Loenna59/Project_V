@@ -286,21 +286,29 @@ void APlayCharacter::PickWeapon()
 
 void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
 {
+	if (currentWeapon == weapon)
+	{
+		return;
+	}
+	
 	if (currentWeapon.IsValid())
 	{
 		currentWeapon->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		currentWeapon->RevertProjectile();
 		currentWeapon->SetVisibility(false);
-	}
-	
-	if (holdingWeapon.IsValid())
-	{
-		holdingWeapon = nullptr;
 	}
 
 	anim->weaponType = weapon->GetWeaponType();
 	weapon->SetVisibility(true);
 	currentWeapon = weapon;
-
+	
+	anim->weaponChanged = true;
+	if (holdingWeapon.IsValid())
+	{
+		holdingWeapon = nullptr;
+		anim->OnPlayEquip();
+	}
+	
 	combatComp->bIsCompleteReload = true;
 }
 

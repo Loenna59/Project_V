@@ -3,6 +3,7 @@
 
 #include "Player/Weapon/Wire.h"
 #include "CableComponent.h"
+#include "Project_V.h"
 
 // Sets default values
 AWire::AWire()
@@ -23,17 +24,32 @@ AWire::AWire()
 void AWire::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	mesh->OnComponentBeginOverlap.AddDynamic(this, &AWire::OnOverlapped);
+}
+
+void AWire::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::OnOverlapped(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	PrintLogFunc(*OtherActor->GetActorNameOrLabel());
 }
 
 void AWire::Link(AActor* proj)
 {
+	cableComp->SetAttachEndTo(proj, NAME_None);
+	
 	if (proj)
 	{
-		cableComp->SetAttachEndTo(proj, NAME_None);
 		cableComp->bAttachEnd = true;
 		cableComp->EndLocation = FVector(-38, 0, 0);
 		cableComp->SetVisibility(true);
+	}
+	else
+	{
+		cableComp->bAttachEnd = false;
+		cableComp->SetVisibility(false);
 	}
 }
 

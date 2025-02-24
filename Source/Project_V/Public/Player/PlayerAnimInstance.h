@@ -73,6 +73,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bTwiceShot;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool weaponChanged;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EWeaponType weaponType;
 
