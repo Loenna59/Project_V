@@ -15,14 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	APlayerWeapon();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class USkeletalMeshComponent* mesh;
 
@@ -30,22 +22,28 @@ public:
 	class USceneComponent* arrowSlot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<class AArrow> arrowFactory;
+	TSubclassOf<class APlayerProjectile> projectileFactory;
 	
 	UPROPERTY()
-	TWeakObjectPtr<class AArrow> arrow;
+	TWeakObjectPtr<class APlayerProjectile> projectile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USkeletalMesh* skeletalMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UAnimInstance> animInstance;
 
 	UAnimInstance* GetAnimInstance();
 
-	void SpawnArrowInBow();
+	virtual void SpawnArrowInBow();
 
-	void SpawnArrow(USceneComponent* parent, FName socketName = NAME_None);
+	virtual void SpawnArrow(USceneComponent* parent, FName socketName = NAME_None);
 
-	void PlaceArrowOnBow();
+	virtual void PlaceArrowOnBow();
 
-	void PlaceOrSpawnArrow();
+	virtual void PlaceOrSpawnArrow();
 
-	bool Fire(FVector direction, float alpha);
+	virtual bool Fire(FVector direction, float alpha);
 	
-	void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
+	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
 };

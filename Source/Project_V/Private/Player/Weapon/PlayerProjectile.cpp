@@ -1,0 +1,71 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Player/PlayerProjectile.h"
+
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
+
+
+// Sets default values
+APlayerProjectile::APlayerProjectile()
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	SetRootComponent(mesh);
+
+	moveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
+	moveComp->SetUpdatedComponent(RootComponent);
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tmpMesh(TEXT("/Script/Engine.StaticMesh'/Game/Assets/Ranged/SM_ProjectileArrowMesh.SM_ProjectileArrowMesh'"));
+
+	if (tmpMesh.Succeeded())
+	{
+		mesh->SetStaticMesh(tmpMesh.Object);
+		mesh->SetCollisionProfileName(TEXT("PlayerProjectile"));
+	}
+
+	// 물리 속성 설정
+	moveComp->ProjectileGravityScale = 1;
+	moveComp->bShouldBounce = false;
+	moveComp->bAutoActivate = false;
+	moveComp->bRotationFollowsVelocity = true;
+
+	moveComp->SetActive(false);
+
+	ConstructorHelpers::FObjectFinder<UParticleSystem> tmpEffect(TEXT("/Script/Engine.ParticleSystem'/Game/Assets/Medieval_Weapons/VFX/P_ArrowTrail.P_ArrowTrail'"));
+
+	if (tmpEffect.Succeeded())
+	{
+		tailVFX = tmpEffect.Object;
+	}
+}
+
+// Called when the game starts or when spawned
+void APlayerProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	moveComp->InitialSpeed = initialSpeed;
+	moveComp->MaxSpeed = maxSpeed;
+	mesh->OnComponentBeginOverlap.AddDynamic(this, &APlayerProjectile::OnOverlapped);
+}
+
+void APlayerProjectile::Fire(FVector to, float alpha)
+{
+	FVector direction = (to - GetActorLocation()).GetSafeNormal();
+	
+	FVector currentVelocity = direction * initialSpeed * FMath::Clamp(alpha, 0, 1);
+	
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	
+	moveComp->Velocity = currentVelocity;
+	moveComp->SetActive(true);
+	moveComp->Activate();
+
+	UGameplayStatics::SpawnEmitterAttached(tailVFX, mesh);
+}
+
