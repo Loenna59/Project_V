@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Weapon/Bow.h"
+#include "Player/Weapon/Tripcaster.h"
 
 
 // Sets default values
-ABow::ABow()
+ATripcaster::ATripcaster()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -13,14 +13,14 @@ ABow::ABow()
 	mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	SetRootComponent(mesh);
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> skeletalMesh (TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Bow.SKM_Bow'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> skeletalMesh (TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Ranged/SKM_Crossbow.SKM_Crossbow'"));
 
 	if (skeletalMesh.Succeeded())
 	{
 		mesh->SetSkeletalMesh(skeletalMesh.Object);
 	}
 
-	ConstructorHelpers::FClassFinder<UAnimInstance> temp_anim (TEXT("/Script/Engine.AnimBlueprintGeneratedClass'/Game/Blueprints/Player/Animation/ABP_Bow.ABP_Bow_C'"));
+	ConstructorHelpers::FClassFinder<UAnimInstance> temp_anim (TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Tripcaster.ABP_Tripcaster_C'"));
 
 	if (temp_anim.Succeeded())
 	{
@@ -33,4 +33,3 @@ ABow::ABow()
 	arrowSlot->SetRelativeLocation(FVector(25, 0, 0));
 	arrowSlot->SetRelativeScale3D(FVector(1.1f));
 }
-

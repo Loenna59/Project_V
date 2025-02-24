@@ -11,10 +11,8 @@ class PROJECT_V_API APlayerWeapon : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	APlayerWeapon();
-
+public:
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class USkeletalMeshComponent* mesh;
 
@@ -26,12 +24,6 @@ public:
 	
 	UPROPERTY()
 	TWeakObjectPtr<class APlayerProjectile> projectile;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class USkeletalMesh* skeletalMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UAnimInstance> animInstance;
 
 	UAnimInstance* GetAnimInstance();
 

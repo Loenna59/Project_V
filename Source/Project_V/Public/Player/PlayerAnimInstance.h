@@ -10,6 +10,13 @@
  * 
  */
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Base,
+	Caster
+};
+
 UCLASS()
 class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
 {
@@ -62,6 +69,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isShot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponType weaponType;
 
 	void SetWeaponAnim(UAnimInstance* anim);
 
