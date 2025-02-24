@@ -257,7 +257,7 @@ void APlayCharacter::SpawnArrow()
 {
 	if (currentWeapon.IsValid())
 	{
-		currentWeapon->SpawnArrow(GetMesh(), TEXT("PickArrowSocket"));
+		currentWeapon->SpawnArrow(GetMesh(), currentWeapon->GetPickProjectileSocket());
 	}
 }
 
@@ -416,7 +416,8 @@ void APlayCharacter::Fire(FVector velocity, float alpha)
 {
 	if (holdingWeapon.IsValid())
 	{
-		holdingWeapon->Fire(velocity, alpha);
-		anim->OnFire();
+		bool twice = holdingWeapon->Fire(velocity, alpha);
+		
+		anim->OnFire(twice);
 	}
 }

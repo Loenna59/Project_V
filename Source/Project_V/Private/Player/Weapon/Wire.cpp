@@ -16,6 +16,7 @@ AWire::AWire()
 	cableComp->SetRelativeLocation(FVector(-38, 0, 0));
 	cableComp->bAttachEnd = false;
 	cableComp->CableWidth = 3;
+	cableComp->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -23,5 +24,21 @@ void AWire::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AWire::Link(AActor* proj)
+{
+	if (proj)
+	{
+		cableComp->SetAttachEndTo(proj, NAME_None);
+		cableComp->bAttachEnd = true;
+		cableComp->EndLocation = FVector(-38, 0, 0);
+		cableComp->SetVisibility(true);
+	}
+}
+
+bool AWire::IsChaining() const
+{
+	return cableComp->GetAttachedActor() != nullptr;
 }
 

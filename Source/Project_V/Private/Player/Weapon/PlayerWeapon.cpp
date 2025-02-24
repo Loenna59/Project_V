@@ -69,8 +69,6 @@ bool APlayerWeapon::Fire(FVector direction, float alpha)
 	{
 		projectile->Fire(direction, alpha);
 		projectile = nullptr;
-
-		return false;
 	}
 
 	return true;

@@ -70,6 +70,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isShot;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bTwiceShot;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EWeaponType weaponType;
 
@@ -82,7 +85,7 @@ public:
 	void OnStartDodge();
 
 	UFUNCTION()
-	void OnFire();
+	void OnFire(bool twice);
 
 	UFUNCTION()
 	void OnModifyWaistRotation(const FRotator& rotation);

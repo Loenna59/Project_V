@@ -20,9 +20,10 @@ void UPlayerAnimInstance::SetWeaponAnim(UAnimInstance* anim)
 	weaponAnim = CastChecked<UWeaponAnim>(anim);
 }
 
-void UPlayerAnimInstance::OnFire()
+void UPlayerAnimInstance::OnFire(bool twice)
 {
 	isShot = true;
+	bTwiceShot = twice;
 }
 
 void UPlayerAnimInstance::OnModifyWaistRotation(const FRotator& rotation)

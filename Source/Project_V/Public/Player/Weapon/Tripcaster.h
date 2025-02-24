@@ -15,9 +15,28 @@ public:
 	// Sets default values for this actor's properties
 	ATripcaster();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class AWire> wireFactory;
+	
+	UPROPERTY()
+	TWeakObjectPtr<class AWire> wire;
+
+	virtual void SpawnArrowInBow() override;
+
+	virtual void SpawnArrow(USceneComponent* parent, FName socketName = NAME_None) override;
+
+	virtual void PlaceArrowOnBow() override;
+
+	virtual bool Fire(FVector direction, float alpha) override;
+
 	virtual FName GetGripSocket() const override
 	{
 		return TEXT("CasterGripSocket");
+	}
+
+	virtual FName GetPickProjectileSocket() const override
+	{
+		return TEXT("PickWireSocket");
 	}
 
 	virtual EWeaponType GetWeaponType() const override

@@ -2,7 +2,10 @@
 
 
 #include "Player/Weapon/Tripcaster.h"
+
+#include "Project_V.h"
 #include "Player/Weapon/PlayerProjectile.h"
+#include "Player/Weapon/Wire.h"
 
 // Sets default values
 ATripcaster::ATripcaster()
@@ -28,15 +31,103 @@ ATripcaster::ATripcaster()
 		mesh->SetAnimInstanceClass(temp_anim.Class);
 	}
 
-	ConstructorHelpers::FClassFinder<APlayerProjectile> temp_proj (TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Wire.BP_Wire_C'"));
+	ConstructorHelpers::FClassFinder<AWire> temp_proj (TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Wire.BP_Wire_C'"));
 
 	if (temp_proj.Succeeded())
 	{
-		projectileFactory = temp_proj.Class;
+		wireFactory = temp_proj.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<APlayerProjectile> temp_proj2 (TEXT("/Script/Engine.BlueprintGeneratedClass'/Game/Blueprints/Player/BP_Arrow.BP_Arrow_C'"));
+
+	if (temp_proj2.Succeeded())
+	{
+		projectileFactory = temp_proj2.Class;
 	}
 
 	arrowSlot = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSlotComp"));
 	arrowSlot->SetupAttachment(mesh, TEXT("bowstring"));
 	arrowSlot->SetRelativeLocation(FVector(25, 0, 0));
 	arrowSlot->SetRelativeScale3D(FVector(1.1f));
+}
+
+void ATripcaster::SpawnArrowInBow()
+{
+	if (!wire.IsValid())
+	{
+		AWire* spawned_proj = GetWorld()->SpawnActor<AWire>(wireFactory);
+		wire = spawned_proj;
+	}
+	
+	if (!projectile.IsValid())
+	{
+		APlayerProjectile* spawned_proj2 = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
+		projectile = spawned_proj2;
+		projectile->SetHidden(true);
+	}
+
+	PlaceArrowOnBow();
+}
+
+void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
+{
+	if (wire.IsValid() && wire->IsChaining())
+	{
+		projectile->SetHidden(false);
+		return;	
+	}
+	
+	if (!wire.IsValid())
+	{
+		AWire* spawned_proj2 = GetWorld()->SpawnActor<AWire>(wireFactory);
+		spawned_proj2->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+		wire = spawned_proj2;
+	}
+	
+	if (!projectile.IsValid())
+	{
+		APlayerProjectile* spawned_proj = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
+		spawned_proj->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+		projectile = spawned_proj;
+		projectile->SetHidden(true);
+	}
+}
+
+void ATripcaster::PlaceArrowOnBow()
+{
+	if (wire.IsValid())
+	{
+		if (projectile.IsValid() && wire->IsChaining())
+		{
+			projectile->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+			projectile->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+			projectile->AttachToComponent(arrowSlot, FAttachmentTransformRules::SnapToTargetIncludingScale);
+
+			return;
+		}
+
+		wire->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		wire->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+		wire->AttachToComponent(arrowSlot, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	}
+}
+
+bool ATripcaster::Fire(FVector direction, float alpha)
+{
+	if (wire.IsValid())
+	{
+		if (projectile.IsValid() && wire->IsChaining())
+		{
+			projectile->Fire(direction, alpha);
+			projectile = nullptr;
+			wire = nullptr;
+
+			return true;
+		}
+		
+		wire->Fire(direction, alpha);
+		wire->Link(projectile.Get());
+	}
+	
+	return false;
 }

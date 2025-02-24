@@ -18,6 +18,10 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCableComponent* cableComp;
 
+	void Link(class AActor* proj);
+
+	bool IsChaining() const;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

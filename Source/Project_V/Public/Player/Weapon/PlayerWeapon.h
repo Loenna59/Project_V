@@ -46,6 +46,11 @@ public:
 		return TEXT("BowGripSocket");
 	}
 
+	virtual FName GetPickProjectileSocket() const
+	{
+		return TEXT("PickArrowSocket");
+	}
+
 	virtual EWeaponType GetWeaponType() const
 	{
 		return EWeaponType::Base;
