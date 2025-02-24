@@ -39,14 +39,14 @@ void ADiscLauncher::InitComponents()
 	if (Root)
 	{
 		SetRootComponent(Root);
-		Root->SetBoxExtent(FVector(130.000000,55.000000,55.000000));
+		Root->SetBoxExtent(FVector(150,80,80));
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(2.500000,1.000000,1.000000));
+		Mesh->SetRelativeScale3D(FVector(2.5,1.0,1.0));
 	}
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Engine/BasicShapes/Cube.Cube'"));
 	if (tempMesh.Succeeded())
@@ -104,6 +104,7 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 			if (primComp)
 			{
 				primComp->SetSimulatePhysics(true);
+				primComp->SetAllMassScale(500.0f);
 			}
 		}
 		arrow->Destroy();

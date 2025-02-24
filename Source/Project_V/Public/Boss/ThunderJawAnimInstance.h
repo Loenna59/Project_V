@@ -42,5 +42,5 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
-	float BossAnimYaw;
+	UAnimMontage* CurrentPlayingMontage;
 };

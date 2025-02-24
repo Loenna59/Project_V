@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void InitConstruct();
@@ -56,6 +58,7 @@ public:
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
 
+	
 	UFUNCTION(BlueprintCallable)
 	void SetVisibilityBoss();
 	UFUNCTION()
@@ -82,7 +85,6 @@ protected:
 	class ADiscLauncher* LDiscLauncher;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class ADiscLauncher* RDiscLauncher;
-	
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
@@ -97,4 +99,8 @@ public:
 	float PatrolDist{2000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bIsLSEnd{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bPartsBroken{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bTrapped{false};	
 };

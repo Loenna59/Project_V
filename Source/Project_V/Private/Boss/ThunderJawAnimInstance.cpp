@@ -17,4 +17,6 @@ void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		BossAnimMoveSpeed = FVector::DotProduct(velocity,forward);
 	}
+
+	CurrentPlayingMontage = GetCurrentActiveMontage();
 }

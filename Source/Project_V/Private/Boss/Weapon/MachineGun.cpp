@@ -41,7 +41,7 @@ void AMachineGun::InitComponents()
 	{
 		SetRootComponent(Root);
 		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
-		Root->SetBoxExtent(FVector(18.0,15.0,12.0));
+		Root->SetBoxExtent(FVector(25.0,20.0,15.0));
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -107,6 +107,7 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 			if (primComp)
 			{
 				primComp->SetSimulatePhysics(true);
+				primComp->SetAllMassScale(500.0f);
 			}
 		}
 		

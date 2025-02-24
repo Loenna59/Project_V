@@ -2,14 +2,19 @@
 #include "Boss/ThunderJaw.h"
 
 #include "NavigationInvokerComponent.h"
+#include "Project_V.h"
+#include "Blueprint/UserWidget.h"
+#include "Boss/BossHPUI.h"
 #include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/DiscLauncher.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/Arrow.h"
 #include "Player/PlayCharacter.h"
 
 
@@ -29,11 +34,25 @@ void AThunderJaw::BeginPlay()
 	// controller가 생성자에서 할당되지 않기에 Beginplay에서 casting해줌
 	
 	InitBeginPlay();
+	GetMesh()->OnComponentBeginOverlap.AddDynamic(this,&AThunderJaw::OnBossBeginOverlap);
 }
 
 void AThunderJaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto* arrow = Cast<AArrow>(OtherActor);
+	if (arrow)
+	{
+		PRINTLOG(TEXT("Hit arrow"));
+		BossAIController->DetectedTarget = true;
+		FSM->ChangeBossState(EBossState::Combat);
+		OtherActor->Destroy();
+	}
 }
 
 void AThunderJaw::InitConstruct()
@@ -47,6 +66,8 @@ void AThunderJaw::InitConstruct()
 		GetMesh()->SetRelativeLocation(FVector(0,0,-100.0));
 		GetMesh()->SetRelativeRotation(FRotator(0,-90,0));
 		GetMesh()->SetRelativeScale3D(FVector(3.0));
+		GetMesh()->SetGenerateOverlapEvents(true);
+		GetMesh()->SetCollisionProfileName(TEXT("Enemy"));
 	}
 
 	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Assets/SciFi_Beasts_Pack/SciFi_Beast05/Materials/Skin1/Mat_SciFi_Beast05_Armor_Skin1.Mat_SciFi_Beast05_Armor_Skin1'"));
@@ -68,6 +89,7 @@ void AThunderJaw::InitConstruct()
 	}
 
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	
 }
 
 void AThunderJaw::InitBeginPlay()
@@ -116,6 +138,7 @@ void AThunderJaw::InitBeginPlay()
 		RDiscLauncher->LeftorRight = 1;
 		RDiscLauncher->Boss = this;
 	}
+	
 
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
@@ -173,30 +196,31 @@ class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
 
 void AThunderJaw::MachineGunBroken(float LeftorRight)
 {
-	
+	bPartsBroken = true;
+	FSM->ChangeBossState(EBossState::Damage);
+
 	if (LeftorRight == -1)
 	{
 		LMachineGun = nullptr;
-		FSM->ChangeBossState(EBossState::Damage);
 	}
 	else
 	{
 		RMachineGun = nullptr;
-		FSM->ChangeBossState(EBossState::Damage);
 	}
 }
 
 void AThunderJaw::DiscLauncherBroken(float LeftorRight)
 {
+	bPartsBroken = true;
+	FSM->ChangeBossState(EBossState::Damage);
+
 	if (LeftorRight == -1)
 	{
 		LDiscLauncher = nullptr;
-		FSM->ChangeBossState(EBossState::Damage);
 	}
 	else
 	{
 		RDiscLauncher = nullptr;
-		FSM->ChangeBossState(EBossState::Damage);
 	}
 }
 
@@ -228,7 +252,6 @@ void AThunderJaw::SetVisibilityBoss()
 	if (bIsLSEnd)
 	{
 		SetActorHiddenInGame(false);
-		
 		LMachineGun->SetActorHiddenInGame(false);
 		RMachineGun->SetActorHiddenInGame(false);
 		LDiscLauncher->SetActorHiddenInGame(false);
@@ -243,6 +266,7 @@ void AThunderJaw::SetVisibilityBoss()
 		RDiscLauncher->SetActorHiddenInGame(true);
 	}
 }
+
 
 void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 {

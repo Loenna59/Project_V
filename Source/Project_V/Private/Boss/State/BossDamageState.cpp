@@ -9,15 +9,23 @@
 void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
+	if (Boss->bPartsBroken)
+	{
+		Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
+		Boss->bPartsBroken = false;
+	}
 }
 
 void UBossDamageState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
 {
 	Super::Update(Boss, FSM, DeltaTime);
-	if (!Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
+	if (Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
 	{
-		FSM->ChangeBossState(FSM->GetPrevState()->BossState);		
+		return;
+	}
+	else
+	{
+		FSM->ChangeBossState(FSM->GetPrevState()->BossState);
 	}
 }
 

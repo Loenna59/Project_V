@@ -333,7 +333,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
-	if (!Boss->GetLMachineGun() && !Boss->GetRMachineGun())
+	if (!Boss->GetLDiscLauncher() && !Boss->GetRDiscLauncher())
 	{
 		PatternTime = 0;
 		return;
