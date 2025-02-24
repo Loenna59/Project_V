@@ -66,12 +66,20 @@ void UBossPatrolState::RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, fl
 {
 	// 타겟 위치로 몸을 돌리는 함수
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(Boss->GetActorLocation(), FSM->RandomLocation);
-	float NewYaw = UKismetMathLibrary::FInterpTo(Boss->GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
-	Boss->SetActorRotation(FRotator(0,NewYaw,0));
+
+	float Delta = LookAtRot.Yaw - UKismetMathLibrary::NormalizeAxis(Boss->GetActorRotation().Yaw);
+	Delta = UKismetMathLibrary::NormalizeAxis(Delta);
+
+	float NewYaw = UKismetMathLibrary::NormalizeAxis(Boss->GetActorRotation().Yaw) + Delta;
+	
+	float NewDestYaw = UKismetMathLibrary::FInterpTo(UKismetMathLibrary::NormalizeAxis(Boss->GetActorRotation().Yaw),NewYaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
+	
+	Boss->SetActorRotation(FRotator(0,NewDestYaw,0));
+	
 	// 현재 회전값과 목표 회전값의 차이 계산
 	float YawDifference = FMath::Abs(FMath::FindDeltaAngleDegrees(Boss->GetActorRotation().Yaw, LookAtRot.Yaw));
 	// 임계값보다 작으면 회전 완료로 간주
-	FSM->bIsRotateEnd = YawDifference <= 18.0;
+	FSM->bIsRotateEnd = YawDifference <= 10.0;
 }
 
 

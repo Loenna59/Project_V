@@ -208,8 +208,14 @@ void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
 {
 	// 타겟 위치로 몸을 돌리는 함수
 	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLoc);
-	float NewYaw = UKismetMathLibrary::FInterpTo(GetActorRotation().Yaw,LookAtRot.Yaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
-	SetActorRotation(FRotator(0,NewYaw,0));
+	float Delta = LookAtRot.Yaw - UKismetMathLibrary::NormalizeAxis(GetActorRotation().Yaw);
+	Delta = UKismetMathLibrary::NormalizeAxis(Delta);
+
+	float NewYaw = UKismetMathLibrary::NormalizeAxis(GetActorRotation().Yaw) + Delta;
+	
+	float NewDestYaw = UKismetMathLibrary::FInterpTo(UKismetMathLibrary::NormalizeAxis(GetActorRotation().Yaw),NewYaw, GetWorld()->GetDeltaSeconds(),InterpSpeed);
+	
+	SetActorRotation(FRotator(0,NewDestYaw,0));
 }
 
 void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)

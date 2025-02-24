@@ -208,7 +208,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		int32 randomNum = FMath::RandRange(3,3);
+		int32 randomNum = FMath::RandRange(2,3);
 		if (randomNum == 2)
 		{
 			PRINTLOG(TEXT("Using MachineGun"));
@@ -245,7 +245,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 1.75;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 2.0;
 			}
 		},recoilTime,false);
 	}
@@ -325,7 +325,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	
 	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
 
-	if (Boss->GetBossAIController()->FacingDot < 0.75)
+	if (Boss->GetBossAIController()->FacingDot < 0.95)
 	{
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 	}
@@ -334,6 +334,13 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
 	DiscLauncherDelayCurrentTime += GetWorld()->GetDeltaSeconds();
+
+	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);
+	if (Boss->GetBossAIController()->FacingDot < 0.95)
+	{
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+	}
+	
 	if (DiscLauncherDelayCurrentTime > DiscLauncherDelay)
 	{
 		DiscLauncherDelayCurrentTime = 0;

@@ -153,8 +153,7 @@ void AThunderJawAIController::UpdateFacingDot()
 	{
 		return;
 	}
-
-	//PRINTLOG(TEXT("FacingDot : %f"), FacingDot);
+	PRINTLOGTOSCREEN(TEXT("FacingDot : %f"), FacingDot);
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();

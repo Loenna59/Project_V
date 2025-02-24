@@ -85,6 +85,7 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
+		PRINTLOG(TEXT("player hit bullet"));
 		Destroy();
 	}
 }
