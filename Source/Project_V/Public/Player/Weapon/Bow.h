@@ -14,5 +14,7 @@ class PROJECT_V_API ABow : public APlayerWeapon
 public:
 	// Sets default values for this actor's properties
 	ABow();
+
+	virtual void SetVisibility(bool visible) override;
 	
 };

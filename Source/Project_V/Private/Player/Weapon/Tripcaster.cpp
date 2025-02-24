@@ -63,7 +63,13 @@ void ATripcaster::SpawnArrowInBow()
 	{
 		APlayerProjectile* spawned_proj2 = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
 		projectile = spawned_proj2;
-		projectile->SetHidden(true);
+		if (projectile.IsValid())
+		{
+			if (projectile->mesh)
+			{
+				projectile->mesh->SetVisibility(false);
+			}
+		}
 	}
 
 	PlaceArrowOnBow();
@@ -73,7 +79,13 @@ void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
 {
 	if (wire.IsValid() && wire->IsChaining())
 	{
-		projectile->SetHidden(false);
+		if (projectile.IsValid())
+		{
+			if (projectile->mesh)
+			{
+				projectile->mesh->SetVisibility(true);
+			}
+		}
 		return;	
 	}
 	
@@ -89,7 +101,26 @@ void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
 		APlayerProjectile* spawned_proj = GetWorld()->SpawnActor<APlayerProjectile>(projectileFactory);
 		spawned_proj->AttachToComponent(parent, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
 		projectile = spawned_proj;
-		projectile->SetHidden(true);
+		if (projectile.IsValid())
+		{
+			if (projectile->mesh)
+			{
+				projectile->mesh->SetVisibility(false);
+			}
+		}
+	}
+}
+
+void ATripcaster::AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow)
+{
+	Super::AttachSocket(comp, socketName, visibleArrow);
+
+	if (wire.IsValid())
+	{
+		if (wire->mesh)
+		{
+			wire->mesh->SetVisibility(visibleArrow);
+		}
 	}
 }
 
@@ -130,4 +161,9 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 	}
 	
 	return false;
+}
+
+void ATripcaster::SetVisibility(bool visible)
+{
+	Super::SetVisibility(visible);
 }

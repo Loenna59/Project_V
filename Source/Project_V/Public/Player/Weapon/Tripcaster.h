@@ -25,9 +25,13 @@ public:
 
 	virtual void SpawnArrow(USceneComponent* parent, FName socketName = NAME_None) override;
 
+	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow) override;
+
 	virtual void PlaceArrowOnBow() override;
 
 	virtual bool Fire(FVector direction, float alpha) override;
+
+	virtual void SetVisibility(bool visible) override;
 
 	virtual FName GetGripSocket() const override
 	{

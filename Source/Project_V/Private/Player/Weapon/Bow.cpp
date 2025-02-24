@@ -42,3 +42,8 @@ ABow::ABow()
 	arrowSlot->SetRelativeScale3D(FVector(1.1f));
 }
 
+void ABow::SetVisibility(bool visible)
+{
+	Super::SetVisibility(visible);
+}
+
