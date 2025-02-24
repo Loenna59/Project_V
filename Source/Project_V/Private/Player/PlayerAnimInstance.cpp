@@ -5,7 +5,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
-#include "Player/WeaponAnim.h"
+#include "Player/Weapon/WeaponAnim.h"
 
 void UPlayerAnimInstance::NativeBeginPlay()
 {

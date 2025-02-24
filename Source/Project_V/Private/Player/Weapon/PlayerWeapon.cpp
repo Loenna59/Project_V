@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/PlayerWeapon.h"
+#include "Player/Weapon/PlayerWeapon.h"
 
-#include "Player/Arrow.h"
+#include "Player/Weapon/Arrow.h"
 
 // Sets default values
 APlayerWeapon::APlayerWeapon()

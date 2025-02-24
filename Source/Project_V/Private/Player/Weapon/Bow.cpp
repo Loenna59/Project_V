@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Bow.h"
+#include "Player/Weapon/Bow.h"
 
 
 // Sets default values

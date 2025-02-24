@@ -15,7 +15,7 @@
 #include "Player/FocusDome.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
-#include "Player/PlayerWeapon.h"
+#include "Player/Weapon/PlayerWeapon.h"
 #include "Player/Component/PlayerCameraSwitcher.h"
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerMovement.h"
