@@ -78,7 +78,7 @@ void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	// 	FSM->bIsArriveRandomLocation = false;
 	// }
 
-	DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Red);
+	// DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Red);
 }
 
 void UBossPatrolState::RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, float InterpSpeed)

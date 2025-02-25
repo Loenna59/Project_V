@@ -18,6 +18,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/PlayCharacter.h"
 #include "Player/Weapon/Arrow.h"
+#include "Player/Weapon/Wire.h"
 
 
 // Sets default values
@@ -132,7 +133,10 @@ void AThunderJaw::InitBeginPlay()
 	}
 
 	TSubclassOf<AActor> SplineClass = LoadClass<AActor>(nullptr,TEXT("'/Game/Blueprints/Boss/BP_Spline.BP_Spline_C'"));
-	splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
+	if (SplineClass)
+	{
+		splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
+	}
 
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
@@ -295,7 +299,7 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)
 	{
-		if (FSM->GetCurrentState()->BossState != EBossState::Combat)
+		if (FSM->GetCurrentState()->BossState != EBossState::Combat && FSM->GetCurrentState()->BossState != EBossState::Damage)
 		{
 			BossAIController->DetectedTarget = true;
 			FSM->ChangeBossState(EBossState::Combat);
@@ -303,6 +307,16 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		CurrentHP -= 100.0f;
 		
 		PRINTLOG(TEXT("%f"),CurrentHP);
+		OtherActor->Destroy();
+		return;
+	}
+
+	auto* wire = Cast<AWire>(OtherActor);
+	if(wire)
+	{
+		CurrentHP -= 200.0f;
+		bTrapped = true;
+		FSM->ChangeBossState(EBossState::Damage);
 		OtherActor->Destroy();
 	}
 }

@@ -20,9 +20,11 @@ class PROJECT_V_API APlayerHUD : public AHUD
 
 	TSubclassOf<class UPlayerUI> playerUIFactory;
 	
-	class UPlayerUI* playerUI;
 
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UPlayerUI* playerUI;
+	
 	class UPlayerUI* GetPlayerUI() const
 	{
 		return playerUI;

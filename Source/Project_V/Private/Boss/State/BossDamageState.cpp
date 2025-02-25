@@ -4,6 +4,7 @@
 #include "Boss/State/BossDamageState.h"
 
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 
 void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
@@ -13,6 +14,11 @@ void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	{
 		Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
 		Boss->bPartsBroken = false;
+	}
+	if (Boss->bTrapped)
+	{
+		Boss->GetBossAnimInstance()->OnPlayFallDownMontage();
+		Boss->bTrapped = false;
 	}
 }
 
@@ -25,7 +31,8 @@ void UBossDamageState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	}
 	else
 	{
-		FSM->ChangeBossState(FSM->GetPrevState()->BossState);
+		Boss->GetBossAIController()->DetectedTarget = true;
+		FSM->ChangeBossState(EBossState::Combat);
 	}
 }
 
