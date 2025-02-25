@@ -6,6 +6,7 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/State/BossCombatState.h"
 #include "Boss/State/BossBaseState.h"
+#include "Boss/State/BossDamageState.h"
 #include "Boss/State/BossIdleState.h"
 #include "Boss/State/BossLookOutState.h"
 #include "Boss/State/BossPatrolState.h"
@@ -33,6 +34,11 @@ void UThunderJawFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!Boss->bIsLSEnd)
+	{
+		return;
+	}
+	
 	if (CurrentState)
 	{
 		CurrentState->Update(Boss,this,DeltaTime);
@@ -53,6 +59,9 @@ void UThunderJawFSM::InitStatePool()
 	// LookOut State
 	StatePool.Add(EBossState::LookOut, NewObject<UBossLookOutState>(this,UBossLookOutState::StaticClass()));
 	StatePool[EBossState::LookOut]->BossState = EBossState::LookOut;
+	// Damage State
+	StatePool.Add(EBossState::Damage,NewObject<UBossDamageState>(this,UBossDamageState::StaticClass()));
+	StatePool[EBossState::Damage]->BossState = EBossState::Damage;
 }
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
@@ -92,12 +101,16 @@ bool UThunderJawFSM::GetRandomLocationFromNavMesh(FVector CenterLocation, float 
 	FNavLocation Loc;
 	bool bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
 	float Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
+
+
 	while (Dist < Radius / 2.0)
 	{
 		bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
 		Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
 	}
+	
 	Dest = Loc.Location;
+	PRINTLOG(TEXT("randomLoc : %f,%f,%f"),Dest.X,Dest.Y,Dest.Z);
 	return bResult;
 }
 

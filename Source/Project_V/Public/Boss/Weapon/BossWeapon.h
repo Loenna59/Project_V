@@ -22,6 +22,15 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	class AThunderJaw* Boss;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UBoxComponent* Root;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UArrowComponent* FirePos;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float MaxHP;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

@@ -21,7 +21,6 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void InitComponents();
@@ -29,16 +28,7 @@ protected:
 	void OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 public:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	class AThunderJaw* Boss;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class UBoxComponent* Root;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class UStaticMeshComponent* Mesh;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class USceneComponent* FirePos;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AMachineGunBullet> BulletFactory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -41,6 +41,7 @@ void AMachineGunBullet::InitComponents()
 	if (Root)
 	{
 		SetRootComponent(Root);
+		Root->SetBoxExtent(FVector(30,10,10));
 		Root->SetGenerateOverlapEvents(true);
 	}
 
@@ -49,8 +50,8 @@ void AMachineGunBullet::InitComponents()
 	{
 		Mesh->SetupAttachment(Root);
 		Mesh->SetRelativeLocation(FVector(-30,0,0));
-		Mesh->SetRelativeRotation(FRotator(0,-90,0));
-		Mesh->SetRelativeScale3D(FVector(0.15,0.15,0.75));
+		Mesh->SetRelativeRotation(FRotator(-90,0,0));
+		Mesh->SetRelativeScale3D(FVector(0.1,0.1,0.6));
 	}
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/StarterContent/Shapes/Shape_NarrowCapsule.Shape_NarrowCapsule'"));

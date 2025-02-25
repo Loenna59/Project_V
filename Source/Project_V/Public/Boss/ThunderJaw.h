@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "ThunderJaw.generated.h"
 
@@ -21,6 +22,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void InitConstruct();
@@ -42,12 +45,25 @@ public:
 	class AMachineGun* GetLMachineGun();
 	UFUNCTION(BlueprintCallable)
 	class AMachineGun* GetRMachineGun();
+	UFUNCTION(BlueprintCallable)
+	class ADiscLauncher* GetLDiscLauncher();
+	UFUNCTION(BlueprintCallable)
+	class ADiscLauncher* GetRDiscLauncher();
+	
 	UFUNCTION()
-	void MachineGunBronken(float LeftorRight);
+	void MachineGunBroken(float LeftorRight);
+	UFUNCTION()
+	void DiscLauncherBroken(float LeftorRight);
 	UFUNCTION()
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
+
+	
+	UFUNCTION(BlueprintCallable)
+	void SetVisibilityBoss();
+	UFUNCTION()
+	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -66,6 +82,11 @@ protected:
 	class AMachineGun* LMachineGun;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AMachineGun* RMachineGun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class ADiscLauncher* LDiscLauncher;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class ADiscLauncher* RDiscLauncher;
+
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
@@ -77,5 +98,14 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{1000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float PatrolDist{2000.0f};	
+	float PatrolDist{2000.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bIsLSEnd{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bPartsBroken{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bTrapped{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	class USplineComponent* splineComp;
+
 };

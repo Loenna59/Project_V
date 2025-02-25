@@ -35,11 +35,14 @@ public:
 	void OnPlayChargeMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayTailMontage();
-	
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayPartDestructionMontage();	
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayFallDownMontage();
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
-	float BossAnimYaw;
+	UAnimMontage* CurrentPlayingMontage;
 };

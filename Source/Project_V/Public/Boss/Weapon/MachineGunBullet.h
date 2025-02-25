@@ -14,6 +14,9 @@ class PROJECT_V_API AMachineGunBullet : public AActor
 public:
 	AMachineGunBullet();
 
+	UFUNCTION()
+	void FireToTarget(const FVector& Target, float Radius);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -29,11 +32,6 @@ protected:
 
 	UFUNCTION()
 	FVector GetRandomPointInCircleXY(float radius, FVector centerPoint);
-	
-public:
-	UFUNCTION()
-	void FireToTarget(const FVector& Target, float Radius);
-	
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")

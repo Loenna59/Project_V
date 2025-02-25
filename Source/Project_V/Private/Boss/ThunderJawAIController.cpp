@@ -7,6 +7,7 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
+#include "Boss/State/BossCombatState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -41,6 +42,11 @@ void AThunderJawAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (!Boss)
+	{
+		return;
+	}
+
+	if (!Boss->bIsLSEnd)
 	{
 		return;
 	}
@@ -107,6 +113,12 @@ void AThunderJawAIController::MoveToPlayer()
 
 void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
+	
+	if (Boss->GetFSMComponent()->GetCurrentState()->BossState == EBossState::Combat)
+	{
+		return;
+	}
+	
 	if (Stimulus.Type== UAISense::GetSenseID<UAISense_Sight>())
 	{
 		if (Stimulus.WasSuccessfullySensed())
@@ -114,8 +126,13 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 			auto* player = Cast<APlayCharacter>(Actor);
 			if (player)
 			{
+				// 플레이어가 감지됨
+				// 경계모드로 변환 된 상태이면 감지됐던 장소를 저장
 				PRINTLOG(TEXT("Target is in Sight"));
 				DetectedTarget = true;
+				Boss->GetFSMComponent()->bIsArrivedDetectedLocation = false;
+				DetectedLocation = player->GetActorLocation();
+				PRINTLOG(TEXT("DetectedLocation : %f,%f,%f"),DetectedLocation.X,DetectedLocation.Y,DetectedLocation.Z);
 			}
 		}
 	}
@@ -141,8 +158,7 @@ void AThunderJawAIController::UpdateFacingDot()
 	{
 		return;
 	}
-
-	PRINTLOG(TEXT("FacingDot : %f"), FacingDot);
+	//PRINTLOGTOSCREEN(TEXT("FacingDot : %f"), FacingDot);
 	FVector bossPos = Boss->GetActorLocation();
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	FVector direction = (targetPos - bossPos).GetSafeNormal();
@@ -152,7 +168,7 @@ void AThunderJawAIController::UpdateFacingDot()
 void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 {
 	auto* bossFSM = Boss->GetFSMComponent();
-	if (!bossFSM)
+	if (bossFSM->GetCurrentState()->BossState == EBossState::Combat || bossFSM->GetCurrentState()->BossState == EBossState::Damage)
 	{
 		return;
 	}

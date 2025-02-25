@@ -8,8 +8,8 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/MachineGunBullet.h"
+#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/Weapon/Arrow.h"
 
 
@@ -17,7 +17,7 @@
 AMachineGun::AMachineGun()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	InitComponents();
 }
@@ -33,12 +33,6 @@ void AMachineGun::BeginPlay()
 
 }
 
-// Called every frame
-void AMachineGun::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AMachineGun::InitComponents()
 {
 	Root = CreateDefaultSubobject<UBoxComponent>(TEXT("Root"));
@@ -46,7 +40,7 @@ void AMachineGun::InitComponents()
 	{
 		SetRootComponent(Root);
 		Root->SetRelativeScale3D(FVector(3.0,3.0,5.0));
-		Root->SetBoxExtent(FVector(18.0,15.0,12.0));
+		Root->SetBoxExtent(FVector(25.0,20.0,15.0));
 	}
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -56,7 +50,7 @@ void AMachineGun::InitComponents()
 		Mesh->SetRelativeScale3D(FVector(0.350000,0.200000,0.200000));
 	}
 
-	FirePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirePos"));
+	FirePos = CreateDefaultSubobject<UArrowComponent>(TEXT("FirePos"));
 	if (FirePos)
 	{
 		FirePos->SetupAttachment(Root);
@@ -102,20 +96,19 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 		Boss->GetBossAIController()->DetectedTarget = true;
 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
-		// detach from parent
+		// Detach from parent
 		if (bIsBroken)
 		{
-			
-			Boss->MachineGunBronken(LeftorRight);
+			Boss->MachineGunBroken(LeftorRight);
 			Root->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,true));
 			Root->SetCollisionProfileName(FName("BlockAll"));
 			UPrimitiveComponent* primComp = GetComponentByClass<UPrimitiveComponent>();
 			if (primComp)
 			{
 				primComp->SetSimulatePhysics(true);
+				primComp->SetAllMassScale(500.0f);
 			}
 		}
-		
 		arrow->Destroy();
 	}
 }

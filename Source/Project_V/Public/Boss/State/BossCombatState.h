@@ -58,8 +58,7 @@ protected:
 	UFUNCTION()
 	void MouseLaser(AThunderJaw* Boss);
 	
-	UFUNCTION()
-	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
+	
 
 protected:
 	UPROPERTY()
@@ -100,17 +99,19 @@ protected:
 
 	// Machine Gun
 	UPROPERTY()
-	FTimerHandle MachineGunTimer;
+	float MachineGunPatternTime{3.0};
 	UPROPERTY()
 	float MachineGunDelayCurrentTime{0.0};
 	UPROPERTY()
 	float MachineGunDelay{0.1};
-	UPROPERTY()
-	float MachineGunPatternTime{3.0};
 	
 	// Disc Launcher
 	UPROPERTY()
-	float DiscLauncherPatternTime{3.0};
+	float DiscLauncherPatternTime{3.5};
+	UPROPERTY()
+	float DiscLauncherDelayCurrentTime{0.0};
+	UPROPERTY()
+	float DiscLauncherDelay{1.0};
 	
 	// Mouse Laser
 	UPROPERTY()

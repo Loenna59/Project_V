@@ -8,6 +8,8 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
+#include "Boss/Weapon/DiscLauncher.h"
+#include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PlayCharacter.h"
 
@@ -79,6 +81,8 @@ void UBossCombatState::InitComponents(AThunderJaw* Boss)
 	UsingPattern = EAttackPattern::None;
 	PatternCurrentTime = 0;
 	PatternTime = 0;
+	MachineGunDelayCurrentTime = 0;
+	DiscLauncherDelayCurrentTime = 0;
 	ChargeFlag = false;
 	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
 }
@@ -204,7 +208,7 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		int32 randomNum = FMath::RandRange(2,2);
+		int32 randomNum = FMath::RandRange(2,3);
 		if (randomNum == 2)
 		{
 			PRINTLOG(TEXT("Using MachineGun"));
@@ -213,11 +217,13 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 		}
 		else if (randomNum == 3)
 		{
+			PRINTLOG(TEXT("Using DiscLauncher"));
 			UsingPattern = EAttackPattern::DiscLauncher;
 			PatternTime = DiscLauncherPatternTime;
 		}
 		else if (randomNum == 4)
 		{
+			PRINTLOG(TEXT("Using MachineGun"));
 			UsingPattern = EAttackPattern::MouseLaser;
 			PatternTime = MouseLaserPatternTime;
 		}
@@ -239,7 +245,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 1.75;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 2.0;
 			}
 		},recoilTime,false);
 	}
@@ -295,8 +301,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		return;
 	}
 	
-	//PRINTLOG(TEXT("Using Machine Gun"));
-	DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
+	Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -320,7 +325,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 	
 	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0);
 
-	if (Boss->GetBossAIController()->FacingDot < 0.75)
+	if (Boss->GetBossAIController()->FacingDot < 0.95)
 	{
 		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
 	}
@@ -328,7 +333,37 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 
 void UBossCombatState::DiscLauncher(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("Using DiscLauncher"));
+	if (!Boss->GetLDiscLauncher() && !Boss->GetRDiscLauncher())
+	{
+		PatternTime = 0;
+		return;
+	}
+	
+	DiscLauncherDelayCurrentTime += GetWorld()->GetDeltaSeconds();
+
+	Boss->RotateToTarget(Boss->GetAloy()->GetActorLocation(),1.0f);
+	if (Boss->GetBossAIController()->FacingDot < 0.95)
+	{
+		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+	}
+	
+	if (DiscLauncherDelayCurrentTime > DiscLauncherDelay)
+	{
+		DiscLauncherDelayCurrentTime = 0;
+		if (Boss->GetLDiscLauncher())
+		{
+			FTransform Lt = Boss->GetLDiscLauncher()->FirePos->GetComponentTransform();
+			Lt.SetScale3D(FVector(1.0));
+			Boss->GetLDiscLauncher()->CreateDisc(Lt);
+		}
+
+		if (Boss->GetRDiscLauncher())
+		{
+			FTransform Rt = Boss->GetRDiscLauncher()->FirePos->GetComponentTransform();
+			Rt.SetScale3D(FVector(1.0));
+			Boss->GetRDiscLauncher()->CreateDisc(Rt);
+		}
+	}
 }
 
 void UBossCombatState::MouseLaser(AThunderJaw* Boss)
@@ -336,29 +371,3 @@ void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using MouseLaser"));
 }
 
-void UBossCombatState::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
-{
-	if (!World) return;
-
-	const float AngleStep = 2.0f * PI / 32;
-	FVector PrevPoint = Center + FVector(Radius, 0.0f, 0.0f);
-    
-	for (int32 i = 1; i <= 32; i++)
-	{
-		float Angle = AngleStep * i;
-		FVector NextPoint = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.0f);
-        
-		DrawDebugLine(
-			World,
-			PrevPoint,
-			NextPoint,
-			FColor::Red,
-			false,
-			-1.0f,
-			0,
-			1
-		);
-        
-		PrevPoint = NextPoint;
-	}
-}
