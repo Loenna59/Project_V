@@ -11,7 +11,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/Arrow.h"
+#include "Player/Weapon/Arrow.h"
 
 
 // Sets default values

@@ -4,12 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Animation/AnimNodeReference.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Base,
+	Caster
+};
 
 UCLASS()
 class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
@@ -63,9 +69,30 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isShot;
-	
-	UFUNCTION(BlueprintCallable, Category=Dodge)
-	void OnMoveDodge();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bTwiceShot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool weaponChanged;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponType weaponType;
 
 	void SetWeaponAnim(UAnimInstance* anim);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPlayEquip();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartDodge();
+
+	UFUNCTION()
+	void OnFire(bool twice);
+
+	UFUNCTION()
+	void OnModifyWaistRotation(const FRotator& rotation);
+
+	UFUNCTION()
+	void OnSetDrawStrength(float strength);
 };

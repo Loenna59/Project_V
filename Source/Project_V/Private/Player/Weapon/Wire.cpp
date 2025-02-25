@@ -1,0 +1,58 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Player/Weapon/Wire.h"
+#include "CableComponent.h"
+#include "Project_V.h"
+
+// Sets default values
+AWire::AWire()
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+	cableComp = CreateDefaultSubobject<UCableComponent>(TEXT("CableComp"));
+	cableComp->SetupAttachment(mesh);
+
+	cableComp->SetRelativeLocation(FVector(-38, 0, 0));
+	cableComp->bAttachEnd = false;
+	cableComp->CableWidth = 3;
+	cableComp->SetVisibility(false);
+	cableComp->bEnableCollision = true;
+}
+
+void AWire::BeginPlay()
+{
+	Super::BeginPlay();
+
+	cableComp->OnComponentBeginOverlap.AddDynamic(this, &AWire::OnCableOverlapped);
+}
+
+void AWire::OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	PrintLogFunc(TEXT("와이어에 걸림"));
+}
+
+void AWire::Link(AActor* proj)
+{
+	cableComp->SetAttachEndTo(proj, NAME_None);
+	
+	if (proj)
+	{
+		cableComp->bAttachEnd = true;
+		cableComp->EndLocation = FVector(-38, 0, 0);
+		cableComp->SetVisibility(true);
+	}
+	else
+	{
+		cableComp->bAttachEnd = false;
+		cableComp->SetVisibility(false);
+	}
+}
+
+bool AWire::IsChaining() const
+{
+	return cableComp->GetAttachedActor() != nullptr;
+}
+
