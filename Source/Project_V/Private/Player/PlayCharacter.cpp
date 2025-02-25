@@ -392,6 +392,8 @@ void APlayCharacter::GameOver()
 		GetWorldTimerManager().ClearTimer(timerHandle);
 		timerHandle.Invalidate();
 	}
+
+	GetCharacterMovement()->Deactivate();
 	
 	APlayerController* pc = Cast<APlayerController>(Controller);
 
