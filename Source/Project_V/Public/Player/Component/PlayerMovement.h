@@ -8,14 +8,12 @@
 #include "PlayerMovement.generated.h"
 
 DECLARE_DELEGATE_OneParam(FOnEventCameraSlowMode, bool);
-DECLARE_DELEGATE_OneParam(FOnEventChangedCameraMode, EPlayerCameraMode);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UPlayerMovement : public UPlayerBaseComponent
 {
 	GENERATED_BODY()
-
-	FOnEventChangedCameraMode onEventCameraModeChanged;
+	
 	FOnEventCameraSlowMode onEventCameraSlowMode;
 
 public:
@@ -83,16 +81,7 @@ public:
 	bool bIsPlayingDodge = false;
 
 	template<typename UserClass>
-	void AddEventHandler(UserClass* obj, void (UserClass::* func)(EPlayerCameraMode mode))
-	{
-		if (obj && func)
-		{
-			onEventCameraModeChanged.BindUObject(obj, func);
-		}
-	}
-
-	template<typename UserClass>
-	void AddEventHandler(UserClass* obj, void (UserClass::* func)(bool value))
+	void AddHandler(UserClass* obj, void (UserClass::* func)(bool value))
 	{
 		if (obj && func)
 		{

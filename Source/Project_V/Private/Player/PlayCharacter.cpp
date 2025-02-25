@@ -7,17 +7,16 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
-#include "Player/FocusDome.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
 #include "Player/Weapon/PlayerWeapon.h"
 #include "Player/Component/PlayerCameraSwitcher.h"
 #include "Player/Component/PlayerCombat.h"
+#include "Player/Component/PlayerFocusMode.h"
 #include "Player/Component/PlayerMovement.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
@@ -81,13 +80,6 @@ APlayCharacter::APlayCharacter()
 		imc = tmp_imc.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_focus(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerFocusMode.IA_PlayerFocusMode'"));
-
-	if (tmp_ia_focus.Succeeded())
-	{
-		ia_focus = tmp_ia_focus.Object;
-	}
-
 	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
 	if (tmp_bow.Succeeded())
@@ -109,16 +101,10 @@ APlayCharacter::APlayCharacter()
 		GetMesh()->SetAnimInstanceClass(tmp.Object);
 	}
 
-	ConstructorHelpers::FClassFinder<AFocusDome> tmp_dome(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_FocusDome.BP_FocusDome_C'"));
-
-	if (tmp_dome.Succeeded())
-	{
-		domeFactory = tmp_dome.Class;
-	}
-
 	movementComp = CreateDefaultSubobject<UPlayerMovement>(TEXT("PlayerMovement"));
 	combatComp = CreateDefaultSubobject<UPlayerCombat>(TEXT("PlayerCombat"));
 	cameraSwitcher = CreateDefaultSubobject<UPlayerCameraSwitcher>(TEXT("CameraSwitcher"));
+	focusMode = CreateDefaultSubobject<UPlayerFocusMode>(TEXT("FocusMode"));
 }
 
 // Called when the game starts or when spawned
@@ -156,12 +142,6 @@ void APlayCharacter::BeginPlay()
 		tripcaster->SetVisibility(false);
 	}
 
-	if ((focusDome = GetWorld()->SpawnActor<AFocusDome>(domeFactory)))
-	{
-		focusDome->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		focusDome->SetActorRelativeLocation(FVector(0, 0, -200));
-	}
-
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	if (hud)
@@ -181,14 +161,17 @@ void APlayCharacter::BeginPlay()
 	AddEventHandler(movementComp, &UPlayerMovement::OnChangedCameraMode);
 	AddEventHandler(combatComp, &UPlayerCombat::OnChangedCameraMode);
 	AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
+	AddEventHandler(focusMode, &UPlayerFocusMode::OnChangedCameraMode);
 
 	cameraSwitcher->SetCameraSlowMode(false);
 
 	combatComp->AddHandler(this, &APlayCharacter::IsNotAnchoredMode);
 	combatComp->AddHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
 
-	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
-	movementComp->AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
+	movementComp->AddHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
+	movementComp->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
+
+	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	ChangeWeapon(bow);
 }
@@ -212,45 +195,8 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		movementComp->SetupInputBinding(pi);
 		combatComp->SetupInputBinding(pi);
-		pi->BindAction(ia_focus, ETriggerEvent::Triggered, this, &APlayCharacter::OnFocusOrScan);
-		pi->BindAction(ia_focus, ETriggerEvent::Completed, this, &APlayCharacter::EndFocusOrScan);
+		focusMode->SetupInputBinding(pi);
 	}
-}
-
-void APlayCharacter::OnFocusOrScan(const FInputActionValue& actionValue)
-{
-	if (!focusDome)
-	{
-		return;
-	}
-	
-	if (currentCameraMode == EPlayerCameraMode::Focus)
-	{
-		focusDome->Deactivate();
-		cameraSwitcher->OnChangedCameraMode(EPlayerCameraMode::Default);
-		return;
-	}
-
-	if (focusPressingTime > focusModeThreshold)
-	{
-		focusDome->Activate();
-		cameraSwitcher->OnChangedCameraMode(EPlayerCameraMode::Focus);
-	}
-	
-	focusPressingTime += GetWorld()->DeltaTimeSeconds;
-}
-
-void APlayCharacter::EndFocusOrScan()
-{
-	if (currentCameraMode != EPlayerCameraMode::Focus && focusPressingTime < focusModeThreshold)
-	{
-		//PrintLogFunc(TEXT("scan"));
-		focusPressingTime = 0;
-		return;
-	}
-	
-	focusPressingTime = 0;
-	SetPlayerCameraMode(currentCameraMode == EPlayerCameraMode::Focus? EPlayerCameraMode::Default : EPlayerCameraMode::Focus);
 }
 
 void APlayCharacter::SpawnArrow()
@@ -363,7 +309,6 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		{
 			currentWeapon->PlaceOrSpawnArrow();
 		}
-		focusDome->Deactivate();
 		
 		GetWorldTimerManager().SetTimer(
 			timerHandle,
@@ -396,7 +341,6 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		{
 			currentWeapon->SpawnArrowInBow();
 		}
-		focusDome->Deactivate();
 		break;
 	case EPlayerCameraMode::Focus:
 		bUseControllerRotationYaw = true;

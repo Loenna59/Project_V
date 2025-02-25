@@ -18,7 +18,7 @@ AWire::AWire()
 	cableComp->bAttachEnd = false;
 	cableComp->CableWidth = 3;
 	cableComp->SetVisibility(false);
-	cableComp->bEnableCollision = true;
+	// cableComp->bEnableCollision = true;
 }
 
 void AWire::BeginPlay()
