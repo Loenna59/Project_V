@@ -35,6 +35,11 @@ public:
 
 	virtual void RevertProjectile() override;
 
+	virtual FName GetSlotSocket() const override
+	{
+		return TEXT("CasterSocket");
+	}
+
 	virtual FName GetGripSocket() const override
 	{
 		return TEXT("CasterGripSocket");

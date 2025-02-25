@@ -138,7 +138,7 @@ void APlayCharacter::BeginPlay()
 	{
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		tripcaster->SpawnArrowInBow();
-		tripcaster->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		tripcaster->AttachSocket(GetMesh(), TEXT("CasterSocket"), false);
 		tripcaster->SetVisibility(false);
 	}
 
@@ -212,7 +212,7 @@ void APlayCharacter::PickWeapon()
 {
 	if (holdingWeapon.IsValid())
 	{
-		currentWeapon->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetSlotSocket(), false);
 		holdingWeapon = nullptr;
 	}
 	else
@@ -231,7 +231,7 @@ void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
 	
 	if (currentWeapon.IsValid())
 	{
-		currentWeapon->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
+		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetSlotSocket(), false);
 		currentWeapon->RevertProjectile();
 		currentWeapon->SetVisibility(false);
 	}
@@ -372,18 +372,7 @@ void APlayCharacter::TakeDamage(float damage, FVector forward)
 	ui->SetHealthUI(currentHealth, maxHealth);
 	if (currentHealth <= 0)
 	{
-		APlayerController* pc = Cast<APlayerController>(Controller);
-
-		if (pc)
-		{
-			auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
-
-			if (subSystem)
-			{
-				subSystem->ClearAllMappings();
-			}
-		}
-		anim->OnDead();
+		GameOver();
 		return;
 	}
 
@@ -392,4 +381,27 @@ void APlayCharacter::TakeDamage(float damage, FVector forward)
 	float degrees = FMath::RadiansToDegrees(radians);
 
 	anim->OnDamaged(degrees);
+}
+
+void APlayCharacter::GameOver()
+{
+	SetPlayerCameraMode(EPlayerCameraMode::Default);
+	anim->OnDead();
+	if (timerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(timerHandle);
+		timerHandle.Invalidate();
+	}
+	
+	APlayerController* pc = Cast<APlayerController>(Controller);
+
+	if (pc)
+	{
+		auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+
+		if (subSystem)
+		{
+			subSystem->ClearAllMappings();
+		}
+	}
 }

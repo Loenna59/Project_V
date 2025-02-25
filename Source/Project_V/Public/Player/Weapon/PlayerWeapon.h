@@ -41,6 +41,11 @@ public:
 
 	virtual void SetVisibility(bool visible);
 
+	virtual FName GetSlotSocket() const
+	{
+		return TEXT("BowSocket");
+	}
+
 	virtual FName GetGripSocket() const
 	{
 		return TEXT("BowGripSocket");
