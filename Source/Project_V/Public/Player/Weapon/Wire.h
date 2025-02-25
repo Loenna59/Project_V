@@ -18,12 +18,17 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCableComponent* cableComp;
 
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* cableCollision;
+
 	void Link(class AActor* proj);
 
 	bool IsChaining() const;
 	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 	UFUNCTION()
 	void OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
