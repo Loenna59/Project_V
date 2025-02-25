@@ -8,7 +8,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
-#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
@@ -26,7 +25,7 @@
 APlayCharacter::APlayCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	GetCapsuleComponent()->SetCollisionProfileName("Player");
@@ -175,14 +174,6 @@ void APlayCharacter::BeginPlay()
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	ChangeWeapon(bow);
-}
-
-// Called every frame
-void APlayCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	bIsShot = false;
 }
 
 // Called to bind functionality to input
@@ -377,10 +368,22 @@ void APlayCharacter::Fire(FVector velocity, float alpha)
 
 void APlayCharacter::TakeDamage(float damage, FVector forward)
 {
-	currentHealth -= damage;
+	currentHealth = FMath::Clamp(currentHealth - damage, 0, maxHealth);
+	ui->SetHealthUI(currentHealth, maxHealth);
 	if (currentHealth <= 0)
 	{
-		PrintLogFunc(TEXT("으앙 쥬금 ㅠㅠ"));
+		APlayerController* pc = Cast<APlayerController>(Controller);
+
+		if (pc)
+		{
+			auto subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+
+			if (subSystem)
+			{
+				subSystem->ClearAllMappings();
+			}
+		}
+		anim->OnDead();
 		return;
 	}
 

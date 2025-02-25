@@ -85,6 +85,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool damaged;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool isDead;
+
 	void SetWeaponAnim(UAnimInstance* anim);
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -95,6 +98,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDamaged(float degrees);
+
+	UFUNCTION()
+	void OnDead();
 	
 	UFUNCTION()
 	void OnFire(bool twice);

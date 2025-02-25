@@ -25,9 +25,6 @@ protected:
 	FOnEventCameraModeChanged onEventCameraModeChanged;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -86,8 +83,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
-
-	bool bIsShot = false;
 
 	void SpawnArrow();
 

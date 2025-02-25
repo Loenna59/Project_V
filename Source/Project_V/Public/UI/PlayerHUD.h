@@ -23,7 +23,8 @@ class PROJECT_V_API APlayerHUD : public AHUD
 	class UPlayerUI* playerUI;
 
 public:
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class UPlayerUI* GetPlayerUI() const
 	{
 		return playerUI;

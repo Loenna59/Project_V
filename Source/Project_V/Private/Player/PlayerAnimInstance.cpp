@@ -20,6 +20,11 @@ void UPlayerAnimInstance::SetWeaponAnim(UAnimInstance* anim)
 	weaponAnim = CastChecked<UWeaponAnim>(anim);
 }
 
+void UPlayerAnimInstance::OnDead()
+{
+	isDead = true;
+}
+
 void UPlayerAnimInstance::OnFire(bool twice)
 {
 	isShot = true;
