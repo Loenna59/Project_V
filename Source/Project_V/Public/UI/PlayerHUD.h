@@ -23,6 +23,7 @@ class PROJECT_V_API APlayerHUD : public AHUD
 	class UPlayerUI* playerUI;
 
 public:
+	
 	class UPlayerUI* GetPlayerUI() const
 	{
 		return playerUI;

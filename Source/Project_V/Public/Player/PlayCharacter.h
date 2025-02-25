@@ -140,4 +140,6 @@ public:
 	void OnAnchoredMode();
 
 	void Fire(FVector velocity, float alpha);
+
+	void TakeDamage(float damage, FVector forward);
 };

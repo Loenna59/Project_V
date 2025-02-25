@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
+#include "Project_V.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
@@ -372,4 +373,20 @@ void APlayCharacter::Fire(FVector velocity, float alpha)
 		
 		anim->OnFire(twice);
 	}
+}
+
+void APlayCharacter::TakeDamage(float damage, FVector forward)
+{
+	currentHealth -= damage;
+	if (currentHealth <= 0)
+	{
+		PrintLogFunc(TEXT("으앙 쥬금 ㅠㅠ"));
+		return;
+	}
+
+	float dotProduct = FVector::DotProduct(GetActorForwardVector(), forward);
+	float radians = FMath::Acos(dotProduct);
+	float degrees = FMath::RadiansToDegrees(radians);
+
+	anim->OnDamaged(degrees);
 }

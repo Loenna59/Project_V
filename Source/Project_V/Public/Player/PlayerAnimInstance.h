@@ -79,6 +79,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EWeaponType weaponType;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float damagedDegree;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool damaged;
+
 	void SetWeaponAnim(UAnimInstance* anim);
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -87,6 +93,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnStartDodge();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDamaged(float degrees);
+	
 	UFUNCTION()
 	void OnFire(bool twice);
 
