@@ -29,3 +29,14 @@ inline void PrintLogFunc(const TCHAR* fmt, ...)
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
 	va_end(args);
 }
+
+inline void PrintLogFunc(int32 key, const TCHAR* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	TCHAR buffer[1024];
+	FCString::GetVarArgs(buffer, UE_ARRAY_COUNT(buffer), fmt, args);
+	PRINTLOG(TEXT("%s"), buffer);
+	GEngine->AddOnScreenDebugMessage(key, 5, FColor::Cyan, *FString::Printf(TEXT("%s"), buffer));
+	va_end(args);
+}

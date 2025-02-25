@@ -238,5 +238,6 @@ void UPlayerMovement::PlayingDodge()
 
 void UPlayerMovement::EndDodge()
 {
+	dodgeValue = FVector2D::ZeroVector;
 	bIsPlayingDodge = false;
 }

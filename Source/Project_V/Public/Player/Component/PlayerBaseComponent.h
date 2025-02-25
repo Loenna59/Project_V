@@ -7,6 +7,8 @@
 #include "Player/PlayerCameraMode.h"
 #include "PlayerBaseComponent.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnEventChangedCameraMode, EPlayerCameraMode);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_V_API UPlayerBaseComponent : public UActorComponent
 {
@@ -17,6 +19,8 @@ public:
 	UPlayerBaseComponent();
 
 protected:
+	FOnEventChangedCameraMode onEventCameraModeChanged;
+	
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -27,6 +31,15 @@ protected:
 	class UPlayerAnimInstance* anim;
 	
 public:
+	template<typename UserClass>
+	void AddBaseEventHandler(UserClass* obj, void (UserClass::* func)(EPlayerCameraMode mode))
+	{
+		if (obj && func)
+		{
+			onEventCameraModeChanged.BindUObject(obj, func);
+		}
+	}
+	
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) {}
 
 	virtual void OnChangedCameraMode(EPlayerCameraMode mode) {}

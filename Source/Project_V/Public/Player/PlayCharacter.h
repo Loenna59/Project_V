@@ -44,6 +44,9 @@ public:
 	class UPlayerCameraSwitcher* cameraSwitcher;
 
 	UPROPERTY(VisibleAnywhere)
+	class UPlayerFocusMode* focusMode;
+
+	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(VisibleAnywhere)
@@ -66,9 +69,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APlayerWeapon* tripcaster;
-
-	UPROPERTY(VisibleAnywhere)
-	class AFocusDome* focusDome;
 	
 	class UPlayerUI* ui;
 
@@ -78,14 +78,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class APlayerWeapon> tripcasterFactory;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class AFocusDome> domeFactory;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	double minPinchDegrees = 50;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float focusModeThreshold = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float idleTimerDuration = 10;
@@ -94,12 +88,6 @@ public:
 	float maxHealth = 100;
 
 	bool bIsShot = false;
-
-	UFUNCTION()
-	void OnFocusOrScan(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void EndFocusOrScan();
 
 	void SpawnArrow();
 
@@ -122,12 +110,7 @@ private:
 	UPROPERTY()
 	class UInputMappingContext* imc;
 
-	UPROPERTY()
-	class UInputAction* ia_focus;
-
 	float currentHealth;
-
-	float focusPressingTime;
 
 	FTimerHandle timerHandle;
 
