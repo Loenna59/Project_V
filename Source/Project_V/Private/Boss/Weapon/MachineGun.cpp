@@ -10,7 +10,6 @@
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/Weapon/Arrow.h"
 
 
@@ -110,7 +109,6 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 				primComp->SetAllMassScale(500.0f);
 			}
 		}
-		
 		arrow->Destroy();
 	}
 }

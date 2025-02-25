@@ -7,6 +7,8 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
+#include "Components/SplineComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Player/PlayCharacter.h"
@@ -33,31 +35,48 @@ void UBossPatrolState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 
 void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
-	// 랜덤 위치 패트롤
-	// spline 깔아놓고 따라가도록 설정할 예정
-	if (!FSM->bIsArriveRandomLocation)
+
+	DistanceAlongSpline += GetWorld()->DeltaTimeSeconds * Boss->BossSpeed;
+	if (DistanceAlongSpline > Boss->splineComp->GetSplineLength())
 	{
-		auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
-		if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
-			result == EPathFollowingRequestResult::Type::Failed)
-		{
-			FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), Boss->PatrolDist,FSM->RandomLocation);
-			FSM->bIsArriveRandomLocation = true;
-			FSM->bIsRotateEnd = false;
-		}
+		DistanceAlongSpline = 0;
 	}
 
-	if (!FSM->bIsRotateEnd)
-	{
-		Boss->GetBossAIController()->StopMovement();
-		RotateToTarget(Boss,FSM,1.0f);
-		Boss->GetBossAnimInstance()->OnPlayTurnMontage();
-	}
-	else
-	{
-		FSM->bIsRotateEnd = true;
-		FSM->bIsArriveRandomLocation = false;
-	}
+	FVector TargetLoc = Boss->splineComp->GetLocationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World);
+	FVector Direction = (TargetLoc - Boss->GetActorLocation()).GetSafeNormal();
+	Boss->AddMovementInput(Direction,1.0f);
+
+	float TargetRotYaw = Boss->splineComp->GetRotationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World).Yaw;
+	float NewYaw = FMath::FInterpTo(Boss->GetActorRotation().Yaw,TargetRotYaw,GetWorld()->DeltaTimeSeconds,1.0f);
+	FRotator NewRot = FRotator(Boss->GetActorRotation().Pitch,NewYaw,Boss->GetActorRotation().Roll);
+	Boss->SetActorRotation(NewRot);
+	
+	
+	// // 랜덤 위치 패트롤
+	// // spline 깔아놓고 따라가도록 설정할 예정
+	// if (!FSM->bIsArriveRandomLocation)
+	// {
+	// 	auto result = Boss->GetBossAIController()->MoveToLocation(FSM->RandomLocation);
+	// 	if (result == EPathFollowingRequestResult::Type::AlreadyAtGoal ||
+	// 		result == EPathFollowingRequestResult::Type::Failed)
+	// 	{
+	// 		FSM->GetRandomLocationFromNavMesh(Boss->GetActorLocation(), Boss->PatrolDist,FSM->RandomLocation);
+	// 		FSM->bIsArriveRandomLocation = true;
+	// 		FSM->bIsRotateEnd = false;
+	// 	}
+	// }
+	//
+	// if (!FSM->bIsRotateEnd)
+	// {
+	// 	Boss->GetBossAIController()->StopMovement();
+	// 	RotateToTarget(Boss,FSM,1.0f);
+	// 	Boss->GetBossAnimInstance()->OnPlayTurnMontage();
+	// }
+	// else
+	// {
+	// 	FSM->bIsRotateEnd = true;
+	// 	FSM->bIsArriveRandomLocation = false;
+	// }
 
 	DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Red);
 }

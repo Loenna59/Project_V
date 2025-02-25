@@ -20,4 +20,8 @@ public:
 
 	void Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM);
 	void RotateToTarget(AThunderJaw* Boss, UThunderJawFSM* FSM, float InterpSpeed);
+
+public:
+	float DistanceAlongSpline{0.0};
+
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "ThunderJaw.generated.h"
 
@@ -86,6 +87,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class ADiscLauncher* RDiscLauncher;
 
+
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MaxHP{1000.0};
@@ -102,5 +104,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bPartsBroken{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	bool bTrapped{false};	
+	bool bTrapped{false};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	class USplineComponent* splineComp;
+
 };

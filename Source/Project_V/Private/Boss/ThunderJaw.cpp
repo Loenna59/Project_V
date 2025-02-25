@@ -1,7 +1,6 @@
 
 #include "Boss/ThunderJaw.h"
 
-#include "NavigationInvokerComponent.h"
 #include "Project_V.h"
 #include "Blueprint/UserWidget.h"
 #include "Boss/BossHPUI.h"
@@ -9,13 +8,16 @@
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
 #include "Boss/ThunderJawFSM.h"
+#include "Boss/State/BossBaseState.h"
 #include "Boss/Weapon/DiscLauncher.h"
 #include "Components/BoxComponent.h"
+#include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Player/Arrow.h"
 #include "Player/PlayCharacter.h"
+#include "Player/Weapon/Arrow.h"
 
 
 // Sets default values
@@ -34,6 +36,7 @@ void AThunderJaw::BeginPlay()
 	// controller가 생성자에서 할당되지 않기에 Beginplay에서 casting해줌
 	
 	InitBeginPlay();
+	
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this,&AThunderJaw::OnBossBeginOverlap);
 }
 
@@ -42,18 +45,6 @@ void AThunderJaw::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	auto* arrow = Cast<AArrow>(OtherActor);
-	if (arrow)
-	{
-		PRINTLOG(TEXT("Hit arrow"));
-		BossAIController->DetectedTarget = true;
-		FSM->ChangeBossState(EBossState::Combat);
-		OtherActor->Destroy();
-	}
-}
 
 void AThunderJaw::InitConstruct()
 {
@@ -89,7 +80,8 @@ void AThunderJaw::InitConstruct()
 	}
 
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
-	
+
+	//WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPUI"));
 }
 
 void AThunderJaw::InitBeginPlay()
@@ -138,7 +130,9 @@ void AThunderJaw::InitBeginPlay()
 		RDiscLauncher->LeftorRight = 1;
 		RDiscLauncher->Boss = this;
 	}
-	
+
+	TSubclassOf<AActor> SplineClass = LoadClass<AActor>(nullptr,TEXT("'/Game/Blueprints/Boss/BP_Spline.BP_Spline_C'"));
+	splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
 
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
@@ -295,6 +289,23 @@ void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 	}
 }
 
+void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto* arrow = Cast<AArrow>(OtherActor);
+	if (arrow)
+	{
+		if (FSM->GetCurrentState()->BossState != EBossState::Combat)
+		{
+			BossAIController->DetectedTarget = true;
+			FSM->ChangeBossState(EBossState::Combat);
+		}
+		CurrentHP -= 100.0f;
+		
+		PRINTLOG(TEXT("%f"),CurrentHP);
+		OtherActor->Destroy();
+	}
+}
 
 
 

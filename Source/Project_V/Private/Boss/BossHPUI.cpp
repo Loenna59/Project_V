@@ -3,27 +3,33 @@
 
 #include "Boss/BossHPUI.h"
 
+#include "Project_V.h"
 #include "Boss/ThunderJaw.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/GameplayStatics.h"
 
 void UBossHPUI::NativeConstruct()
 {
 	Super::NativeConstruct();
+	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
+
 }
 
 void UBossHPUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	Boss = Cast<AThunderJaw>(GetOuter());
+	//PRINT_CALLINFO();
+	SetPlayerHPUI();
+}
+
+void UBossHPUI::SetPlayerHPUI()
+{
 	if (Boss)
 	{
 		CurrentHP = Boss->CurrentHP;
 		MaxHP = Boss->MaxHP;
 	}
-}
-
-void UBossHPUI::SetPlayerHPUI()
-{
 	float per = CurrentHP / MaxHP;
+	//PRINTLOG(TEXT("%f"),per);
 	HPBar->SetPercent(per);
 }
