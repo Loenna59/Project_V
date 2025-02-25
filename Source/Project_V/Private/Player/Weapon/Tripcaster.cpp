@@ -143,14 +143,14 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 	{
 		if (projectile.IsValid() && wire->IsChaining())
 		{
-			projectile->Fire(direction, alpha);
+			projectile->Fire(direction, alpha, true);
 			projectile = nullptr;
 			wire = nullptr;
 
 			return true;
 		}
 		
-		wire->Fire(direction, alpha);
+		wire->Fire(direction, alpha, true);
 		wire->Link(projectile.Get());
 	}
 	

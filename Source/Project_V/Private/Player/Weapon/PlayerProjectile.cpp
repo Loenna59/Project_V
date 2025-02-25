@@ -3,6 +3,7 @@
 
 #include "Player/Weapon/PlayerProjectile.h"
 
+#include "Project_V.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
@@ -51,10 +52,24 @@ void APlayerProjectile::BeginPlay()
 
 	moveComp->InitialSpeed = initialSpeed;
 	moveComp->MaxSpeed = maxSpeed;
+
+	mesh->OnComponentHit.AddDynamic(this, &APlayerProjectile::OnComponentHit);
+	mesh->OnComponentBeginOverlap.AddDynamic(this, &APlayerProjectile::OnOverlapped);
 }
 
-void APlayerProjectile::Fire(FVector to, float alpha)
+void APlayerProjectile::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (bOrtho)
+	{
+		SetActorRelativeRotation(Hit.ImpactNormal.Rotation() - FRotator(180, 0, 0));
+	}
+}
+
+void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
+{
+	bOrtho = ortho;
+	
 	FVector direction = (to - GetActorLocation()).GetSafeNormal();
 	
 	FVector currentVelocity = direction * initialSpeed * FMath::Clamp(alpha, 0, 1);

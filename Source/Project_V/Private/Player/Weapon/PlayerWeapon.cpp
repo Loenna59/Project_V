@@ -67,7 +67,7 @@ bool APlayerWeapon::Fire(FVector direction, float alpha)
 {
 	if (projectile.IsValid())
 	{
-		projectile->Fire(direction, alpha);
+		projectile->Fire(direction, alpha, false);
 		projectile = nullptr;
 	}
 

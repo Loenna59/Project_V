@@ -20,20 +20,10 @@ AWire::AWire()
 	cableComp->SetVisibility(false);
 }
 
-// Called when the game starts or when spawned
-void AWire::BeginPlay()
-{
-	Super::BeginPlay();
-
-	mesh->OnComponentBeginOverlap.AddDynamic(this, &AWire::OnOverlapped);
-}
-
 void AWire::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                         int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnOverlapped(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
-	PrintLogFunc(*OtherActor->GetActorNameOrLabel());
 }
 
 void AWire::Link(AActor* proj)
