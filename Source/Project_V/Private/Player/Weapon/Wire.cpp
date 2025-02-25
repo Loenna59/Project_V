@@ -18,12 +18,20 @@ AWire::AWire()
 	cableComp->bAttachEnd = false;
 	cableComp->CableWidth = 3;
 	cableComp->SetVisibility(false);
+	cableComp->bEnableCollision = true;
 }
 
-void AWire::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                         int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWire::BeginPlay()
 {
-	Super::OnOverlapped(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	Super::BeginPlay();
+
+	cableComp->OnComponentBeginOverlap.AddDynamic(this, &AWire::OnCableOverlapped);
+}
+
+void AWire::OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	PrintLogFunc(TEXT("와이어에 걸림"));
 }
 
 void AWire::Link(AActor* proj)
