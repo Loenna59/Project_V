@@ -28,6 +28,8 @@ protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 public:
+	UPROPERTY()
+	class AThunderJaw* Boss;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bDie{false};
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
@@ -43,7 +45,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayFallDownMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
-	void OnPlayDieMontage();	
+	void OnPlayDieMontage();
+	UFUNCTION()
+	void AnimNotify_PlayRageSound();
+	UFUNCTION()
+	void AnimNotify_PlayWalkSound();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;

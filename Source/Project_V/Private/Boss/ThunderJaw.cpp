@@ -10,6 +10,7 @@
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
 #include "Boss/Weapon/DiscLauncher.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
@@ -79,6 +80,21 @@ void AThunderJaw::InitConstruct()
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
+
+	SoundInstance = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundInstance"));
+
+	ConstructorHelpers::FObjectFinder<USoundWave> tempRageSound(TEXT("'/Game/Blueprints/Boss/Sounds/RageSound.RageSound'"));
+	if (tempRageSound.Succeeded())
+	{
+		RageSound = tempRageSound.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<USoundWave> tempWalkSound(TEXT("'/Game/Blueprints/Boss/Sounds/WalkSound.WalkSound'"));
+	if (tempWalkSound.Succeeded())
+	{
+		WalkSound = tempWalkSound.Object;
+	}
+
 
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 

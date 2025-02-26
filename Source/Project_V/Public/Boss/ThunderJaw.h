@@ -70,7 +70,6 @@ public:
 	void BossTakeDamage(int Damage);
 	
 protected:
-
 	// Class Instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
@@ -82,7 +81,7 @@ protected:
 	class UThunderJawAnimInstance* BossAnimInstance;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	APlayCharacter* Aloy;
-
+	
 	// EyeMaterial
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterialInstanceDynamic* EyeMatInst;
@@ -123,5 +122,13 @@ public:
 	class USplineComponent* splineComp;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UWidgetComponent* WidgetComp;
+
+	// sound
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Sound")
+	class UAudioComponent* SoundInstance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundWave* RageSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundWave* WalkSound;
 
 };
