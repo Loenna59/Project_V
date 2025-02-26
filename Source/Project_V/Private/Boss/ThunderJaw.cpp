@@ -138,6 +138,12 @@ void AThunderJaw::InitBeginPlay()
 		splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
 	}
 
+	WidgetComp = GetComponentByClass<UWidgetComponent>();
+	if (WidgetComp)
+	{
+		WidgetComp->SetVisibility(false);
+	}
+
 	BossAIController = Cast<AThunderJawAIController>(GetController());
 	Aloy = Cast<APlayCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());

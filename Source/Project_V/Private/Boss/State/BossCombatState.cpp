@@ -18,6 +18,7 @@ void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
 	Boss->ChangeEyeColor(FLinearColor(1,0,0),2000);
+	Boss->WidgetComp->SetVisibility(true);
 }
 
 void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime)
@@ -201,24 +202,25 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 
 	if (Dist <= Boss->MeleeAttackDist)
 	{
-		int32 randomNum = FMath::RandRange(0,1);
-		if (randomNum == 0)
+		Boss->GetBossAIController()->StopMovement();
+	
+		PRINTLOG(TEXT("Using Tail"));
+		UsingPattern = EAttackPattern::Tail;
+		PatternTime = TailPatternTime;
+	}
+	else if (Dist > Boss->MeleeAttackDist && Dist <= Boss->RangeAttackDist)
+	{
+		Boss->GetBossAIController()->StopMovement();
+
+		int32 randomNum = FMath::RandRange(1,3);
+		if (randomNum == 1)
 		{
 			PRINTLOG(TEXT("Using Charge"));
 			UsingPattern = EAttackPattern::Charge;
+			// 뒷걸음질 시간 + 돌진 시간
 			PatternTime = recoilTime + ChargeTime;
 		}
-		else if (randomNum == 1)
-		{
-			PRINTLOG(TEXT("Using Tail"));
-			UsingPattern = EAttackPattern::Tail;
-			PatternTime = TailPatternTime;
-		}
-	}
-	else
-	{
-		int32 randomNum = FMath::RandRange(2,3);
-		if (randomNum == 2)
+		else if (randomNum == 2)
 		{
 			PRINTLOG(TEXT("Using MachineGun"));
 			UsingPattern = EAttackPattern::MachineGun;
@@ -237,6 +239,10 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 			PatternTime = MouseLaserPatternTime;
 		}
 	}
+	else
+	{
+		Boss->GetBossAIController()->MoveToPlayer();
+	}
 }
 
 void UBossCombatState::Charge(AThunderJaw* Boss)
@@ -254,12 +260,10 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 2.0;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 3.0;
 			}
 		},recoilTime,false);
 	}
-	
-	//PRINTLOG(TEXT("Using Charge"));
 
 	if (!ChargeStart)
 	{
