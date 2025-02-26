@@ -95,6 +95,24 @@ void AThunderJaw::InitConstruct()
 		WalkSound = tempWalkSound.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<USoundWave> tempChargeSound(TEXT("'/Game/Blueprints/Boss/Sounds/ChargeSound.ChargeSound'"));
+	if (tempChargeSound.Succeeded())
+	{
+		ChargeSound = tempChargeSound.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<USoundWave> tempFallDownSound(TEXT("'/Game/Blueprints/Boss/Sounds/FallDownSound.FallDownSound'"));
+	if (tempFallDownSound.Succeeded())
+	{
+		FallDownSound = tempFallDownSound.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<USoundWave> tempDieSound(TEXT("'/Game/Blueprints/Boss/Sounds/DieSound.DieSound'"));
+	if (tempDieSound.Succeeded())
+	{
+		DieSound = tempDieSound.Object;
+	}
+
 
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 

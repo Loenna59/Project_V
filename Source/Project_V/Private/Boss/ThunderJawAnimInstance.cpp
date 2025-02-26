@@ -42,7 +42,44 @@ void UThunderJawAnimInstance::AnimNotify_PlayWalkSound()
 	if (boss)
 	{
 		boss->SoundInstance->SetSound(boss->WalkSound);
+		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
 		boss->SoundInstance->Play();
 		boss->SoundInstance->SetVolumeMultiplier(0.5f);
+	}
+}
+
+void UThunderJawAnimInstance::AnimNotify_PlayChargeSound()
+{
+	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
+	if (boss)
+	{
+		boss->SoundInstance->SetSound(boss->ChargeSound);
+		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
+		boss->SoundInstance->Play();
+		boss->SoundInstance->SetVolumeMultiplier(0.25f);
+	}
+}
+
+void UThunderJawAnimInstance::AnimNotify_PlayFallDownSound()
+{
+	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
+	if (boss)
+	{
+		boss->SoundInstance->SetSound(boss->FallDownSound);
+		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
+		boss->SoundInstance->Play();
+		boss->SoundInstance->SetVolumeMultiplier(0.25f);
+	}
+}
+
+void UThunderJawAnimInstance::AnimNotify_PlayDieSound()
+{
+	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
+	if (boss)
+	{
+		boss->SoundInstance->SetSound(boss->DieSound);
+		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
+		boss->SoundInstance->Play();
+		boss->SoundInstance->SetVolumeMultiplier(0.25f);
 	}
 }
