@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Sound/SoundCue.h"
 
 
 // Sets default values
@@ -81,5 +82,10 @@ void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
 	moveComp->SetActive(true, true);
 
 	UGameplayStatics::SpawnEmitterAttached(tailVFX, mesh);
+
+	if (sfx)
+	{
+		UGameplayStatics::SpawnSoundAttached(sfx, mesh);
+	}
 }
 
