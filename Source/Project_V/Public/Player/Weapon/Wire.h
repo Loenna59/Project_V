@@ -24,7 +24,12 @@ public:
 	void Link(class AActor* proj);
 
 	bool IsChaining() const;
-	
+
+	float GetLength() const;
+
+	UFUNCTION()
+	void SetEnableCollision();
+
 protected:
 	virtual void BeginPlay() override;
 

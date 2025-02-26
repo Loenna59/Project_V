@@ -26,6 +26,7 @@ AWire::AWire()
 	cableCollision->SetupAttachment(cableComp);
 	cableCollision->SetBoxExtent(FVector(5));
 	cableCollision->SetCollisionProfileName("PlayerProjectile");
+	cableCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AWire::BeginPlay()
@@ -55,8 +56,7 @@ void AWire::Tick(float DeltaSeconds)
 void AWire::OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	PrintLogFunc(TEXT("와이어에 걸림"));
-
+	
 	// SetAttach한 actor도 지움
 	// 나중에 이거 지움
 }
@@ -81,5 +81,18 @@ void AWire::Link(AActor* proj)
 bool AWire::IsChaining() const
 {
 	return cableComp->GetAttachedActor() != nullptr;
+}
+
+float AWire::GetLength() const
+{
+	TArray<FVector> locations;
+	cableComp->GetCableParticleLocations(locations);
+
+	return FVector::Distance(locations.Last(), locations[0]);
+}
+
+void AWire::SetEnableCollision()
+{
+	cableCollision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 }
 

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "PlayerProjectile.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnEventComponentHit);
+
 UCLASS()
 class PROJECT_V_API APlayerProjectile : public AActor
 {
@@ -44,4 +46,6 @@ public:
 
 	UFUNCTION()
 	virtual void Fire(FVector to, float alpha, bool ortho);
+
+	FOnEventComponentHit onEventComponentHit;
 };

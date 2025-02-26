@@ -11,7 +11,7 @@
 ATripcaster::ATripcaster()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	SetRootComponent(mesh);
@@ -51,6 +51,20 @@ ATripcaster::ATripcaster()
 	arrowSlot->SetRelativeScale3D(FVector(1.1f));
 }
 
+void ATripcaster::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (wire.IsValid() && wire->IsChaining())
+	{
+		float len = wire->GetLength();
+		if (len > maxLength)
+		{
+			RevertProjectile();
+		}
+	}
+}
+
 void ATripcaster::SpawnArrowInBow()
 {
 	if (!wire.IsValid())
@@ -67,6 +81,7 @@ void ATripcaster::SpawnArrowInBow()
 		{
 			projectile->mesh->SetVisibility(false);
 		}
+		projectile->AttachToComponent(arrowSlot, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
 
 	PlaceArrowOnBow();
@@ -152,6 +167,7 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 		
 		wire->Fire(direction, alpha, true);
 		wire->Link(projectile.Get());
+		projectile->onEventComponentHit.AddUObject(wire.Get(), &AWire::SetEnableCollision);
 	}
 	
 	return false;
@@ -166,18 +182,15 @@ void ATripcaster::RevertProjectile()
 {
 	if (wire.IsValid())
 	{
-		wire->Link(nullptr);
-		
-		wire->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		wire->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-		wire->AttachToComponent(arrowSlot, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
-		if (projectile.IsValid())
-		{
-			if (projectile->mesh)
-			{
-				projectile->mesh->SetVisibility(false);
-			}
-		}
+		wire->Destroy();
+		wire = nullptr;
 	}
+	
+	if (projectile.IsValid())
+	{
+		projectile->Destroy();
+		projectile = nullptr;
+	}
+
+	SpawnArrowInBow();
 }
