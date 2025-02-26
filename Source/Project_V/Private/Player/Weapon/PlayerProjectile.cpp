@@ -63,6 +63,7 @@ void APlayerProjectile::OnComponentHit(UPrimitiveComponent* HitComponent, AActor
 	if (bOrtho)
 	{
 		SetActorRelativeRotation(Hit.ImpactNormal.Rotation() - FRotator(180, 0, 0));
+		onEventComponentHit.Broadcast();
 	}
 }
 
@@ -77,8 +78,7 @@ void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	
 	moveComp->Velocity = currentVelocity;
-	moveComp->SetActive(true);
-	moveComp->Activate();
+	moveComp->SetActive(true, true);
 
 	UGameplayStatics::SpawnEmitterAttached(tailVFX, mesh);
 }

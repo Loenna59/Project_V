@@ -15,6 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	ATripcaster();
 
+	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float maxLength = 1600;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class AWire> wireFactory;
 	
