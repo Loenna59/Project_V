@@ -109,6 +109,8 @@ private:
 
 	FTimerHandle timerHandle;
 
+	void TakeDamageInternal(float damage, FVector forward, float& degrees);
+
 public:
 	template<typename UserClass>
 	void AddEventHandler(UserClass* obj, void (UserClass::* func)(EPlayerCameraMode mode))
@@ -136,7 +138,9 @@ public:
 
 	void Fire(FVector velocity, float alpha);
 
-	void TakeDamage(float damage, FVector forward);
+	void HitDamage(float damage, FVector forward);
+
+	void HitLargeDamage(float damage, FVector forward);
 
 	void GameOver();
 };

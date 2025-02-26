@@ -114,11 +114,11 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 				{
 					FVector dir = end - start;
 					FVector wantDir = FVector(-dir.Y,dir.X,0).GetSafeNormal();
-					player->TakeDamage(30.0f,wantDir);
+					player->HitLargeDamage(30.0f,wantDir);
 				}
 				else
 				{
-					player->TakeDamage(30.0f,Boss->GetActorForwardVector());
+					player->HitLargeDamage(30.0f,Boss->GetActorForwardVector());
 				}
 				BoxColor = FColor::Red;
 			}
