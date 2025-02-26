@@ -84,7 +84,7 @@ void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
-		player->TakeDamage(50.0f, PerposeDirection);
+		player->HitDamage(50.0f, PerposeDirection);
 		Destroy();
 	}
 }

@@ -366,7 +366,25 @@ void APlayCharacter::Fire(FVector velocity, float alpha)
 	}
 }
 
-void APlayCharacter::TakeDamage(float damage, FVector forward)
+void APlayCharacter::HitDamage(float damage, FVector forward)
+{
+	float degrees;	
+
+	TakeDamageInternal(damage, forward, degrees);
+	
+	anim->OnDamaged(degrees);
+}
+
+void APlayCharacter::HitLargeDamage(float damage, FVector forward)
+{
+	float degrees;	
+
+	TakeDamageInternal(damage, forward, degrees);
+
+	anim->OnLargeDamaged(degrees);
+}
+
+void APlayCharacter::TakeDamageInternal(float damage, FVector forward, float& degrees)
 {
 	currentHealth = FMath::Clamp(currentHealth - damage, 0, maxHealth);
 	ui->SetHealthUI(currentHealth, maxHealth);
@@ -378,9 +396,7 @@ void APlayCharacter::TakeDamage(float damage, FVector forward)
 
 	float dotProduct = FVector::DotProduct(GetActorForwardVector(), forward);
 	float radians = FMath::Acos(dotProduct);
-	float degrees = FMath::RadiansToDegrees(radians);
-
-	anim->OnDamaged(degrees);
+	degrees = FMath::RadiansToDegrees(radians);
 }
 
 void APlayCharacter::GameOver()

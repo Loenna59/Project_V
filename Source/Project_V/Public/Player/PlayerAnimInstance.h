@@ -99,6 +99,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDamaged(float degrees);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLargeDamaged(float degrees);
+
 	UFUNCTION()
 	void OnDead();
 	
