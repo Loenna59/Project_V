@@ -7,6 +7,7 @@
 #include "Boss/State/BossCombatState.h"
 #include "Boss/State/BossBaseState.h"
 #include "Boss/State/BossDamageState.h"
+#include "Boss/State/BossDieState.h"
 #include "Boss/State/BossIdleState.h"
 #include "Boss/State/BossLookOutState.h"
 #include "Boss/State/BossPatrolState.h"
@@ -34,7 +35,7 @@ void UThunderJawFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!Boss->bIsLSEnd)
+	if (!Boss->bIsLSEnd || Boss->bDie)
 	{
 		return;
 	}
@@ -62,6 +63,9 @@ void UThunderJawFSM::InitStatePool()
 	// Damage State
 	StatePool.Add(EBossState::Damage,NewObject<UBossDamageState>(this,UBossDamageState::StaticClass()));
 	StatePool[EBossState::Damage]->BossState = EBossState::Damage;
+	// Die State
+	StatePool.Add(EBossState::Die, NewObject<UBossDieState>(this, UBossDieState::StaticClass()));
+	StatePool[EBossState::Die]->BossState = EBossState::Die;
 }
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)

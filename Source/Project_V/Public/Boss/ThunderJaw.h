@@ -66,6 +66,8 @@ public:
 	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 	UFUNCTION(BlueprintCallable)
 	void ChangeToFocusModeMat(bool focusMode);
+	UFUNCTION(BlueprintCallable)
+	void BossTakeDamage(int Damage);
 	
 protected:
 
@@ -115,7 +117,8 @@ public:
 	bool bPartBroken{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bTrapped{false};
-	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	bool bDie{false};	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USplineComponent* splineComp;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

@@ -307,6 +307,15 @@ void AThunderJaw::ChangeToFocusModeMat(bool focusMode)
 	RDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
 }
 
+void AThunderJaw::BossTakeDamage(int Damage)
+{
+	CurrentHP -= Damage;
+	if (CurrentHP <= 0)
+	{
+		FSM->ChangeBossState(EBossState::Die);
+	}
+}
+
 void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -318,9 +327,9 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 			BossAIController->DetectedTarget = true;
 			FSM->ChangeBossState(EBossState::Combat);
 		}
-		CurrentHP -= 100.0f;
+		BossTakeDamage(100);
 		
-		PRINTLOG(TEXT("%f"),CurrentHP);
+		PRINTLOG(TEXT("Hit Arrow, HP : %f"),CurrentHP);
 		OtherActor->Destroy();
 		return;
 	}
@@ -328,9 +337,10 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	auto* wire = Cast<AWire>(OtherActor);
 	if(wire)
 	{
-		CurrentHP -= 200.0f;
 		bTrapped = true;
 		FSM->ChangeBossState(EBossState::Damage);
+		
+		PRINTLOG(TEXT("Hit Wire, HP : %f"),CurrentHP);
 		OtherActor->Destroy();
 	}
 }

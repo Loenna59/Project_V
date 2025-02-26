@@ -46,7 +46,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		return;
 	}
 
-	if (!Boss->bIsLSEnd)
+	if (!Boss->bIsLSEnd || Boss->bDie)
 	{
 		return;
 	}

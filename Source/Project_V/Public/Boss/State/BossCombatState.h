@@ -80,6 +80,10 @@ protected:
 	UPROPERTY()
 	EAttackPattern UsingPattern;
 
+
+	UPROPERTY()
+	bool bMeleeHit{false};
+	
 	// Charge
 	UPROPERTY()
 	float recoilTime{1.5};
@@ -93,11 +97,15 @@ protected:
 	FVector PerposeLocation;
 	UPROPERTY()
 	FTimerHandle ChargeTimerHandle;
+	UPROPERTY(EditAnywhere)
+	float ChargeDamage{30.0f};
 
 	
 	// Tail
 	UPROPERTY()
 	float TailPatternTime{1.0};
+	UPROPERTY(EditAnywhere)
+	float TailDamage{30.0f};
 
 	// Machine Gun
 	UPROPERTY()

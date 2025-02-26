@@ -87,6 +87,7 @@ void UBossCombatState::InitComponents(AThunderJaw* Boss)
 	DiscLauncherDelayCurrentTime = 0;
 	ChargeFlag = false;
 	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
+	bMeleeHit = false;
 }
 
 void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize, AThunderJaw* Boss)
@@ -115,11 +116,19 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 				{
 					FVector dir = end - start;
 					FVector wantDir = FVector(-dir.Y,dir.X,0).GetSafeNormal();
-					player->HitLargeDamage(30.0f,wantDir);
+					if (!bMeleeHit)
+					{
+						player->HitLargeDamage(TailDamage, wantDir);
+						bMeleeHit = true;
+					}
 				}
 				else
 				{
-					player->HitLargeDamage(30.0f,Boss->GetActorForwardVector());
+					if (!bMeleeHit)
+					{
+						player->HitLargeDamage(ChargeDamage, Boss->GetActorForwardVector());
+						bMeleeHit = true;
+					}
 				}
 				BoxColor = FColor::Red;
 			}

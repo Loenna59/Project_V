@@ -24,9 +24,12 @@ class PROJECT_V_API UThunderJawAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY() 
 protected:
+	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bDie{false};
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayTurnMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
@@ -39,7 +42,8 @@ public:
 	void OnPlayPartDestructionMontage();	
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayFallDownMontage();
-	
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayDieMontage();	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;

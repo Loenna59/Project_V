@@ -17,6 +17,7 @@ void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	}
 	if (Boss->bTrapped)
 	{
+		Boss->BossTakeDamage(200.0f);
 		Boss->GetBossAnimInstance()->OnPlayFallDownMontage();
 		Boss->bTrapped = false;
 	}
