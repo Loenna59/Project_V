@@ -97,7 +97,6 @@ void ADisc::MoveToPerposeLocation()
 
 void ADisc::LaunchMissileToTarget()
 {
-	PRINTLOG(TEXT("LaunchMissileToTarget"));
 	float length = FVector::Distance(TargetLocation,GetActorLocation());
 	FRotator trailRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),TargetLocation);
 	AActor* trail = GetWorld()->SpawnActor<AActor>(TrailFactory);

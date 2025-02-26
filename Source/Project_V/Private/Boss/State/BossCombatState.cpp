@@ -192,12 +192,12 @@ void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("PatternDelayEnd"));
 	bIsDelay = false;
-	ChooseRandomPattern(Boss);
+	ChoosePattern(Boss);
 }
 
-void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
+void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 {
-	PRINTLOG(TEXT("ChooseRandomPattern"));
+	PRINTLOG(TEXT("ChoosePattern"));
 	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
 
 	if (Dist <= Boss->MeleeAttackDist)
@@ -212,7 +212,8 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	{
 		Boss->GetBossAIController()->StopMovement();
 
-		int32 randomNum = FMath::RandRange(1,3);
+		// 랜덤 패턴 고를 때 부위파괴 된 패턴이 걸리면 돌진으로 바꿈
+		int32 randomNum = MakeRandomRangeNum(Boss);
 		if (randomNum == 1)
 		{
 			PRINTLOG(TEXT("Using Charge"));
@@ -245,6 +246,23 @@ void UBossCombatState::ChooseRandomPattern(AThunderJaw* Boss)
 	}
 }
 
+int32 UBossCombatState::MakeRandomRangeNum(AThunderJaw* Boss)
+{
+	int32 RandomNum = FMath::RandRange(1,3);
+	if (!Boss->GetLMachineGun() && !Boss->GetRMachineGun() && RandomNum == 2)
+	{
+		RandomNum = 1;
+		return RandomNum;
+	}
+	else if (!Boss->GetLDiscLauncher() && !Boss->GetRDiscLauncher() && RandomNum == 3)
+	{
+		RandomNum = 1;
+		return RandomNum;
+	}
+
+	return RandomNum;
+}
+
 void UBossCombatState::Charge(AThunderJaw* Boss)
 {
 	if (!ChargeFlag)
@@ -260,7 +278,7 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 3.0;
+				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 4.0;
 			}
 		},recoilTime,false);
 	}

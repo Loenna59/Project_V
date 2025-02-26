@@ -200,7 +200,7 @@ class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
 
 void AThunderJaw::MachineGunBroken(float LeftorRight)
 {
-	bPartsBroken = true;
+	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
 	if (LeftorRight == -1)
@@ -215,7 +215,7 @@ void AThunderJaw::MachineGunBroken(float LeftorRight)
 
 void AThunderJaw::DiscLauncherBroken(float LeftorRight)
 {
-	bPartsBroken = true;
+	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
 	if (LeftorRight == -1)

@@ -112,7 +112,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bIsLSEnd{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	bool bPartsBroken{false};
+	bool bPartBroken{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bTrapped{false};
 	

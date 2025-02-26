@@ -25,7 +25,6 @@ void ADiscMissile::BeginPlay()
 	Super::BeginPlay();
 
 	Root->OnComponentBeginOverlap.AddDynamic(this,&ADiscMissile::OnDiscMissileBeginOverlap);
-	PRINTLOG(TEXT("Spawned missile"));
 }
 
 // Called every frame

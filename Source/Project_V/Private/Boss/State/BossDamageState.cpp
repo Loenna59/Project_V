@@ -10,10 +10,10 @@
 void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	if (Boss->bPartsBroken)
+	if (Boss->bPartBroken)
 	{
 		Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
-		Boss->bPartsBroken = false;
+		Boss->bPartBroken = false;
 	}
 	if (Boss->bTrapped)
 	{

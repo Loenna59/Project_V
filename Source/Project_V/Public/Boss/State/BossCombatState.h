@@ -38,7 +38,9 @@ protected:
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss);
 	UFUNCTION()
-	void ChooseRandomPattern(AThunderJaw* Boss);
+	void ChoosePattern(AThunderJaw* Boss);
+	UFUNCTION()
+	int32 MakeRandomRangeNum(AThunderJaw* Boss);
 	UFUNCTION()
 	void StartChoosingPatternCycle(AThunderJaw* Boss);
 	UFUNCTION()
