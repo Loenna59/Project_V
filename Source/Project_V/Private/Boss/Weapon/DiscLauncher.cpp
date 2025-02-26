@@ -88,7 +88,7 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 	if (arrow)
 	{
 		DamageWeaponHP(50);
-		Boss->CurrentHP -= 50;
+		Boss->BossTakeDamage(50);
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 	
 		// 경계중이거나 정찰중일 때 맞으면 combat state로 전환

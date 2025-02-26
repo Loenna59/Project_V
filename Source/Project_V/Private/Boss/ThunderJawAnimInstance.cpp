@@ -5,6 +5,11 @@
 
 #include "Boss/ThunderJaw.h"
 
+void UThunderJawAnimInstance::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
+}
+
 void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
@@ -17,6 +22,4 @@ void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		BossAnimMoveSpeed = FVector::DotProduct(velocity,forward);
 	}
-
-	CurrentPlayingMontage = GetCurrentActiveMontage();
 }

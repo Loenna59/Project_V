@@ -93,7 +93,8 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 	if (arrow)
 	{
 		DamageWeaponHP(50);
-		Boss->CurrentHP -= 50;
+		Boss->BossTakeDamage(50);
+
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 		Boss->GetBossAIController()->DetectedTarget = true;
 		Boss->GetFSMComponent()->ChangeBossState(EBossState::Combat);
