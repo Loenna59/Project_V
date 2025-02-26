@@ -130,5 +130,11 @@ public:
 	class USoundWave* RageSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
 	class USoundWave* WalkSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundWave* ChargeSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundWave* FallDownSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundWave* DieSound;
 
 };
