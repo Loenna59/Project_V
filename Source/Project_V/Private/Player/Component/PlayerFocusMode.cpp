@@ -102,8 +102,11 @@ void UPlayerFocusMode::EndFocusOrScan()
 
 void UPlayerFocusMode::SetVisibleFocusMode(bool visible)
 {
-	PrintLogFunc(TEXT("SetVisibleFocusMode %s"), (visible? TEXT("true") : TEXT("false")));
-	Boss->ChangeToFocusModeMat(visible);
+	// PrintLogFunc(TEXT("SetVisibleFocusMode %s"), (visible? TEXT("true") : TEXT("false")));
+	if (Boss)
+	{
+		Boss->ChangeToFocusModeMat(visible);
+	}
 }
 
 void UPlayerFocusMode::OnChangedCameraMode(EPlayerCameraMode mode)

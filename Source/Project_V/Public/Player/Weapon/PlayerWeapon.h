@@ -25,6 +25,9 @@ public:
 	UPROPERTY()
 	TWeakObjectPtr<class APlayerProjectile> projectile;
 
+	UPROPERTY(EditDefaultsOnly, Category=SoundEffect)
+	class USoundBase* fireSfx;
+
 	UAnimInstance* GetAnimInstance();
 
 	virtual void SpawnArrowInBow();

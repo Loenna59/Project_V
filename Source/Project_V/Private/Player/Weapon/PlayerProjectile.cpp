@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Sound/SoundCue.h"
 
 
 // Sets default values
@@ -65,6 +66,7 @@ void APlayerProjectile::OnComponentHit(UPrimitiveComponent* HitComponent, AActor
 		SetActorRelativeRotation(Hit.ImpactNormal.Rotation() - FRotator(180, 0, 0));
 		onEventComponentHit.Broadcast();
 	}
+	
 }
 
 void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)

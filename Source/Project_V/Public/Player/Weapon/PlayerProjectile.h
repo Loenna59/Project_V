@@ -48,4 +48,5 @@ public:
 	virtual void Fire(FVector to, float alpha, bool ortho);
 
 	FOnEventComponentHit onEventComponentHit;
+	
 };

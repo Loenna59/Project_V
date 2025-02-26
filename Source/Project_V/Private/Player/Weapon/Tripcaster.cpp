@@ -4,6 +4,7 @@
 #include "Player/Weapon/Tripcaster.h"
 
 #include "Project_V.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/Weapon/PlayerProjectile.h"
 #include "Player/Weapon/Wire.h"
 
@@ -156,6 +157,11 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 {
 	if (wire.IsValid())
 	{
+		if (fireSfx)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), fireSfx, GetActorLocation());
+		}
+		
 		if (projectile.IsValid() && wire->IsChaining())
 		{
 			projectile->Fire(direction, alpha, true);
