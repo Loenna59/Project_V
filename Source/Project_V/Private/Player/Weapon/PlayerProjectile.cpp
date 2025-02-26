@@ -66,6 +66,7 @@ void APlayerProjectile::OnComponentHit(UPrimitiveComponent* HitComponent, AActor
 		SetActorRelativeRotation(Hit.ImpactNormal.Rotation() - FRotator(180, 0, 0));
 		onEventComponentHit.Broadcast();
 	}
+	
 }
 
 void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
@@ -82,10 +83,5 @@ void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
 	moveComp->SetActive(true, true);
 
 	UGameplayStatics::SpawnEmitterAttached(tailVFX, mesh);
-
-	if (sfx)
-	{
-		UGameplayStatics::SpawnSoundAttached(sfx, mesh);
-	}
 }
 

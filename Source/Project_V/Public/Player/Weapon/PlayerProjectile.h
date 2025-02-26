@@ -44,9 +44,6 @@ public:
 	UPROPERTY(EditAnywhere, Category=Settings)
 	float maxSpeed = 5000;
 
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
-	class USoundCue* sfx;
-
 	UFUNCTION()
 	virtual void Fire(FVector to, float alpha, bool ortho);
 

@@ -3,6 +3,7 @@
 
 #include "Player/Weapon/PlayerWeapon.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Player/Weapon/PlayerProjectile.h"
 
 UAnimInstance* APlayerWeapon::GetAnimInstance()
@@ -67,6 +68,10 @@ bool APlayerWeapon::Fire(FVector direction, float alpha)
 {
 	if (projectile.IsValid())
 	{
+		if (fireSfx)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), fireSfx, GetActorLocation());
+		}
 		projectile->Fire(direction, alpha, false);
 		projectile = nullptr;
 	}
