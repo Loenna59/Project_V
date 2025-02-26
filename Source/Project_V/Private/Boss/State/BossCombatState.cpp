@@ -87,7 +87,7 @@ void UBossCombatState::InitComponents(AThunderJaw* Boss)
 	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
 }
 
-void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize)
+void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize, AThunderJaw* Boss)
 {
 	FCollisionQueryParams Params;
 	TArray<FHitResult> HitResults;
@@ -109,7 +109,7 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 			auto* player = Cast<APlayCharacter>(hit.GetActor());
 			if (player)
 			{
-				PRINTLOG(TEXT("player hit"));
+				player->TakeDamage(30.0f,Boss->GetActorForwardVector());
 				BoxColor = FColor::Red;
 			}
 		}
@@ -269,11 +269,9 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		FVector HeadStart = Boss->GetMesh()->GetSocketLocation(TEXT("head1"));
 		FVector HeadEnd = Boss->GetMesh()->GetSocketLocation(TEXT("head1EndSocket"));
 		FVector BoxHalfSize(150,150,100);
-		MakeTraceBoxAndCheckHit(HeadStart,HeadEnd,BoxHalfSize);
+		MakeTraceBoxAndCheckHit(HeadStart,HeadEnd,BoxHalfSize,Boss);
 		
 		Boss->GetBossAnimInstance()->OnPlayChargeMontage();
-
-		
 	}
 }
 
@@ -285,7 +283,7 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
 	FVector BoxHalfSize = FVector(300,300,200);
-	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize);
+	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize,Boss);
 	Boss->GetBossAnimInstance()->OnPlayTailMontage();
 }
 

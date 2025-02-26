@@ -64,20 +64,27 @@ public:
 	void SetVisibilityBoss();
 	UFUNCTION()
 	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
+	UFUNCTION(BlueprintCallable)
+	void ChangeToFocusModeMat(bool focusMode);
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UNavigationInvokerComponent* NavInvoker;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	AThunderJawAIController* BossAIController;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UThunderJawAnimInstance* BossAnimInstance;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	APlayCharacter* Aloy;
+
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterialInstanceDynamic* EyeMatInst;
-	UPROPERTY()
-	APlayCharacter* Aloy;
+
+
+	// Parts
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AMachineGun* LMachineGun;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")

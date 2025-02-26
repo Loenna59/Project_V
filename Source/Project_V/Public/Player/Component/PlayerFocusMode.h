@@ -36,6 +36,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class AFocusDome* focusDome;
 
+	UPROPERTY(VisibleAnywhere)
+	class AThunderJaw* Boss;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float focusModeThreshold = 0.5f;
 	

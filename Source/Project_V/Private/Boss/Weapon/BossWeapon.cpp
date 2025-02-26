@@ -9,6 +9,12 @@ ABossWeapon::ABossWeapon()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Blueprints/Boss/Material/M_WeakParts.M_WeakParts'"));
+	if (tempMat.Succeeded())
+	{
+		WeakPartsMatInst = tempMat.Object;
+	}
 }
 
 
@@ -16,7 +22,7 @@ ABossWeapon::ABossWeapon()
 void ABossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -33,3 +39,16 @@ void ABossWeapon::DamageWeaponHP(float Damage)
 		bIsBroken = true;
 	}
 }
+
+void ABossWeapon::CheckFocusModeAndChangeMat(bool focusMode)
+{
+	if (focusMode)
+	{
+		Mesh->SetOverlayMaterial(WeakPartsMatInst);
+	}
+	else
+	{
+		Mesh->SetOverlayMaterial(nullptr);
+	}
+}
+

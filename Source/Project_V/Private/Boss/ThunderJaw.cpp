@@ -293,8 +293,16 @@ void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 	}
 }
 
+void AThunderJaw::ChangeToFocusModeMat(bool focusMode)
+{
+	LMachineGun->CheckFocusModeAndChangeMat(focusMode);
+	RMachineGun->CheckFocusModeAndChangeMat(focusMode);
+	LDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
+	RDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
+}
+
 void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)

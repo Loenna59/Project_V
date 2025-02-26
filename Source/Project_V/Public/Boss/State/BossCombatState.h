@@ -33,7 +33,7 @@ protected:
 	UFUNCTION()
 	void InitComponents(AThunderJaw* Boss);
 	UFUNCTION()
-	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize);
+	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize, AThunderJaw* Boss);
 	
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss);

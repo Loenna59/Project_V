@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BossWeapon.generated.h"
 
+
 UCLASS()
 class PROJECT_V_API ABossWeapon : public AActor
 {
@@ -16,6 +17,9 @@ public:
 
 	UFUNCTION()
 	void DamageWeaponHP(float Damage);
+	UFUNCTION()
+	void CheckFocusModeAndChangeMat(bool focusMode);
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,6 +34,9 @@ public:
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UArrowComponent* FirePos;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
+	class UMaterial* WeakPartsMatInst;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float MaxHP;

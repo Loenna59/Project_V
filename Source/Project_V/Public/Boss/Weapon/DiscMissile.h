@@ -37,4 +37,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
 
+	UPROPERTY()
+	FVector PerposeDirection;
 };

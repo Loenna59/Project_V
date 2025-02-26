@@ -5,6 +5,8 @@
 
 #include "EnhancedInputComponent.h"
 #include "Project_V.h"
+#include "Boss/ThunderJaw.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/FocusDome.h"
 #include "Player/PlayCharacter.h"
 
@@ -42,7 +44,13 @@ void UPlayerFocusMode::BeginPlay()
 		focusDome->AttachToActor(GetOwner(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		focusDome->SetActorRelativeLocation(FVector(0, 0, -200));
 	}
-	
+
+	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
+	if (!Boss)
+	{
+		PRINTLOG(TEXT("ㅈ됨"));
+	}
+
 }
 
 void UPlayerFocusMode::SetupInputBinding(class UEnhancedInputComponent* input)
@@ -95,6 +103,7 @@ void UPlayerFocusMode::EndFocusOrScan()
 void UPlayerFocusMode::SetVisibleFocusMode(bool visible)
 {
 	PrintLogFunc(TEXT("SetVisibleFocusMode %s"), (visible? TEXT("true") : TEXT("false")));
+	Boss->ChangeToFocusModeMat(visible);
 }
 
 void UPlayerFocusMode::OnChangedCameraMode(EPlayerCameraMode mode)

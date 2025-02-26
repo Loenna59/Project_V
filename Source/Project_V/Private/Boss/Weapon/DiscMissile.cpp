@@ -84,12 +84,13 @@ void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
-		PRINTLOG(TEXT("Player Hit Missile"));
+		player->TakeDamage(50.0f, PerposeDirection);
 		Destroy();
 	}
 }
 
 void ADiscMissile::SetFireDirection(const FVector& Direction)
 {
+	PerposeDirection = Direction;
 	PMC->Velocity = Direction * PMC->InitialSpeed;
 }
