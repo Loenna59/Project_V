@@ -68,6 +68,8 @@ public:
 	void ChangeToFocusModeMat(bool focusMode);
 	
 protected:
+
+	// Class Instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -79,11 +81,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	APlayCharacter* Aloy;
 
-	
+	// EyeMaterial
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterialInstanceDynamic* EyeMatInst;
-
-
+	
 	// Parts
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AMachineGun* LMachineGun;
@@ -94,7 +95,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class ADiscLauncher* RDiscLauncher;
 
-
+	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MaxHP{1000.0};
@@ -105,6 +106,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{1000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	float RangeAttackDist{2500.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float PatrolDist{2000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bIsLSEnd{false};
@@ -112,7 +115,10 @@ public:
 	bool bPartsBroken{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bTrapped{false};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USplineComponent* splineComp;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UWidgetComponent* WidgetComp;
 
 };
