@@ -7,12 +7,16 @@
 #include "Player/PlayerAnimInstance.h"
 #include "PlayerWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteFire, bool, complete);
+
 UCLASS()
 class PROJECT_V_API APlayerWeapon : public AActor
 {
 	GENERATED_BODY()
 	
 public:
+	FOnCompleteFire onCompleteFire;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class USkeletalMeshComponent* mesh;
 

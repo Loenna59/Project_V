@@ -168,12 +168,15 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 			projectile = nullptr;
 			wire = nullptr;
 
+			onCompleteFire.Broadcast(true);
 			return true;
 		}
 		
 		wire->Fire(direction, alpha, true);
 		wire->Link(projectile.Get());
 		projectile->onEventComponentHit.AddUObject(wire.Get(), &AWire::SetEnableCollision);
+
+		onCompleteFire.Broadcast(false);
 	}
 	
 	return false;

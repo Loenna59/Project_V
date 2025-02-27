@@ -140,6 +140,8 @@ void APlayCharacter::BeginPlay()
 		tripcaster->SpawnArrowInBow();
 		tripcaster->AttachSocket(GetMesh(), TEXT("CasterSocket"), false);
 		tripcaster->SetVisibility(false);
+		
+		tripcaster->onCompleteFire.AddDynamic(this, &APlayCharacter::CheckPutWeaponTimer);
 	}
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -175,6 +177,16 @@ void APlayCharacter::BeginPlay()
 
 	ChangeWeapon(bow);
 	
+}
+
+void APlayCharacter::CheckPutWeaponTimer(bool bComplete)
+{
+	ClearPutWeaponTimer();
+				
+	if (bComplete)
+	{
+		StartTimerPutWeapon();
+	}
 }
 
 // Called to bind functionality to input
@@ -290,13 +302,18 @@ void APlayCharacter::SetCurrentHealth(float health)
 	}
 }
 
-void APlayCharacter::StartTimerPutWeapon()
+void APlayCharacter::ClearPutWeaponTimer()
 {
 	if (timerHandle.IsValid())
 	{
 		GetWorldTimerManager().ClearTimer(timerHandle);
 		timerHandle.Invalidate();
 	}
+}
+
+void APlayCharacter::StartTimerPutWeapon()
+{
+	ClearPutWeaponTimer();
 	
 	TWeakObjectPtr<APlayCharacter> weakThis = this;
 	GetWorldTimerManager().SetTimer(
@@ -421,11 +438,7 @@ void APlayCharacter::GameOver()
 {
 	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	anim->OnDead();
-	if (timerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(timerHandle);
-		timerHandle.Invalidate();
-	}
+	ClearPutWeaponTimer();
 
 	GetCharacterMovement()->Deactivate();
 	
