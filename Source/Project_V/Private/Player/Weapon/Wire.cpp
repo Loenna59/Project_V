@@ -41,6 +41,7 @@ void AWire::BeginPlay()
 {
 	Super::BeginPlay();
 
+	cableCollision->SetGenerateOverlapEvents(false);
 	cableCollision->OnComponentHit.AddDynamic(this, &AWire::OnCableComponentHit);
 }
 
@@ -69,24 +70,7 @@ void AWire::OnCableComponentHit(UPrimitiveComponent* HitComponent, AActor* Other
 void AWire::DestroyAfterPlayFX()
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), fx, GetActorLocation(), FRotator::ZeroRotator, FVector(10));
-
-	FTimerHandle timerHandle;
-	
-	TWeakObjectPtr<AWire> weakThis = this;
-
-	GetWorld()->GetTimerManager()
-	.SetTimer(
-		timerHandle,
-		[weakThis] ()
-		{
-			if (weakThis.IsValid())
-			{
-				weakThis->Destroy();
-			}
-		},
-		1.5f,
-		false
-	);
+	Destroy();
 }
 
 void AWire::Link(AActor* proj)
@@ -122,5 +106,6 @@ float AWire::GetLength() const
 void AWire::SetEnableCollision()
 {
 	cableCollision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+	cableCollision->SetGenerateOverlapEvents(true);
 }
 

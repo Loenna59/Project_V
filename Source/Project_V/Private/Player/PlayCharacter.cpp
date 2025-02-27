@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
+#include "Components/AudioComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/HUD.h"
@@ -74,6 +75,11 @@ APlayCharacter::APlayCharacter()
 	transitionCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TransitionCamera"));
 	transitionCameraComp->SetupAttachment(transitionSpringArmComp);
 
+	voiceComp = CreateDefaultSubobject<UAudioComponent>(TEXT("VoiceComp"));
+	voiceComp->SetupAttachment(RootComponent);
+	voiceComp->bAlwaysPlay = false;
+	voiceComp->bAutoActivate = false;
+
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> tmp_imc(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Player.IMC_Player'"));
 
 	if (tmp_imc.Succeeded())
@@ -102,6 +108,14 @@ APlayCharacter::APlayCharacter()
 		GetMesh()->SetAnimInstanceClass(tmp.Object);
 	}
 
+	ConstructorHelpers::FObjectFinder<USoundBase> tmp_voice(TEXT("/Script/Engine.SoundCue'/Game/Sounds/Player_Damaged.Player_Damaged'"));
+
+	if (tmp_voice.Succeeded())
+	{
+		damagedVoice = tmp_voice.Object;
+		voiceComp->SetSound(damagedVoice);
+	}
+	
 	movementComp = CreateDefaultSubobject<UPlayerMovement>(TEXT("PlayerMovement"));
 	combatComp = CreateDefaultSubobject<UPlayerCombat>(TEXT("PlayerCombat"));
 	cameraSwitcher = CreateDefaultSubobject<UPlayerCameraSwitcher>(TEXT("CameraSwitcher"));
@@ -177,7 +191,8 @@ void APlayCharacter::BeginPlay()
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	ChangeWeapon(bow);
-	
+
+	// voiceComp->SetSound(damagedVoice);
 }
 
 void APlayCharacter::CheckPutWeaponTimer(bool bComplete)
@@ -438,6 +453,8 @@ void APlayCharacter::TakeDamageInternal(float damage, FVector forward, float& de
 	float dotProduct = FVector::DotProduct(GetActorForwardVector(), forward);
 	float radians = FMath::Acos(dotProduct);
 	degrees = FMath::RadiansToDegrees(radians);
+
+	voiceComp->Play(0.05);
 }
 
 void APlayCharacter::GameOver()

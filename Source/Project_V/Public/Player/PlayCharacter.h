@@ -74,6 +74,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APlayerWeapon* tripcaster;
 
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* voiceComp;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPlayerUI* ui;
 
@@ -117,6 +120,13 @@ private:
 
 	FTimerHandle timerHandle;
 
+	FTimerHandle voicePlayTimerHandle;
+
+	UPROPERTY()
+	class USoundBase* damagedVoice;
+	
+	float audioPlayTime = 1.f;
+
 	void TakeDamageInternal(float damage, FVector forward, float& degrees);
 
 public:
@@ -137,7 +147,9 @@ public:
 	void SetPlayingDodge(bool isPlaying);
 
 	void SetCurrentHealth(float health);
+
 	void ClearPutWeaponTimer();
+
 	void StartTimerPutWeapon();
 
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
