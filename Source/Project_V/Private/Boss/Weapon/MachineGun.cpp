@@ -9,6 +9,7 @@
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/ArrowComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Player/Weapon/Arrow.h"
 

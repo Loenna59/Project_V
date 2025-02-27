@@ -2,8 +2,6 @@
 #include "Boss/ThunderJaw.h"
 
 #include "Project_V.h"
-#include "Blueprint/UserWidget.h"
-#include "Boss/BossHPUI.h"
 #include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJawAIController.h"
 #include "Boss/ThunderJawAnimInstance.h"
@@ -112,8 +110,19 @@ void AThunderJaw::InitConstruct()
 	{
 		DieSound = tempDieSound.Object;
 	}
+	
+	ConstructorHelpers::FObjectFinder<USoundWave> tempMachineGunSound(TEXT("'/Game/Blueprints/Boss/Sounds/MachineGunSound.MachineGunSound'"));
+	if (tempMachineGunSound.Succeeded())
+	{
+		MachineGunSound = tempMachineGunSound.Object;
+	}
 
-
+	ConstructorHelpers::FObjectFinder<USoundWave> tempTailSound(TEXT("'/Game/Blueprints/Boss/Sounds/TailSound.TailSound'"));
+	if (tempTailSound.Succeeded())
+	{
+		TailSound = tempTailSound.Object;
+	}
+	
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 
 	//WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPUI"));

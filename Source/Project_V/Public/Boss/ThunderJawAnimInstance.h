@@ -44,6 +44,7 @@ public:
 	void OnPlayFallDownMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayDieMontage();
+
 	UFUNCTION()
 	void AnimNotify_PlayRageSound();
 	UFUNCTION()
@@ -54,6 +55,9 @@ public:
 	void AnimNotify_PlayFallDownSound();
 	UFUNCTION()
 	void AnimNotify_PlayDieSound();
+	UFUNCTION()
+	void AnimNotify_PlayTailSound();
+
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;
