@@ -142,14 +142,14 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 	}
 	
 	// 박스 디버깅
-	int NumSteps = 10;
-	for (int i = 0; i <= NumSteps; i++)
-	{
-		float Alpha = (float)i / NumSteps;
-		FVector DebugLocation = FMath::Lerp(start, end, Alpha);
-
-		DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
-	}
+	// int NumSteps = 10;
+	// for (int i = 0; i <= NumSteps; i++)
+	// {
+	// 	float Alpha = (float)i / NumSteps;
+	// 	FVector DebugLocation = FMath::Lerp(start, end, Alpha);
+	//
+	// 	DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
+	// }
 }
 
 void UBossCombatState::Attack(AThunderJaw* Boss)
@@ -347,7 +347,7 @@ void UBossCombatState::MachineGun(AThunderJaw* Boss)
 		return;
 	}
 	
-	Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
+	//Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함

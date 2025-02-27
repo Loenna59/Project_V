@@ -151,7 +151,6 @@ void AThunderJawAIController::UpdateDistanceFromTarget()
 	FVector targetPos = Boss->GetAloy()->GetActorLocation();
 	// 평지여서 2D로 해놓음, 나중에 평지가 아니게 되면 바꿔야함
 	DistanceFromTarget = UKismetMathLibrary::Vector_Distance2D(bossPos,targetPos);
-	DrawDebugLine(GetWorld(),bossPos,targetPos,FColor::Red,false,0.1f,0,2);
 }
 
 void AThunderJawAIController::UpdateFacingDot()
@@ -185,7 +184,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	else if (DistanceFromTarget > CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
-		// PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
 		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
 		{
 			LoseTargetTime += DeltaTime;
