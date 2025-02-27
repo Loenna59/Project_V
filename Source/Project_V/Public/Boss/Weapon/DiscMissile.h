@@ -36,6 +36,8 @@ public:
 	class UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ExplosionEffect;
 
 	UPROPERTY()
 	FVector PerposeDirection;

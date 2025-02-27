@@ -75,17 +75,24 @@ void ADiscMissile::InitComponents()
 		PMC->Bounciness = 0.3f;
 		PMC->ProjectileGravityScale = 1.0f;
 	}
+
+	ConstructorHelpers::FClassFinder<AActor> tempEffect(TEXT("'/Game/Assets/CinematicFX/BP/BP_Explosion_01.BP_Explosion_01_C'"));
+	if (tempEffect.Succeeded())
+	{
+		ExplosionEffect = tempEffect.Class;
+	}
 }
 
 void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	GetWorld()->SpawnActor<AActor>(ExplosionEffect,GetActorTransform());
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
 		player->HitDamage(50.0f, PerposeDirection);
-		Destroy();
 	}
+	Destroy();
 }
 
 void ADiscMissile::SetFireDirection(const FVector& Direction)
