@@ -347,7 +347,13 @@ void AThunderJaw::BossTakeDamage(int Damage)
 	if (CurrentHP <= 0)
 	{
 		FSM->ChangeBossState(EBossState::Die);
+		GameClear();
 	}
+}
+
+void AThunderJaw::GameClear()
+{
+	Aloy->ShowGameStateUI.Broadcast(true);
 }
 
 void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
