@@ -248,6 +248,8 @@ void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
 	}
 	
 	combatComp->bIsCompleteReload = true;
+
+	ui->ChangeEquippedWeaponUI(weapon->IsBase());
 }
 
 void APlayCharacter::SetPlayingDodge(bool isPlaying)

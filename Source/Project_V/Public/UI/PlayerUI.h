@@ -25,7 +25,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	class UFocusModeUI* FocusModeUI;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(BindWidget))
+	class UEquippedWeaponUI* EquippedWeaponUI;
+
 	void SetVisibleUI(EPlayerCameraMode mode);
 
 	void SetHealthUI(float current, float max);
+	
+	void ChangeEquippedWeaponUI(bool isBase);
 };

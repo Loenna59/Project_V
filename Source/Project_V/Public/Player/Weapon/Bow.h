@@ -16,5 +16,10 @@ public:
 	ABow();
 
 	virtual void SetVisibility(bool visible) override;
+
+	virtual bool IsBase() const override
+	{
+		return true;
+	}
 	
 };

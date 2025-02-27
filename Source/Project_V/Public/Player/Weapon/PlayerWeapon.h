@@ -44,6 +44,11 @@ public:
 
 	virtual void SetVisibility(bool visible);
 
+	virtual bool IsBase() const
+	{
+		return false;
+	}
+
 	virtual FName GetSlotSocket() const
 	{
 		return TEXT("BowSocket");
