@@ -7,12 +7,16 @@
 #include "Player/PlayerAnimInstance.h"
 #include "PlayerWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteFire, bool, complete);
+
 UCLASS()
 class PROJECT_V_API APlayerWeapon : public AActor
 {
 	GENERATED_BODY()
 	
 public:
+	FOnCompleteFire onCompleteFire;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class USkeletalMeshComponent* mesh;
 
@@ -43,6 +47,11 @@ public:
 	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
 
 	virtual void SetVisibility(bool visible);
+
+	virtual bool IsBase() const
+	{
+		return false;
+	}
 
 	virtual FName GetSlotSocket() const
 	{

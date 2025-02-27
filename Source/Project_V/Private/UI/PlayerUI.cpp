@@ -5,6 +5,7 @@
 
 #include "Player/PlayerCameraMode.h"
 #include "UI/CrosshairUI.h"
+#include "UI/EquippedWeaponUI.h"
 #include "UI/FocusModeUI.h"
 #include "UI/PlayerHPUI.h"
 
@@ -18,4 +19,9 @@ void UPlayerUI::SetHealthUI(float current, float max)
 {
 	HealthUI->SetText(current, max);
 	HealthUI->SetProgress(current, max);
+}
+
+void UPlayerUI::ChangeEquippedWeaponUI(bool isBase)
+{
+	EquippedWeaponUI->SetVisible(isBase);
 }

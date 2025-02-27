@@ -141,6 +141,8 @@ void APlayCharacter::BeginPlay()
 		tripcaster->SpawnArrowInBow();
 		tripcaster->AttachSocket(GetMesh(), TEXT("CasterSocket"), false);
 		tripcaster->SetVisibility(false);
+		
+		tripcaster->onCompleteFire.AddDynamic(this, &APlayCharacter::CheckPutWeaponTimer);
 	}
 
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -175,8 +177,18 @@ void APlayCharacter::BeginPlay()
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	ChangeWeapon(bow);
+	
 }
 
+void APlayCharacter::CheckPutWeaponTimer(bool bComplete)
+{
+	ClearPutWeaponTimer();
+				
+	if (bComplete)
+	{
+		StartTimerPutWeapon();
+	}
+}
 
 // Called to bind functionality to input
 void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -250,6 +262,13 @@ void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
 	}
 	
 	combatComp->bIsCompleteReload = true;
+
+	ui->ChangeEquippedWeaponUI(weapon->IsBase());
+
+	if (currentCameraMode != EPlayerCameraMode::Anchored)
+	{
+		StartTimerPutWeapon();
+	}
 }
 
 void APlayCharacter::SetPlayingDodge(bool isPlaying)
@@ -284,6 +303,41 @@ void APlayCharacter::SetCurrentHealth(float health)
 	}
 }
 
+void APlayCharacter::ClearPutWeaponTimer()
+{
+	if (timerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(timerHandle);
+		timerHandle.Invalidate();
+	}
+}
+
+void APlayCharacter::StartTimerPutWeapon()
+{
+	ClearPutWeaponTimer();
+	
+	TWeakObjectPtr<APlayCharacter> weakThis = this;
+	GetWorldTimerManager().SetTimer(
+		timerHandle,
+		[weakThis] ()
+		{
+			if (!weakThis.IsValid())
+			{
+				return;
+			}
+				
+			if (!weakThis->holdingWeapon.IsValid())
+			{
+				return;
+			}
+
+			weakThis->anim->OnPlayEquip();
+		},
+		idleTimerDuration,
+		false
+	);
+}
+
 void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 {
 	prevCameraMode = currentCameraMode;
@@ -293,7 +347,6 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 	
 	ui->SetVisibleUI(mode);
 	
-	TWeakObjectPtr<APlayCharacter> weakThis = this;
 
 	switch (mode)
 	{
@@ -303,26 +356,7 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		{
 			currentWeapon->PlaceOrSpawnArrow();
 		}
-		
-		GetWorldTimerManager().SetTimer(
-			timerHandle,
-			[weakThis] ()
-			{
-				if (!weakThis.IsValid())
-				{
-					return;
-				}
-				
-				if (!weakThis->holdingWeapon.IsValid())
-				{
-					return;
-				}
-
-				weakThis->anim->OnPlayEquip();
-			},
-			idleTimerDuration,
-			false
-		);
+		StartTimerPutWeapon();
 		break;
 	case EPlayerCameraMode::Anchored:
 		bUseControllerRotationYaw = true;
@@ -411,12 +445,7 @@ void APlayCharacter::GameOver()
 	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	anim->OnDead();
 	ShowGameStateUI.Broadcast(false);
-	
-	if (timerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(timerHandle);
-		timerHandle.Invalidate();
-	}
+	ClearPutWeaponTimer();
 
 	GetCharacterMovement()->Deactivate();
 	
@@ -430,5 +459,16 @@ void APlayCharacter::GameOver()
 		{
 			subSystem->ClearAllMappings();
 		}
+	}
+}
+
+void APlayCharacter::SetVisible(bool visible)
+{
+	bool hidden = !visible;
+	SetActorHiddenInGame(hidden);
+
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->SetActorHiddenInGame(hidden);
 	}
 }

@@ -168,12 +168,15 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 			projectile = nullptr;
 			wire = nullptr;
 
+			onCompleteFire.Broadcast(true);
 			return true;
 		}
 		
 		wire->Fire(direction, alpha, true);
 		wire->Link(projectile.Get());
 		projectile->onEventComponentHit.AddUObject(wire.Get(), &AWire::SetEnableCollision);
+
+		onCompleteFire.Broadcast(false);
 	}
 	
 	return false;
@@ -182,6 +185,13 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 void ATripcaster::SetVisibility(bool visible)
 {
 	Super::SetVisibility(visible);
+
+	bool hidden = !visible;
+
+	if (wire.IsValid())
+	{
+		wire->SetHidden(hidden);
+	}
 }
 
 void ATripcaster::RevertProjectile()

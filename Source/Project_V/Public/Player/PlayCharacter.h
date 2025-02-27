@@ -24,8 +24,9 @@ protected:
 
 	FOnEventCameraModeChanged onEventCameraModeChanged;
 
-public:
-	
+	UFUNCTION()
+	void CheckPutWeaponTimer(bool bComplete);
+public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -136,6 +137,8 @@ public:
 	void SetPlayingDodge(bool isPlaying);
 
 	void SetCurrentHealth(float health);
+	void ClearPutWeaponTimer();
+	void StartTimerPutWeapon();
 
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
 
@@ -151,4 +154,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GameOver();
+
+	UFUNCTION(BlueprintCallable)
+	void SetVisible(bool visible);
 };
