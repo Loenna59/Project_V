@@ -11,14 +11,19 @@ void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
 
-	if (Boss->bPartBroken && !Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
+	Boss->GetBossAIController()->StopMovement();
+	if (Boss->bPartBroken)
 	{
 		Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
+		Boss->bPartBroken = false;
+
 	}
-	if (Boss->bTrapped && !Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
+	if (Boss->bTrapped)
 	{
 		Boss->BossTakeDamage(200.0f);
 		Boss->GetBossAnimInstance()->OnPlayFallDownMontage();
+		Boss->bTrapped = false;
+
 	}
 }
 

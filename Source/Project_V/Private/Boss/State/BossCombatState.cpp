@@ -76,6 +76,7 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
+
 }
 
 void UBossCombatState::InitComponents(AThunderJaw* Boss)
