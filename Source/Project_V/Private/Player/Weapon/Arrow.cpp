@@ -4,7 +4,6 @@
 #include "Player/Weapon/Arrow.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "Particles/ParticleSystem.h"
 
 // Sets default values
 AArrow::AArrow()
@@ -16,23 +15,6 @@ AArrow::AArrow()
 void AArrow::DestroyAfterPlayFX()
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitFx, GetActorLocation());
-	
-	FTimerHandle timerHandle;
-	
-	TWeakObjectPtr<AArrow> weakThis = this;
-
-	GetWorld()->GetTimerManager()
-	.SetTimer(
-		timerHandle,
-		[weakThis] ()
-		{
-			if (weakThis.IsValid())
-			{
-				weakThis->Destroy();
-			}
-		},
-		1.f,
-		false
-	);
+	Destroy();
 }
    
