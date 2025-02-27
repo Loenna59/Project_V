@@ -123,7 +123,15 @@ void ATripcaster::SpawnArrow(USceneComponent* parent, FName socketName)
 
 void ATripcaster::AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow)
 {
-	Super::AttachSocket(comp, socketName, visibleArrow);
+	AttachToComponent(comp, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+
+	if (projectile.IsValid())
+	{
+		if (projectile->mesh)
+		{
+			projectile->mesh->SetVisibility(false);
+		}
+	}
 
 	if (wire.IsValid())
 	{
@@ -186,11 +194,9 @@ void ATripcaster::SetVisibility(bool visible)
 {
 	Super::SetVisibility(visible);
 
-	bool hidden = !visible;
-
 	if (wire.IsValid())
 	{
-		wire->SetHidden(hidden);
+		wire->mesh->SetVisibility(visible);
 	}
 }
 

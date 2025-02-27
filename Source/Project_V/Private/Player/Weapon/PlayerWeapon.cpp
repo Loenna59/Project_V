@@ -99,7 +99,7 @@ void APlayerWeapon::SetVisibility(bool visible)
 
 	if (projectile.IsValid())
 	{
-		projectile->SetHidden(hidden);
+		projectile->mesh->SetVisibility(visible);
 	}
 }
 

@@ -486,6 +486,6 @@ void APlayCharacter::SetVisible(bool visible)
 
 	if (currentWeapon.IsValid())
 	{
-		currentWeapon->SetActorHiddenInGame(hidden);
+		currentWeapon->SetVisibility(visible);
 	}
 }
