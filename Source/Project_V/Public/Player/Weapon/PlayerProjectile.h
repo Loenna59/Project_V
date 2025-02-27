@@ -28,6 +28,9 @@ protected:
 	virtual void OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
 
 	bool bOrtho = false;
+
+	class UParticleSystem* hitFx;
+	
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* mesh;
@@ -46,6 +49,9 @@ public:
 
 	UFUNCTION()
 	virtual void Fire(FVector to, float alpha, bool ortho);
+
+	UFUNCTION()
+	virtual void DestroyAfterPlayFX() {}
 
 	FOnEventComponentHit onEventComponentHit;
 	

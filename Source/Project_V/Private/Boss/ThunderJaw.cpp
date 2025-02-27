@@ -370,7 +370,7 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		BossTakeDamage(100);
 		
 		PRINTLOG(TEXT("Hit Arrow, HP : %f"),CurrentHP);
-		OtherActor->Destroy();
+		arrow->DestroyAfterPlayFX();
 		return;
 	}
 
@@ -381,7 +381,7 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		FSM->ChangeBossState(EBossState::Damage);
 		
 		PRINTLOG(TEXT("Hit Wire, HP : %f"),CurrentHP);
-		OtherActor->Destroy();
+		wire->DestroyAfterPlayFX();
 	}
 }
 

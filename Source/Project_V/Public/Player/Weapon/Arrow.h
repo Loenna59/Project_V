@@ -11,13 +11,10 @@ UCLASS()
 class PROJECT_V_API AArrow : public APlayerProjectile
 {
 	GENERATED_BODY()
-
-protected:
-	class UParticleSystem* hitFx;
 	
 public:	
 	// Sets default values for this actor's properties
 	AArrow();
-
-	virtual void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+	
+	virtual void DestroyAfterPlayFX() override;
 };

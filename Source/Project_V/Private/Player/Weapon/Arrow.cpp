@@ -11,20 +11,28 @@ AArrow::AArrow()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
-	ConstructorHelpers::FObjectFinder<UParticleSystem> tmpFx(TEXT("/Script/Engine.ParticleSystem'/Game/Assets/GoodFXImpact/FX/Particle/Chest_Point/Yellow/PS_GFXI_Yellow_Flare_04.PS_GFXI_Yellow_Flare_04'"));
-
-	if (tmpFx.Succeeded())
-	{
-		hitFx = tmpFx.Object;
-	}
 }
 
-void AArrow::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+void AArrow::DestroyAfterPlayFX()
 {
-	Super::OnComponentHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitFx, GetActorLocation());
+	
+	FTimerHandle timerHandle;
+	
+	TWeakObjectPtr<AArrow> weakThis = this;
 
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitFx, Hit.Location);
+	GetWorld()->GetTimerManager()
+	.SetTimer(
+		timerHandle,
+		[weakThis] ()
+		{
+			if (weakThis.IsValid())
+			{
+				weakThis->Destroy();
+			}
+		},
+		1.f,
+		false
+	);
 }
    
