@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "ThunderJaw.generated.h"
 
+
+
 class APlayCharacter;
 class UThunderJawFSM;
 class AThunderJawAIController;
@@ -68,8 +70,10 @@ public:
 	void ChangeToFocusModeMat(bool focusMode);
 	UFUNCTION(BlueprintCallable)
 	void BossTakeDamage(int Damage);
-	
+	UFUNCTION(BlueprintCallable)
+	void GameClear();
 protected:
+	
 	// Class Instance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;

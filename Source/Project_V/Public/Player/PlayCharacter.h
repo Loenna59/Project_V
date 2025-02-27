@@ -8,7 +8,7 @@
 #include "PlayCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEventCameraModeChanged, EPlayerCameraMode)
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShowGameStateUI, bool, gameClear);
 UCLASS()
 class PROJECT_V_API APlayCharacter : public ACharacter
 {
@@ -29,6 +29,11 @@ protected:
 public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// TODO
+	// 장진혁이 함 나중에 고쳐주세용
+	UPROPERTY(BlueprintAssignable)
+	FShowGameStateUI ShowGameStateUI;
 
 	UPROPERTY()
 	class UPlayerAnimInstance* anim;
@@ -68,7 +73,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APlayerWeapon* tripcaster;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPlayerUI* ui;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -146,6 +152,7 @@ public:
 
 	void HitLargeDamage(float damage, FVector forward);
 
+	UFUNCTION(BlueprintCallable)
 	void GameOver();
 
 	UFUNCTION(BlueprintCallable)

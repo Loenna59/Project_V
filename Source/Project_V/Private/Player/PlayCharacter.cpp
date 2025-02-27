@@ -18,6 +18,7 @@
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerFocusMode.h"
 #include "Player/Component/PlayerMovement.h"
+#include "UI/GameStateUI.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
 
@@ -421,6 +422,11 @@ void APlayCharacter::HitLargeDamage(float damage, FVector forward)
 
 void APlayCharacter::TakeDamageInternal(float damage, FVector forward, float& degrees)
 {
+	if (currentHealth <= 0)
+	{
+		return;
+	}
+	
 	currentHealth = FMath::Clamp(currentHealth - damage, 0, maxHealth);
 	ui->SetHealthUI(currentHealth, maxHealth);
 	if (currentHealth <= 0)
@@ -438,6 +444,7 @@ void APlayCharacter::GameOver()
 {
 	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	anim->OnDead();
+	ShowGameStateUI.Broadcast(false);
 	ClearPutWeaponTimer();
 
 	GetCharacterMovement()->Deactivate();
