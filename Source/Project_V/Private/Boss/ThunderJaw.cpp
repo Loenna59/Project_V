@@ -385,11 +385,14 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	auto* wire = Cast<AWire>(OtherActor);
 	if(wire)
 	{
-		bTrapped = true;
-		FSM->ChangeBossState(EBossState::Damage);
+		if (wire->cableCollision->IsCollisionEnabled())
+		{
+			bTrapped = true;
+			FSM->ChangeBossState(EBossState::Damage);
 		
-		PRINTLOG(TEXT("Hit Wire, HP : %f"),CurrentHP);
-		wire->DestroyAfterPlayFX();
+			PRINTLOG(TEXT("Hit Wire, HP : %f"),CurrentHP);
+			wire->DestroyAfterPlayFX();
+		}
 	}
 }
 

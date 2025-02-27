@@ -49,17 +49,7 @@ void AWire::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (cableComp->bAttachEnd && IsChaining())
-	{
-		FVector dist = cableComp->GetAttachedActor()->GetActorLocation() - GetActorLocation();
-
-		FVector center = FMath::Lerp(GetActorLocation(), cableComp->GetAttachedActor()->GetActorLocation(), 0.5f);
-		FRotator rotation = FRotationMatrix::MakeFromY(dist).Rotator();
-		
-		cableCollision->SetBoxExtent(FVector(20, dist.Length() * 0.5f, 20));
-		cableCollision->SetWorldLocation(center);
-		cableCollision->SetWorldRotation(rotation);
-	}
+	
 }
 
 void AWire::OnCableComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -105,7 +95,18 @@ float AWire::GetLength() const
 
 void AWire::SetEnableCollision()
 {
-	cableCollision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-	cableCollision->SetGenerateOverlapEvents(true);
+	if (cableComp->bAttachEnd && IsChaining())
+	{
+		FVector dist = cableComp->GetAttachedActor()->GetActorLocation() - GetActorLocation();
+
+		FVector center = FMath::Lerp(GetActorLocation(), cableComp->GetAttachedActor()->GetActorLocation(), 0.5f);
+		FRotator rotation = FRotationMatrix::MakeFromY(dist).Rotator();
+		
+		cableCollision->SetBoxExtent(FVector(20, dist.Length() * 0.5f, 20));
+		cableCollision->SetWorldLocation(center);
+		cableCollision->SetWorldRotation(rotation);
+		cableCollision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+		cableCollision->SetGenerateOverlapEvents(true);
+	}
 }
 
