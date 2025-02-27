@@ -10,16 +10,15 @@
 void UBossDamageState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
-	if (Boss->bPartBroken)
+
+	if (Boss->bPartBroken && !Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
 	{
 		Boss->GetBossAnimInstance()->OnPlayPartDestructionMontage();
-		Boss->bPartBroken = false;
 	}
-	if (Boss->bTrapped)
+	if (Boss->bTrapped && !Boss->GetBossAnimInstance()->IsAnyMontagePlaying())
 	{
 		Boss->BossTakeDamage(200.0f);
 		Boss->GetBossAnimInstance()->OnPlayFallDownMontage();
-		Boss->bTrapped = false;
 	}
 }
 
@@ -34,6 +33,8 @@ void UBossDamageState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 	{
 		Boss->GetBossAIController()->DetectedTarget = true;
 		FSM->ChangeBossState(EBossState::Combat);
+		Boss->bTrapped = false;
+		Boss->bPartBroken = false;
 	}
 }
 

@@ -70,7 +70,7 @@ void UThunderJawFSM::InitStatePool()
 
 void UThunderJawFSM::ChangeBossState(EBossState BossState)
 {
-	if (CurrentState->BossState == BossState)
+	if (CurrentState->BossState == BossState || CurrentState->BossState == EBossState::Die)
 	{
 		return;
 	}

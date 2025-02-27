@@ -365,8 +365,7 @@ void AThunderJaw::GameClear()
 	Aloy->ShowGameStateUI.Broadcast(true);
 }
 
-void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)
@@ -376,11 +375,11 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 			BossAIController->DetectedTarget = true;
 			FSM->ChangeBossState(EBossState::Combat);
 		}
+
 		BossTakeDamage(100);
 		
 		PRINTLOG(TEXT("Hit Arrow, HP : %f"),CurrentHP);
 		arrow->DestroyAfterPlayFX();
-		return;
 	}
 
 	auto* wire = Cast<AWire>(OtherActor);

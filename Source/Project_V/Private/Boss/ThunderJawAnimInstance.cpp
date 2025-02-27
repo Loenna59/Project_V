@@ -23,6 +23,8 @@ void UThunderJawAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		BossAnimMoveSpeed = FVector::DotProduct(velocity,forward);
 	}
+
+	CurrentPlayingMontage = GetCurrentActiveMontage();
 }
 
 void UThunderJawAnimInstance::AnimNotify_PlayRageSound()
@@ -69,7 +71,6 @@ void UThunderJawAnimInstance::AnimNotify_PlayFallDownSound()
 		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
 		boss->SoundInstance->Play();
 		boss->SoundInstance->SetVolumeMultiplier(1.0f);
-		boss->SoundInstance->
 	}
 }
 
