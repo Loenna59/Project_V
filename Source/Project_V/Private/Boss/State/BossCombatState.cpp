@@ -76,7 +76,6 @@ void UBossCombatState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Delt
 void UBossCombatState::Exit(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Exit(Boss, FSM);
-
 }
 
 void UBossCombatState::InitComponents(AThunderJaw* Boss)
@@ -88,6 +87,8 @@ void UBossCombatState::InitComponents(AThunderJaw* Boss)
 	DiscLauncherDelayCurrentTime = 0;
 	ChargeFlag = false;
 	Boss->GetCharacterMovement()->MaxWalkSpeed = Boss->BossSpeed;
+	Boss->GetCharacterMovement()->bOrientRotationToMovement = true;
+
 	bMeleeHit = false;
 }
 
@@ -209,6 +210,11 @@ void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
 void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("ChoosePattern"));
+	if (Boss->GetFSMComponent()->GetCurrentState()->BossState != EBossState::Combat)
+	{
+		return;
+	}
+	
 	float Dist = Boss->GetBossAIController()->DistanceFromTarget;
 
 	if (Dist <= Boss->MeleeAttackDist)

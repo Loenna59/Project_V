@@ -105,6 +105,7 @@ void AThunderJawAIController::InitComponent()
 
 void AThunderJawAIController::MoveToPlayer()
 {
+	PRINT_CALLINFO();
 	if (!Boss->GetAloy())
 	{
 		return;
@@ -115,7 +116,7 @@ void AThunderJawAIController::MoveToPlayer()
 void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	
-	if (Boss->GetFSMComponent()->GetCurrentState()->BossState == EBossState::Combat)
+	if (Boss->GetFSMComponent()->GetCurrentState()->BossState != EBossState::Patrol)
 	{
 		return;
 	}
