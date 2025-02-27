@@ -30,11 +30,16 @@ public:
 	UFUNCTION()
 	void SetEnableCollision();
 
+	virtual void DestroyAfterPlayFX() override;
 protected:
+	UFUNCTION()
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
+
+	class UParticleSystem* fx;
 	
 	UFUNCTION()
-	void OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnCableComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 };

@@ -3,9 +3,9 @@
 
 #include "Player/Weapon/Wire.h"
 #include "CableComponent.h"
-#include "Project_V.h"
-#include "VectorTypes.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 // Sets default values
 AWire::AWire()
@@ -27,13 +27,21 @@ AWire::AWire()
 	cableCollision->SetBoxExtent(FVector(5));
 	cableCollision->SetCollisionProfileName("PlayerProjectile");
 	cableCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	ConstructorHelpers::FObjectFinder<UParticleSystem> temp_fx(TEXT("/Script/Engine.ParticleSystem'/Game/Assets/GoodFXImpact/FX/Particle/Chest_Point/Blue/PS_GFXI_Blue_Lightning_02.PS_GFXI_Blue_Lightning_02'"));
+
+	if (temp_fx.Succeeded())
+	{
+		fx = temp_fx.Object;
+	}
+	
 }
 
 void AWire::BeginPlay()
 {
 	Super::BeginPlay();
 
-	cableCollision->OnComponentBeginOverlap.AddDynamic(this, &AWire::OnCableOverlapped);
+	cableCollision->OnComponentHit.AddDynamic(this, &AWire::OnCableComponentHit);
 }
 
 void AWire::Tick(float DeltaSeconds)
@@ -53,12 +61,32 @@ void AWire::Tick(float DeltaSeconds)
 	}
 }
 
-void AWire::OnCableOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWire::OnCableComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
 {
+}
+
+void AWire::DestroyAfterPlayFX()
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), fx, GetActorLocation(), FRotator::ZeroRotator, FVector(10));
+
+	FTimerHandle timerHandle;
 	
-	// SetAttach한 actor도 지움
-	// 나중에 이거 지움
+	TWeakObjectPtr<AWire> weakThis = this;
+
+	GetWorld()->GetTimerManager()
+	.SetTimer(
+		timerHandle,
+		[weakThis] ()
+		{
+			if (weakThis.IsValid())
+			{
+				weakThis->Destroy();
+			}
+		},
+		1.5f,
+		false
+	);
 }
 
 void AWire::Link(AActor* proj)

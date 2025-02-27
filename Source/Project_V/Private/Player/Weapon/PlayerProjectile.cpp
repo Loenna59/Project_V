@@ -3,11 +3,9 @@
 
 #include "Player/Weapon/PlayerProjectile.h"
 
-#include "Project_V.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
-#include "Sound/SoundCue.h"
 
 
 // Sets default values
@@ -44,6 +42,13 @@ APlayerProjectile::APlayerProjectile()
 	{
 		tailVFX = tmpEffect.Object;
 	}
+
+	ConstructorHelpers::FObjectFinder<UParticleSystem> tmpFx(TEXT("/Script/Engine.ParticleSystem'/Game/Assets/GoodFXImpact/FX/Particle/Chest_Point/Yellow/PS_GFXI_Yellow_Flare_04.PS_GFXI_Yellow_Flare_04'"));
+
+	if (tmpFx.Succeeded())
+	{
+		hitFx = tmpFx.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -61,12 +66,12 @@ void APlayerProjectile::BeginPlay()
 void APlayerProjectile::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitFx, Hit.Location);
 	if (bOrtho)
 	{
 		SetActorRelativeRotation(Hit.ImpactNormal.Rotation() - FRotator(180, 0, 0));
 		onEventComponentHit.Broadcast();
 	}
-	
 }
 
 void APlayerProjectile::Fire(FVector to, float alpha, bool ortho)
