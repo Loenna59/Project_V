@@ -94,9 +94,12 @@ void APlayerWeapon::AttachSocket(USceneComponent* comp, FName socketName, bool v
 
 void APlayerWeapon::SetVisibility(bool visible)
 {
-	if (mesh)
+	bool hidden = !visible;
+	SetActorHiddenInGame(hidden);
+
+	if (projectile.IsValid())
 	{
-		mesh->SetVisibility(visible);
+		projectile->SetHidden(hidden);
 	}
 }
 

@@ -174,6 +174,7 @@ void APlayCharacter::BeginPlay()
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	ChangeWeapon(bow);
+	
 }
 
 // Called to bind functionality to input
@@ -250,6 +251,11 @@ void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
 	combatComp->bIsCompleteReload = true;
 
 	ui->ChangeEquippedWeaponUI(weapon->IsBase());
+
+	if (currentCameraMode != EPlayerCameraMode::Anchored)
+	{
+		StartTimerPutWeapon();
+	}
 }
 
 void APlayCharacter::SetPlayingDodge(bool isPlaying)
@@ -284,6 +290,36 @@ void APlayCharacter::SetCurrentHealth(float health)
 	}
 }
 
+void APlayCharacter::StartTimerPutWeapon()
+{
+	if (timerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(timerHandle);
+		timerHandle.Invalidate();
+	}
+	
+	TWeakObjectPtr<APlayCharacter> weakThis = this;
+	GetWorldTimerManager().SetTimer(
+		timerHandle,
+		[weakThis] ()
+		{
+			if (!weakThis.IsValid())
+			{
+				return;
+			}
+				
+			if (!weakThis->holdingWeapon.IsValid())
+			{
+				return;
+			}
+
+			weakThis->anim->OnPlayEquip();
+		},
+		idleTimerDuration,
+		false
+	);
+}
+
 void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 {
 	prevCameraMode = currentCameraMode;
@@ -293,7 +329,6 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 	
 	ui->SetVisibleUI(mode);
 	
-	TWeakObjectPtr<APlayCharacter> weakThis = this;
 
 	switch (mode)
 	{
@@ -303,26 +338,7 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 		{
 			currentWeapon->PlaceOrSpawnArrow();
 		}
-		
-		GetWorldTimerManager().SetTimer(
-			timerHandle,
-			[weakThis] ()
-			{
-				if (!weakThis.IsValid())
-				{
-					return;
-				}
-				
-				if (!weakThis->holdingWeapon.IsValid())
-				{
-					return;
-				}
-
-				weakThis->anim->OnPlayEquip();
-			},
-			idleTimerDuration,
-			false
-		);
+		StartTimerPutWeapon();
 		break;
 	case EPlayerCameraMode::Anchored:
 		bUseControllerRotationYaw = true;
@@ -423,5 +439,16 @@ void APlayCharacter::GameOver()
 		{
 			subSystem->ClearAllMappings();
 		}
+	}
+}
+
+void APlayCharacter::SetVisible(bool visible)
+{
+	bool hidden = !visible;
+	SetActorHiddenInGame(hidden);
+
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->SetActorHiddenInGame(hidden);
 	}
 }

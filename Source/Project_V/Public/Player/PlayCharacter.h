@@ -129,6 +129,7 @@ public:
 	void SetPlayingDodge(bool isPlaying);
 
 	void SetCurrentHealth(float health);
+	void StartTimerPutWeapon();
 
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
 
@@ -143,4 +144,7 @@ public:
 	void HitLargeDamage(float damage, FVector forward);
 
 	void GameOver();
+
+	UFUNCTION(BlueprintCallable)
+	void SetVisible(bool visible);
 };

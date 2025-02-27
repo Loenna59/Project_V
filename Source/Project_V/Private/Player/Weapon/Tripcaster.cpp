@@ -182,6 +182,13 @@ bool ATripcaster::Fire(FVector direction, float alpha)
 void ATripcaster::SetVisibility(bool visible)
 {
 	Super::SetVisibility(visible);
+
+	bool hidden = !visible;
+
+	if (wire.IsValid())
+	{
+		wire->SetHidden(hidden);
+	}
 }
 
 void ATripcaster::RevertProjectile()
