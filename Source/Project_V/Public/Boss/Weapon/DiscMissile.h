@@ -41,4 +41,7 @@ public:
 
 	UPROPERTY()
 	FVector PerposeDirection;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayCameraShake();
 };

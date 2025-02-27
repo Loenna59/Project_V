@@ -92,6 +92,9 @@ void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		player->HitDamage(50.0f, PerposeDirection);
 	}
+
+	PlayCameraShake();
+	
 	Destroy();
 }
 
