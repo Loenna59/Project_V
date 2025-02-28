@@ -184,7 +184,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	else if (DistanceFromTarget > CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
-		PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		//PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
 		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
 		{
 			LoseTargetTime += DeltaTime;

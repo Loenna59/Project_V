@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "ThunderJaw.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFloatingDamage,float,damage);
 
 class APlayCharacter;
 class UThunderJawFSM;
@@ -33,6 +33,7 @@ protected:
 	void InitBeginPlay();
 
 public:
+	// GetFunc
 	UFUNCTION(BlueprintCallable)
 	UThunderJawFSM* GetFSMComponent();
 	UFUNCTION(BlueprintCallable)
@@ -51,17 +52,18 @@ public:
 	class ADiscLauncher* GetLDiscLauncher();
 	UFUNCTION(BlueprintCallable)
 	class ADiscLauncher* GetRDiscLauncher();
-	
+
+	// Parts Destruction Func
 	UFUNCTION()
 	void MachineGunBroken(float LeftorRight);
 	UFUNCTION()
 	void DiscLauncherBroken(float LeftorRight);
+
+	// ETC
 	UFUNCTION()
 	void ChangeEyeColor(FLinearColor color, float emissivePower);
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
-
-	
 	UFUNCTION(BlueprintCallable)
 	void SetVisibilityBoss();
 	UFUNCTION()
@@ -70,8 +72,11 @@ public:
 	void ChangeToFocusModeMat(bool focusMode);
 	UFUNCTION(BlueprintCallable)
 	void BossTakeDamage(int Damage);
+	UFUNCTION()
+	void SpawnDamageUI(float Damage);
 	UFUNCTION(BlueprintCallable)
 	void GameClear();
+	
 protected:
 	
 	// Class Instance
@@ -100,6 +105,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class ADiscLauncher* RDiscLauncher;
 
+	// DamageUI
+	UPROPERTY(BlueprintAssignable)
+	FFloatingDamage FloatingDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> FloatingTextFactory;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UDamageUI* DamageUI;
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")

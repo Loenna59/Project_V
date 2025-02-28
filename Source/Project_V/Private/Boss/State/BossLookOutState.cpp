@@ -19,8 +19,11 @@ void UBossLookOutState::Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float Del
 {
 	Super::Update(Boss, FSM, DeltaTime);
 
-	//DrawDebugBox(GetWorld(),Boss->GetBossAIController()->DetectedLocation,FVector(50),FColor::Red);
-	//DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Green);
+	if (Boss->GetBossAIController()->bDebugMode)
+	{
+		DrawDebugBox(GetWorld(),Boss->GetBossAIController()->DetectedLocation,FVector(50),FColor::Red);
+		DrawDebugBox(GetWorld(),FSM->RandomLocation,FVector(50),FColor::Green);
+	}
 	
 
 	if (Boss->GetBossAnimInstance()->IsAnyMontagePlaying())

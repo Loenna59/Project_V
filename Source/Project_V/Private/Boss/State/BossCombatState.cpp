@@ -141,15 +141,17 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 		BoxColor = FColor::Green;
 	}
 	
-	// 박스 디버깅
-	// int NumSteps = 10;
-	// for (int i = 0; i <= NumSteps; i++)
-	// {
-	// 	float Alpha = (float)i / NumSteps;
-	// 	FVector DebugLocation = FMath::Lerp(start, end, Alpha);
-	//
-	// 	DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
-	// }
+	if (Boss->GetBossAIController()->bDebugMode)
+	{
+		int NumSteps = 10;
+		for (int i = 0; i <= NumSteps; i++)
+		{
+			float Alpha = (float)i / NumSteps;
+			FVector DebugLocation = FMath::Lerp(start, end, Alpha);
+		
+			DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
+		}
+	}
 }
 
 void UBossCombatState::Attack(AThunderJaw* Boss)
@@ -171,6 +173,9 @@ void UBossCombatState::Attack(AThunderJaw* Boss)
 	case EAttackPattern::MouseLaser:
 		MouseLaser(Boss);
 		break;
+	case EAttackPattern::ChasePlayer:
+		ChasePlayer(Boss);
+		break;
 	default:
 		break;
 	}
@@ -186,30 +191,24 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	}
 
 	bIsDelay = true;
-	InitComponents(Boss);
-
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
 	auto callBack = [this,WeakBoss]()
 	{
 		if (WeakBoss.IsValid())
 		{
-			DelayEndBeforeChoosingPattern(WeakBoss.Get());
+			ChoosePattern(WeakBoss.Get());
 		}
 	};
 	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
 		FTimerDelegate::CreateLambda(callBack),PatternDelay,false);
 }
 
-void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
-{
-	PRINTLOG(TEXT("PatternDelayEnd"));
-	bIsDelay = false;
-	ChoosePattern(Boss);
-}
-
 void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("ChoosePattern"));
+	bIsDelay = false;
+	InitComponents(Boss);
+	
 	if (Boss->GetFSMComponent()->GetCurrentState()->BossState != EBossState::Combat)
 	{
 		return;
@@ -259,7 +258,9 @@ void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		Boss->GetBossAIController()->MoveToPlayer();
+		PRINTLOG(TEXT("Using ChasePlayer"));
+		PatternTime = 1;
+		UsingPattern = EAttackPattern::ChasePlayer;
 	}
 }
 
@@ -417,3 +418,14 @@ void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using MouseLaser"));
 }
 
+void UBossCombatState::ChasePlayer(AThunderJaw* Boss)
+{
+	if (Boss->GetBossAIController()->DistanceFromTarget <= Boss->RangeAttackDist)
+	{
+		PatternTime = 0;
+		Boss->GetBossAIController()->StopMovement();
+		return;
+	}
+	
+	Boss->GetBossAIController()->MoveToPlayer();
+}

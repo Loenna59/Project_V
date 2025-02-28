@@ -18,6 +18,7 @@
 #include "Player/PlayCharacter.h"
 #include "Player/Weapon/Arrow.h"
 #include "Player/Weapon/Wire.h"
+#include "UI/DamageUI.h"
 
 
 // Sets default values
@@ -125,7 +126,11 @@ void AThunderJaw::InitConstruct()
 	
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 
-	//WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPUI"));
+	ConstructorHelpers::FClassFinder<UUserWidget> tempFloatingText(TEXT("'/Game/Blueprints/UI/WBP_DamageUI.WBP_DamageUI_C'"));
+	if (tempFloatingText.Succeeded())
+	{
+		FloatingTextFactory = tempFloatingText.Class;
+	}
 }
 
 void AThunderJaw::InitBeginPlay()
@@ -192,6 +197,8 @@ void AThunderJaw::InitBeginPlay()
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = BossSpeed;
 	ChangeEyeColor(FLinearColor(0,0.14,1),500);
+
+	FloatingDamage.AddDynamic(this,&AThunderJaw::SpawnDamageUI);
 }
 
 UThunderJawFSM* AThunderJaw::GetFSMComponent()
@@ -357,6 +364,18 @@ void AThunderJaw::BossTakeDamage(int Damage)
 	{
 		FSM->ChangeBossState(EBossState::Die);
 		GameClear();
+	}
+	FloatingDamage.Broadcast(Damage);
+}
+
+void AThunderJaw::SpawnDamageUI(float Damage)
+{
+	DamageUI = Cast<UDamageUI>(CreateWidget(GetWorld(),FloatingTextFactory));
+	if (DamageUI)
+	{
+		DamageUI->SetDamageText(Damage);
+		DamageUI->PlayAnimAndRemoveDamageUI();
+		DamageUI->AddToViewport();
 	}
 }
 

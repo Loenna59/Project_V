@@ -18,6 +18,7 @@ enum class EAttackPattern : uint8
 	MachineGun,
 	DiscLauncher,
 	MouseLaser,
+	ChasePlayer,
 };
 
 UCLASS()
@@ -38,13 +39,11 @@ protected:
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss);
 	UFUNCTION()
-	void ChoosePattern(AThunderJaw* Boss);
-	UFUNCTION()
 	int32 MakeRandomRangeNum(AThunderJaw* Boss);
 	UFUNCTION()
 	void StartChoosingPatternCycle(AThunderJaw* Boss);
 	UFUNCTION()
-	void DelayEndBeforeChoosingPattern(AThunderJaw* Boss);
+	void ChoosePattern(AThunderJaw* Boss);
 	
 	// Melee Attack
 	UFUNCTION()
@@ -59,12 +58,17 @@ protected:
 	void DiscLauncher(AThunderJaw* Boss);
 	UFUNCTION()
 	void MouseLaser(AThunderJaw* Boss);
+
+	// Chasing Player
+	UFUNCTION()
+	void ChasePlayer(AThunderJaw* Boss);
 	
 	
 
 protected:
 	UPROPERTY()
 	bool bIsRotateBody{false};
+	
 	// Pattern
 	UPROPERTY()
 	float PatternCurrentTime{0.0};
@@ -81,6 +85,7 @@ protected:
 	EAttackPattern UsingPattern;
 
 
+	// 근접공격 한번만 맞도록 하기위한 bool
 	UPROPERTY()
 	bool bMeleeHit{false};
 	
