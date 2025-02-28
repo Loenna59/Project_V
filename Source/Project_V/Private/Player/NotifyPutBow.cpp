@@ -3,7 +3,7 @@
 
 #include "Player/NotifyPutBow.h"
 
-#include "Player/PlayCharacter.h"
+#include "Player/Component/PlayerCombat.h"
 
 void UNotifyPutBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -11,9 +11,9 @@ void UNotifyPutBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* 
 
 	if (AActor* owner = MeshComp->GetOwner())
 	{
-		if (APlayCharacter* player = Cast<APlayCharacter>(owner))
+		if (UPlayerCombat* combatComp = Cast<UPlayerCombat>(owner->GetDefaultSubobjectByName("PlayerCombat")))
 		{
-			player->PickWeapon();
+			combatComp->PickWeapon();
 		}
 	}
 }

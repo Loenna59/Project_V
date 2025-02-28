@@ -6,7 +6,6 @@
 #include "PlayerBaseComponent.h"
 #include "PlayerCombat.generated.h"
 
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEventReleased, bool);
 DECLARE_DELEGATE_RetVal(bool, FOnEventCheckCameraMode)
 
@@ -21,18 +20,35 @@ public:
 
 protected:
 	FOnEventReleased onEventReleased;
+	
 	FOnEventCheckCameraMode onEventCheckCameraMode;
 	
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	FVector CalculateAnimToVector();
+	FTimerHandle timerHandle;
 
 	float drawStrength = 0;
 	
-	float elapsedDrawingTime; // 활 시위 경과 시간
+	float elapsedDrawingTime;
 
+	bool bIsCompleteReload = false;// 활 시위 경과 시간
+
+	FVector CalculateAnimToVector();
+	
+	// Called when the game starts
+	virtual void BeginPlay() override;
+	
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class APlayerWeapon* bow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class APlayerWeapon* tripcaster;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class APlayerWeapon> bowFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class APlayerWeapon> tripcasterFactory;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float targetDrawStrength = 100.0f; // 활시위 최대값
 
@@ -41,6 +57,61 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float drawingThreshold = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
+	float idleTimerDuration = 10;
+
+	UPROPERTY()
+	class UInputAction* ia_anchored;
+
+	UPROPERTY()
+	class UInputAction* ia_fire;
+
+	UPROPERTY()
+	class UCameraComponent* cameraComp;
+
+	UFUNCTION()
+	void OnAnchor();
+
+	UFUNCTION()
+	void OnAnchorRelease();
+
+	UFUNCTION()
+	void OnPressedFire(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void OnReleasedFire(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void CheckPutWeaponTimer(bool bComplete);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeWeapon(APlayerWeapon* weapon);
+	
+	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
+	
+	TWeakObjectPtr<APlayerWeapon> currentWeapon;
+
+	void SpawnArrow();
+
+	void PlaceArrowOnBow();
+
+	void PickWeapon();
+
+	void ClearPutWeaponTimer();
+
+	void StartTimerPutWeapon();
+
+	void Fire(FVector velocity, float alpha);
+
+	void SetVisibleEquippedWeapon(bool visible);
+
+	void SetDrawStrength(float strength);
+	
+	float GetDrawStrength() const
+	{
+		return drawStrength;
+	}
 
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
 
@@ -63,34 +134,4 @@ public:
 			onEventCheckCameraMode.BindUObject(obj, func);
 		}
 	}
-	
-	UPROPERTY()
-	class UInputAction* ia_anchored;
-
-	UPROPERTY()
-	class UInputAction* ia_fire;
-
-	UPROPERTY()
-	class UCameraComponent* cameraComp;
-
-	UFUNCTION()
-	void OnAnchor();
-
-	UFUNCTION()
-	void OnAnchorRelease();
-
-	UFUNCTION()
-	void OnPressedFire(const FInputActionValue& actionValue);
-
-	UFUNCTION()
-	void OnReleasedFire(const FInputActionValue& actionValue);
-
-	bool bIsCompleteReload = false;
-
-	float GetDrawStrength() const
-	{
-		return drawStrength;
-	}
-
-	void SetDrawStrength(float strength);
 };

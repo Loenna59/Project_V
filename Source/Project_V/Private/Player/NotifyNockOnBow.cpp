@@ -3,7 +3,7 @@
 
 #include "Player/NotifyNockOnBow.h"
 
-#include "Player/PlayCharacter.h"
+#include "Player/Component/PlayerCombat.h"
 
 void UNotifyNockOnBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -12,9 +12,9 @@ void UNotifyNockOnBow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 	AActor* owner = MeshComp->GetOwner();
 	if (owner)
 	{
-		if (APlayCharacter* player = Cast<APlayCharacter>(owner))
+		if (UPlayerCombat* combatComp = Cast<UPlayerCombat>(owner->GetDefaultSubobjectByName("PlayerCombat")))
 		{
-			player->PlaceArrowOnBow();
+			combatComp->PlaceArrowOnBow();
 		}
 	}
 }

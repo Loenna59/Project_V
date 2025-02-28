@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
+#include "Player/Weapon/PlayerWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerUI.h"
 
@@ -32,6 +33,20 @@ UPlayerCombat::UPlayerCombat()
 	{
 		ia_fire = tmp_ia_fire.Object;
 	}
+
+	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
+
+	if (tmp_bow.Succeeded())
+	{
+		bowFactory = tmp_bow.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_tripcaster(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Tripcaster.BP_Tripcaster_C'"));
+
+	if (tmp_tripcaster.Succeeded())
+	{
+		tripcasterFactory = tmp_tripcaster.Class;
+	}
 }
 
 
@@ -41,6 +56,30 @@ void UPlayerCombat::BeginPlay()
 	Super::BeginPlay();
 	
 	cameraComp = me->anchoredCameraComp;
+	
+	if ((bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory)))
+	{
+		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
+		bow->SpawnArrowInBow();
+		bow->AttachSocket(me->GetMesh(), TEXT("BowSocket"), false);
+	}
+
+	if ((tripcaster = GetWorld()->SpawnActor<APlayerWeapon>(tripcasterFactory)))
+	{
+		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
+		tripcaster->SpawnArrowInBow();
+		tripcaster->AttachSocket(me->GetMesh(), TEXT("CasterSocket"), false);
+		tripcaster->SetVisibility(false);
+		
+		tripcaster->onCompleteFire.AddDynamic(this, &UPlayerCombat::CheckPutWeaponTimer);
+	}
+	
+	if (anim && bow)
+	{
+		anim->SetWeaponAnim(bow->GetAnimInstance());
+	}
+
+	ChangeWeapon(bow);
 }
 
 FVector UPlayerCombat::CalculateAnimToVector()
@@ -76,13 +115,34 @@ void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
 	{
 	case EPlayerCameraMode::Default:
 		SetDrawStrength(0);
+		if (currentWeapon.IsValid())
+		{
+			currentWeapon->PlaceOrSpawnArrow();
+		}
+		StartTimerPutWeapon();
+		break;
+	case EPlayerCameraMode::Anchored:
+		ClearPutWeaponTimer();
+		if (currentWeapon.IsValid())
+		{
+			currentWeapon->SpawnArrowInBow();
+		}
+		break;
+	case EPlayerCameraMode::Focus:
+		// 강제로 리로드 처리
+		bIsCompleteReload = true;
 		break;
 	}
 }
 
 void UPlayerCombat::OnAnchor()
 {
-	me->OnAnchoredMode(); 
+	if (!holdingWeapon.IsValid())
+	{
+		anim->OnPlayEquip();
+	}
+	
+	onEventCameraModeChanged.Execute(EPlayerCameraMode::Anchored);
 }
 
 void UPlayerCombat::OnAnchorRelease()
@@ -126,7 +186,7 @@ void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 		return;
 	}
 
-	me->Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
+	Fire(CalculateAnimToVector(), drawStrength / targetDrawStrength);
 
 	bIsCompleteReload = false;
 	SetDrawStrength(0);
@@ -149,4 +209,135 @@ void UPlayerCombat::SetDrawStrength(float strength)
 		elapsedDrawingTime = 0;
 	}
 }
+
+void UPlayerCombat::SpawnArrow()
+{
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->SpawnArrow(me->GetMesh(), currentWeapon->GetPickProjectileSocket());
+	}
+}
+
+void UPlayerCombat::PlaceArrowOnBow()
+{
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->PlaceArrowOnBow();
+		bIsCompleteReload = true;
+	}
+}
+
+void UPlayerCombat::PickWeapon()
+{
+	if (holdingWeapon.IsValid())
+	{
+		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetSlotSocket(), false);
+		holdingWeapon = nullptr;
+	}
+	else
+	{
+		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetGripSocket(), true);
+		holdingWeapon = currentWeapon;
+	}
+}
+
+void UPlayerCombat::ChangeWeapon(APlayerWeapon* weapon)
+{
+	if (currentWeapon == weapon)
+	{
+		return;
+	}
+	
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetSlotSocket(), false);
+		currentWeapon->RevertProjectile();
+		currentWeapon->SetVisibility(false);
+	}
+
+	anim->weaponType = weapon->GetWeaponType();
+	weapon->SetVisibility(true);
+	currentWeapon = weapon;
+	
+	anim->weaponChanged = true;
+	if (holdingWeapon.IsValid())
+	{
+		holdingWeapon = nullptr;
+		anim->OnPlayEquip();
+	}
+	
+	bIsCompleteReload = true;
+	
+	// me->ui->ChangeEquippedWeaponUI(weapon->IsBase());
+
+	if (me->GetPlayerCameraMode() != EPlayerCameraMode::Anchored)
+	{
+		StartTimerPutWeapon();
+	}
+}
+
+void UPlayerCombat::ClearPutWeaponTimer()
+{
+	if (timerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+		timerHandle.Invalidate();
+	}
+}
+
+void UPlayerCombat::StartTimerPutWeapon()
+{
+	ClearPutWeaponTimer();
+	
+	TWeakObjectPtr<UPlayerCombat> weakThis = this;
+	GetWorld()->GetTimerManager().SetTimer(
+		timerHandle,
+		[weakThis] ()
+		{
+			if (!weakThis.IsValid())
+			{
+				return;
+			}
+				
+			if (!weakThis->holdingWeapon.IsValid())
+			{
+				return;
+			}
+
+			weakThis->anim->OnPlayEquip();
+		},
+		idleTimerDuration,
+		false
+	);
+}
+
+void UPlayerCombat::CheckPutWeaponTimer(bool bComplete)
+{
+	ClearPutWeaponTimer();
+				
+	if (bComplete)
+	{
+		StartTimerPutWeapon();
+	}
+}
+
+void UPlayerCombat::Fire(FVector velocity, float alpha)
+{
+	if (holdingWeapon.IsValid())
+	{
+		bool twice = holdingWeapon->Fire(velocity, alpha);
+		
+		anim->OnFire(twice);
+	}
+}
+
+void UPlayerCombat::SetVisibleEquippedWeapon(bool visible)
+{
+	if (currentWeapon.IsValid())
+	{
+		currentWeapon->SetVisibility(visible);
+	}
+}
+
+
 
