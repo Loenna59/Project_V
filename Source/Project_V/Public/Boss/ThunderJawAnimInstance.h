@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ThunderJawFSM.h"
 #include "Animation/AnimInstance.h"
 #include "ThunderJawAnimInstance.generated.h"
 
@@ -28,8 +27,7 @@ protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 public:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool bDie{false};
+#pragma region PlayMontageFunc
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayTurnMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
@@ -44,7 +42,9 @@ public:
 	void OnPlayFallDownMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayDieMontage();
+#pragma endregion 
 
+#pragma region AnimNotify
 	UFUNCTION()
 	void AnimNotify_PlayRageSound();
 	UFUNCTION()
@@ -57,10 +57,13 @@ public:
 	void AnimNotify_PlayDieSound();
 	UFUNCTION()
 	void AnimNotify_PlayTailSound();
-
+#pragma endregion
+	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	float BossAnimMoveSpeed;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="BossAnim")
 	UAnimMontage* CurrentPlayingMontage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool bDie{false};
 };

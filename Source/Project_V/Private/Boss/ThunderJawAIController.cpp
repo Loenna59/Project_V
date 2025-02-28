@@ -7,7 +7,6 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
-#include "Boss/State/BossCombatState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -46,7 +45,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		return;
 	}
 
-	if (!Boss->bIsLSEnd || Boss->bDie)
+	if (!Boss->bIsLevelSequenceEnd || Boss->bDie)
 	{
 		return;
 	}

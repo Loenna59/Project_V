@@ -183,7 +183,7 @@ void AThunderJaw::InitBeginPlay()
 	TSubclassOf<AActor> SplineClass = LoadClass<AActor>(nullptr,TEXT("'/Game/Blueprints/Boss/BP_Spline.BP_Spline_C'"));
 	if (SplineClass)
 	{
-		splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
+		SplineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
 	}
 
 	WidgetComp = GetComponentByClass<UWidgetComponent>();
@@ -246,14 +246,22 @@ class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
 	return RDiscLauncher;
 }
 
+class UWidgetComponent* AThunderJaw::GetWidgetComponent()
+{
+	return WidgetComp;
+}
 
+class USplineComponent* AThunderJaw::GetSplineComponent()
+{
+	return SplineComp;
+}
 
-void AThunderJaw::MachineGunBroken(float LeftorRight)
+void AThunderJaw::MachineGunBroken(float LeftOrRight)
 {
 	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
-	if (LeftorRight == -1)
+	if (LeftOrRight == -1)
 	{
 		LMachineGun = nullptr;
 	}
@@ -263,12 +271,12 @@ void AThunderJaw::MachineGunBroken(float LeftorRight)
 	}
 }
 
-void AThunderJaw::DiscLauncherBroken(float LeftorRight)
+void AThunderJaw::DiscLauncherBroken(float LeftOrRight)
 {
 	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
-	if (LeftorRight == -1)
+	if (LeftOrRight == -1)
 	{
 		LDiscLauncher = nullptr;
 	}
@@ -278,12 +286,12 @@ void AThunderJaw::DiscLauncherBroken(float LeftorRight)
 	}
 }
 
-void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
+void AThunderJaw::ChangeEyeColor(FLinearColor Color, float EmissivePower)
 {
 	if (EyeMatInst)
 	{
-		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
-		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),Color);
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),EmissivePower);
 	}
 }
 
@@ -303,7 +311,7 @@ void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
 
 void AThunderJaw::SetVisibilityBoss()
 {
-	if (bIsLSEnd)
+	if (bIsLevelSequenceEnd)
 	{
 		SetActorHiddenInGame(false);
 		LMachineGun->SetActorHiddenInGame(false);
@@ -322,7 +330,7 @@ void AThunderJaw::SetVisibilityBoss()
 }
 
 
-void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
+void AThunderJaw::DrawDebugCircle(const UWorld* World, const FVector& Center, const float Radius)
 {
 	if (!World) return;
 
@@ -349,12 +357,12 @@ void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 	}
 }
 
-void AThunderJaw::ChangeToFocusModeMat(bool focusMode)
+void AThunderJaw::ChangeToFocusModeMat(const bool bFocusMode)
 {
-	LMachineGun->CheckFocusModeAndChangeMat(focusMode);
-	RMachineGun->CheckFocusModeAndChangeMat(focusMode);
-	LDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
-	RDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
+	LMachineGun->CheckFocusModeAndChangeMat(bFocusMode);
+	RMachineGun->CheckFocusModeAndChangeMat(bFocusMode);
+	LDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
+	RDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
 }
 
 void AThunderJaw::BossTakeDamage(int Damage)
@@ -368,7 +376,7 @@ void AThunderJaw::BossTakeDamage(int Damage)
 	FloatingDamage.Broadcast(Damage);
 }
 
-void AThunderJaw::SpawnDamageUI(float Damage)
+void AThunderJaw::SpawnDamageUI(const float Damage)
 {
 	DamageUI = Cast<UDamageUI>(CreateWidget(GetWorld(),FloatingTextFactory));
 	if (DamageUI)

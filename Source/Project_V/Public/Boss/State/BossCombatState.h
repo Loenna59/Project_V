@@ -33,43 +33,47 @@ public:
 protected:
 	UFUNCTION()
 	void InitComponents(AThunderJaw* Boss);
-	UFUNCTION()
-	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize, AThunderJaw* Boss);
 	
+#pragma region AttackFunc
 	UFUNCTION()
 	void Attack(AThunderJaw* Boss);
 	UFUNCTION()
-	int32 MakeRandomRangeNum(AThunderJaw* Boss);
+	void MakeTraceBoxAndCheckHit(FVector start, FVector end, FVector boxHalfSize, AThunderJaw* Boss);
+#pragma endregion
+
+#pragma region ChoosePatternFunc
 	UFUNCTION()
 	void StartChoosingPatternCycle(AThunderJaw* Boss);
 	UFUNCTION()
 	void ChoosePattern(AThunderJaw* Boss);
+	UFUNCTION()
+	int32 MakeRandomRangeNum(AThunderJaw* Boss);
+#pragma endregion 
 	
-	// Melee Attack
+#pragma region MeleeFunc
 	UFUNCTION()
 	void Charge(AThunderJaw* Boss);
 	UFUNCTION()
 	void Tail(AThunderJaw* Boss);
-
-	// Range Attack
+#pragma endregion
+	
+#pragma region RangeFunc
 	UFUNCTION()
 	void MachineGun(AThunderJaw* Boss);
 	UFUNCTION()
 	void DiscLauncher(AThunderJaw* Boss);
 	UFUNCTION()
 	void MouseLaser(AThunderJaw* Boss);
-
-	// Chasing Player
+#pragma endregion
+	
 	UFUNCTION()
 	void ChasePlayer(AThunderJaw* Boss);
-	
-	
 
 protected:
 	UPROPERTY()
 	bool bIsRotateBody{false};
 	
-	// Pattern
+#pragma region BasePatternVariance
 	UPROPERTY()
 	float PatternCurrentTime{0.0};
 	UPROPERTY()
@@ -78,18 +82,16 @@ protected:
 	float PatternDelay{2.0};
 	UPROPERTY()
 	bool bIsDelay{false};	
+	UPROPERTY()
+	bool bMeleeHit{false};
 
 	UPROPERTY()
 	FTimerHandle PatternTimerHandle;	
 	UPROPERTY()
 	EAttackPattern UsingPattern;
+#pragma endregion 
 
-
-	// 근접공격 한번만 맞도록 하기위한 bool
-	UPROPERTY()
-	bool bMeleeHit{false};
-	
-	// Charge
+#pragma region ChargePatternVariance
 	UPROPERTY()
 	float recoilTime{1.5};
 	UPROPERTY()
@@ -104,29 +106,32 @@ protected:
 	FTimerHandle ChargeTimerHandle;
 	UPROPERTY(EditAnywhere)
 	float ChargeDamage{30.0f};
+#pragma endregion 
 
-	
-	// Tail
+#pragma region TailPatternVariance
 	UPROPERTY()
 	float TailPatternTime{1.0};
 	UPROPERTY(EditAnywhere)
 	float TailDamage{30.0f};
+#pragma endregion
 
-	// Machine Gun
+#pragma region MachineGunPatternVariance
 	UPROPERTY()
 	float MachineGunPatternTime{3.0};
 	UPROPERTY()
 	float MachineGunDelayCurrentTime{0.0};
 	UPROPERTY()
 	float MachineGunDelay{0.1};
-	
-	// Disc Launcher
+#pragma endregion
+
+#pragma region DiscLauncherPatternVariance
 	UPROPERTY()
 	float DiscLauncherPatternTime{3.5};
 	UPROPERTY()
 	float DiscLauncherDelayCurrentTime{0.0};
 	UPROPERTY()
 	float DiscLauncherDelay{1.0};
+#pragma endregion
 	
 	// Mouse Laser
 	UPROPERTY()

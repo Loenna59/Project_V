@@ -17,7 +17,6 @@ UCLASS()
 class PROJECT_V_API AThunderJaw : public ACharacter
 {
 	GENERATED_BODY()
-
 public:
 	AThunderJaw();
 
@@ -25,15 +24,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()
-	void OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
 	void InitConstruct();
 	UFUNCTION()
 	void InitBeginPlay();
-
+	UFUNCTION()
+	void OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 public:
-	// GetFunc
+#pragma region GetFunc
 	UFUNCTION(BlueprintCallable)
 	UThunderJawFSM* GetFSMComponent();
 	UFUNCTION(BlueprintCallable)
@@ -52,34 +50,40 @@ public:
 	class ADiscLauncher* GetLDiscLauncher();
 	UFUNCTION(BlueprintCallable)
 	class ADiscLauncher* GetRDiscLauncher();
+	UFUNCTION(BlueprintCallable)
+	class UWidgetComponent* GetWidgetComponent();
+	UFUNCTION(BlueprintCallable)
+	class USplineComponent* GetSplineComponent();	
+#pragma endregion
 
-	// Parts Destruction Func
+#pragma region PartDestructFunc
 	UFUNCTION()
-	void MachineGunBroken(float LeftorRight);
+	void MachineGunBroken(float LeftOrRight);
 	UFUNCTION()
-	void DiscLauncherBroken(float LeftorRight);
+	void DiscLauncherBroken(float LeftOrRight);
+#pragma endregion
 
-	// ETC
+#pragma region ETC
 	UFUNCTION()
-	void ChangeEyeColor(FLinearColor color, float emissivePower);
+	void ChangeEyeColor(FLinearColor Color, float EmissivePower);
 	UFUNCTION()
 	void RotateToTarget(FVector TargetLoc, float InterpSpeed);
+	UFUNCTION()
+	static void DrawDebugCircle(const UWorld* World, const FVector& Center, const float Radius);
+	UFUNCTION()
+	void SpawnDamageUI(const float Damage);
 	UFUNCTION(BlueprintCallable)
 	void SetVisibilityBoss();
-	UFUNCTION()
-	void DrawDebugCircle(UWorld* World, FVector Center, float Radius);
 	UFUNCTION(BlueprintCallable)
-	void ChangeToFocusModeMat(bool focusMode);
+	void ChangeToFocusModeMat(const bool bFocusMode);
 	UFUNCTION(BlueprintCallable)
-	void BossTakeDamage(int Damage);
-	UFUNCTION()
-	void SpawnDamageUI(float Damage);
+	void BossTakeDamage(const int Damage);
 	UFUNCTION(BlueprintCallable)
 	void GameClear();
+#pragma endregion
 	
 protected:
-	
-	// Class Instance
+#pragma region ClassInst
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	UThunderJawFSM* FSM;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -90,12 +94,15 @@ protected:
 	class UThunderJawAnimInstance* BossAnimInstance;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	APlayCharacter* Aloy;
-	
-	// EyeMaterial
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterialInstanceDynamic* EyeMatInst;
-	
-	// Parts
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UWidgetComponent* WidgetComp;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USplineComponent* SplineComp;
+#pragma endregion 
+
+#pragma region PartsClass
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class AMachineGun* LMachineGun;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
@@ -104,42 +111,48 @@ protected:
 	class ADiscLauncher* LDiscLauncher;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class ADiscLauncher* RDiscLauncher;
+#pragma endregion
 
-	// DamageUI
+#pragma region DamageUI
 	UPROPERTY(BlueprintAssignable)
 	FFloatingDamage FloatingDamage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> FloatingTextFactory;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UDamageUI* DamageUI;
+#pragma endregion
 	
 public:
+#pragma region SettingVariance
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MaxHP{1000.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float CurrentHP{CurrentHP = MaxHP};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float BossSpeed{500.0f};
+#pragma endregion
+
+#pragma region DistanceVariance
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float MeleeAttackDist{1000.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float RangeAttackDist{2500.0f};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float PatrolDist{2000.0f};
+#pragma endregion 
+
+#pragma region Boolean
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	bool bIsLSEnd{false};
+	bool bIsLevelSequenceEnd{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bPartBroken{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	bool bTrapped{false};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	bool bDie{false};	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class USplineComponent* splineComp;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class UWidgetComponent* WidgetComp;
+	bool bDie{false};
+#pragma endregion
 
-	// sound
+#pragma region Sound
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Sound")
 	class UAudioComponent* SoundInstance;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
@@ -156,5 +169,5 @@ public:
 	class USoundWave* MachineGunSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
 	class USoundWave* TailSound;
-
+#pragma endregion 
 };

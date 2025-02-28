@@ -54,14 +54,9 @@ protected:
 	class UAIPerceptionComponent* AIPC;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Sence")
 	class UAISenseConfig_Sight* SightConfig;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Sence")
-	class UAISenseConfig_Hearing* HearingConfig;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Sence")
-	class UAISenseConfig_Damage* DamageConfig;
-
 
 public:
-	// target이 sight안의 LookOut 경계에 들어옴
+#pragma region DetectVariance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	bool DetectedTarget{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
@@ -76,6 +71,7 @@ public:
 	float LoseTargetTime{0.0};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float FacingDot{0.0};
+#pragma endregion 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	bool bDebugMode{false};	
 };

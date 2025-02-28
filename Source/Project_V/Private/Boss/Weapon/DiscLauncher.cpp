@@ -28,7 +28,7 @@ void ADiscLauncher::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MaxHP = 100.0f;
+	MaxHP = 200.0f;
 	CurrentHP = MaxHP;
 	Root->OnComponentBeginOverlap.AddDynamic(this,&ADiscLauncher::OnDiscLauncherOverlap);
 }
@@ -87,8 +87,8 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)
 	{
-		DamageWeaponHP(50);
-		Boss->BossTakeDamage(50);
+		DamageWeaponHP(100);
+		Boss->BossTakeDamage(150);
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 	
 		// 경계중이거나 정찰중일 때 맞으면 combat state로 전환

@@ -35,7 +35,7 @@ void UThunderJawFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!Boss->bIsLSEnd || Boss->bDie)
+	if (!Boss->bIsLevelSequenceEnd || Boss->bDie)
 	{
 		return;
 	}

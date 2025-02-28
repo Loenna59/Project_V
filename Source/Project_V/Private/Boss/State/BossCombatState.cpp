@@ -18,7 +18,7 @@ void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
 	Boss->ChangeEyeColor(FLinearColor(1,0,0),2000);
-	Boss->WidgetComp->SetVisibility(true);
+	Boss->GetWidgetComponent()->SetVisibility(true);
 	InitComponents(Boss);
 }
 

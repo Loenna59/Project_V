@@ -37,16 +37,16 @@ void UBossPatrolState::Patrol(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 
 	DistanceAlongSpline += GetWorld()->DeltaTimeSeconds * Boss->BossSpeed;
-	if (DistanceAlongSpline > Boss->splineComp->GetSplineLength())
+	if (DistanceAlongSpline > Boss->GetSplineComponent()->GetSplineLength())
 	{
 		DistanceAlongSpline = 0;
 	}
 
-	FVector TargetLoc = Boss->splineComp->GetLocationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World);
+	FVector TargetLoc = Boss->GetSplineComponent()->GetLocationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World);
 	FVector Direction = (TargetLoc - Boss->GetActorLocation()).GetSafeNormal();
 	Boss->AddMovementInput(Direction,1.0f);
 
-	float TargetRotYaw = Boss->splineComp->GetRotationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World).Yaw;
+	float TargetRotYaw = Boss->GetSplineComponent()->GetRotationAtDistanceAlongSpline(DistanceAlongSpline,ESplineCoordinateSpace::World).Yaw;
 	float NewYaw = FMath::FInterpTo(Boss->GetActorRotation().Yaw,TargetRotYaw,GetWorld()->DeltaTimeSeconds,1.0f);
 	FRotator NewRot = FRotator(Boss->GetActorRotation().Pitch,NewYaw,Boss->GetActorRotation().Roll);
 	Boss->SetActorRotation(NewRot);
