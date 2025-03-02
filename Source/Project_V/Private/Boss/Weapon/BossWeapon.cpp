@@ -3,6 +3,8 @@
 
 #include "Boss/Weapon/BossWeapon.h"
 
+#include "Project_V.h"
+
 
 // Sets default values
 ABossWeapon::ABossWeapon()
@@ -44,11 +46,19 @@ void ABossWeapon::CheckFocusModeAndChangeMat(bool focusMode)
 {
 	if (focusMode)
 	{
+		PRINT_CALLINFO();
 		Mesh->SetOverlayMaterial(WeakPartsMatInst);
 	}
 	else
 	{
-		Mesh->SetOverlayMaterial(nullptr);
+		if (!GetWorld()->GetTimerManager().TimerExists(ChangeWeakPartsMatTimerHandle))
+		{
+			PRINT_CALLINFO();
+			GetWorld()->GetTimerManager().SetTimer(ChangeWeakPartsMatTimerHandle,[this]()
+			{
+				Mesh->SetOverlayMaterial(nullptr);
+			},5,false);
+		}
 	}
 }
 

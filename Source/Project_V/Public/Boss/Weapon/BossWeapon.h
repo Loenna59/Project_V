@@ -35,6 +35,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UArrowComponent* FirePos;
 	
+	UPROPERTY()
+	FTimerHandle ChangeWeakPartsMatTimerHandle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterial* WeakPartsMatInst;
 	
@@ -44,4 +46,5 @@ public:
 	float CurrentHP;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool bIsBroken{false};
+
 };
