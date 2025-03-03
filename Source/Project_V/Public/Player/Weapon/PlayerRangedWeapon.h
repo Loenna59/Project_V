@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Player/PlayerAnimInstance.h"
+#include "PlayerWeapon.h"
 #include "PlayerRangedWeapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteFire, bool, complete);
 
 UCLASS()
-class PROJECT_V_API APlayerRangedWeapon : public AActor
+class PROJECT_V_API APlayerRangedWeapon : public APlayerWeapon
 {
 	GENERATED_BODY()
 	
@@ -43,34 +42,19 @@ public:
 	virtual void PlaceOrSpawnArrow();
 
 	virtual bool Fire(FVector direction, float alpha);
-	
-	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
-
-	virtual void SetVisibility(bool visible);
-
-	virtual bool IsBase() const
-	{
-		return false;
-	}
-
-	virtual FName GetSlotSocket() const
-	{
-		return TEXT("BowSocket");
-	}
-
-	virtual FName GetGripSocket() const
-	{
-		return TEXT("BowGripSocket");
-	}
 
 	virtual FName GetPickProjectileSocket() const
 	{
 		return TEXT("PickArrowSocket");
 	}
+	
+	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow) override;
 
-	virtual EWeaponType GetWeaponType() const
+	virtual void SetVisibility(bool visible) override;
+
+	virtual bool IsBase() const override
 	{
-		return EWeaponType::Base;
+		return false;
 	}
 
 	virtual void RevertProjectile() {}

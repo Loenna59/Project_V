@@ -18,6 +18,7 @@
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerFocusMode.h"
 #include "Player/Component/PlayerMovement.h"
+#include "Player/Weapon/Katana.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
 
@@ -77,6 +78,16 @@ APlayCharacter::APlayCharacter()
 	voiceComp->SetupAttachment(RootComponent);
 	voiceComp->bAlwaysPlay = false;
 	voiceComp->bAutoActivate = false;
+
+	sheath = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sheath"));
+	sheath->SetupAttachment(GetMesh(), TEXT("SheathSocket"));
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tmp_sheath(TEXT("/Script/Engine.StaticMesh'/Game/Assets/CyberpunkSamurai/Meshes/SM_Katana_Sheath.SM_Katana_Sheath'"));
+
+	if (tmp_sheath.Succeeded())
+	{
+		sheath->SetStaticMesh(tmp_sheath.Object);
+	}
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> tmp_imc(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Player.IMC_Player'"));
 

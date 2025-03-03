@@ -81,7 +81,7 @@ bool APlayerRangedWeapon::Fire(FVector direction, float alpha)
 
 void APlayerRangedWeapon::AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow)
 {
-	AttachToComponent(comp, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+	Super::AttachSocket(comp, socketName, visibleArrow);
 
 	if (projectile.IsValid())
 	{
@@ -94,8 +94,7 @@ void APlayerRangedWeapon::AttachSocket(USceneComponent* comp, FName socketName, 
 
 void APlayerRangedWeapon::SetVisibility(bool visible)
 {
-	bool hidden = !visible;
-	SetActorHiddenInGame(hidden);
+	Super::SetVisibility(visible);
 
 	if (projectile.IsValid())
 	{

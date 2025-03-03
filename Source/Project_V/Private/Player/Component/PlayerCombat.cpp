@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
+#include "Player/Weapon/Katana.h"
 #include "Player/Weapon/PlayerRangedWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerUI.h"
@@ -34,6 +35,13 @@ UPlayerCombat::UPlayerCombat()
 		ia_fire = tmp_ia_fire.Object;
 	}
 
+	ConstructorHelpers::FClassFinder<AKatana> tmp_katana(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Katana.BP_Katana_C'"));
+
+	if (tmp_katana.Succeeded())
+	{
+		katanaFactory = tmp_katana.Class;
+	}
+
 	ConstructorHelpers::FClassFinder<APlayerRangedWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
 	if (tmp_bow.Succeeded())
@@ -56,6 +64,11 @@ void UPlayerCombat::BeginPlay()
 	Super::BeginPlay();
 	
 	cameraComp = me->anchoredCameraComp;
+
+	if ((katana = GetWorld()->SpawnActor<AKatana>(katanaFactory)))
+	{
+		katana->AttachSocket(me->GetMesh(), TEXT("SheathSocket"), false);
+	}
 	
 	if ((bow = GetWorld()->SpawnActor<APlayerRangedWeapon>(bowFactory)))
 	{

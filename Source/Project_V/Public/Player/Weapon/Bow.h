@@ -21,5 +21,19 @@ public:
 	{
 		return true;
 	}
-	
+
+	virtual FName GetSlotSocket() const override
+	{
+		return TEXT("BowSocket");
+	}
+
+	virtual FName GetGripSocket() const override
+	{
+		return TEXT("BowGripSocket");
+	}
+
+	virtual EWeaponType GetWeaponType() const override
+	{
+		return EWeaponType::Base;
+	}
 };

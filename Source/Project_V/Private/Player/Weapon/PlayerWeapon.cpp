@@ -5,20 +5,17 @@
 // Sets default values
 APlayerWeapon::APlayerWeapon()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
-void APlayerWeapon::BeginPlay()
+void APlayerWeapon::AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow)
 {
-	Super::BeginPlay();
-	
+	AttachToComponent(comp, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
 }
 
-// Called every frame
-void APlayerWeapon::Tick(float DeltaTime)
+void APlayerWeapon::SetVisibility(bool visible)
 {
-	Super::Tick(DeltaTime);
+	bool hidden = !visible;
+	SetActorHiddenInGame(hidden);
 }
 

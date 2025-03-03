@@ -69,6 +69,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UAudioComponent* voiceComp;
 
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* sheath;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPlayerUI* ui;
 

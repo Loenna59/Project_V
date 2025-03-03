@@ -37,6 +37,9 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
+	UPROPERTY(VisibleAnywhere)
+	class AKatana* katana;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class APlayerRangedWeapon* bow;
 
@@ -45,6 +48,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class APlayerRangedWeapon> bowFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class AKatana> katanaFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class APlayerRangedWeapon> tripcasterFactory;

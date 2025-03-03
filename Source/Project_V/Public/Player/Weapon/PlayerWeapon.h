@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Player/PlayerAnimInstance.h"
 #include "PlayerWeapon.generated.h"
 
 UCLASS()
@@ -14,12 +15,28 @@ class PROJECT_V_API APlayerWeapon : public AActor
 public:
 	// Sets default values for this actor's properties
 	APlayerWeapon();
+	
+	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void SetVisibility(bool visible);
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual bool IsBase() const
+	{
+		return true;
+	}
+
+	virtual FName GetSlotSocket() const
+	{
+		return TEXT("SheathSocket");
+	}
+
+	virtual FName GetGripSocket() const
+	{
+		return TEXT("WeaponGripSocket");
+	}
+
+	virtual EWeaponType GetWeaponType() const
+	{
+		return EWeaponType::Melee;
+	}
 };

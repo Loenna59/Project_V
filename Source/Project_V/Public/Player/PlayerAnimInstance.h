@@ -13,6 +13,7 @@
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
+	Melee,
 	Base,
 	Caster
 };
