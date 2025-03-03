@@ -12,6 +12,8 @@
 #include "Player/Weapon/PlayerRangedWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerUI.h"
+#include "Player/Weapon/PlayerWeapon.h"
+
 
 
 // Sets default values for this component's properties
@@ -118,6 +120,7 @@ void UPlayerCombat::SetupInputBinding(class UEnhancedInputComponent* input)
 	input->BindAction(ia_anchored, ETriggerEvent::Completed, this, &UPlayerCombat::OnAnchorRelease);
 	input->BindAction(ia_fire, ETriggerEvent::Triggered, this, &UPlayerCombat::OnPressedFire);
 	input->BindAction(ia_fire, ETriggerEvent::Completed, this, &UPlayerCombat::OnReleasedFire);
+	input->BindAction(ia_fire, ETriggerEvent::Started, this, &UPlayerCombat::OnMeleeAttack);
 }
 
 void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
@@ -128,17 +131,17 @@ void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
 	{
 	case EPlayerCameraMode::Default:
 		SetDrawStrength(0);
-		if (currentWeapon.IsValid())
+		if (currentRangedWeapon.IsValid())
 		{
-			currentWeapon->PlaceOrSpawnArrow();
+			currentRangedWeapon->PlaceOrSpawnArrow();
 		}
 		StartTimerPutWeapon();
 		break;
 	case EPlayerCameraMode::Anchored:
 		ClearPutWeaponTimer();
-		if (currentWeapon.IsValid())
+		if (currentRangedWeapon.IsValid())
 		{
-			currentWeapon->SpawnArrowInBow();
+			currentRangedWeapon->SpawnArrowInBow();
 		}
 		break;
 	case EPlayerCameraMode::Focus:
@@ -205,6 +208,21 @@ void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 	SetDrawStrength(0);
 }
 
+void UPlayerCombat::OnMeleeAttack()
+{
+	if (bIsHoldingKatana)
+    {
+    	anim->OnComboKatana();
+    	return;
+    }
+    
+    if (onEventCheckCameraMode.Execute())
+    {
+    	bIsHoldingKatana = true;
+    	anim->OnStartKatana();
+    }
+}
+
 void UPlayerCombat::SetDrawStrength(float strength)
 {
 	drawStrength = strength;
@@ -225,52 +243,58 @@ void UPlayerCombat::SetDrawStrength(float strength)
 
 void UPlayerCombat::SpawnArrow()
 {
-	if (currentWeapon.IsValid())
+	if (currentRangedWeapon.IsValid())
 	{
-		currentWeapon->SpawnArrow(me->GetMesh(), currentWeapon->GetPickProjectileSocket());
+		currentRangedWeapon->SpawnArrow(me->GetMesh(), currentRangedWeapon->GetPickProjectileSocket());
 	}
 }
 
 void UPlayerCombat::PlaceArrowOnBow()
 {
-	if (currentWeapon.IsValid())
+	if (currentRangedWeapon.IsValid())
 	{
-		currentWeapon->PlaceArrowOnBow();
+		currentRangedWeapon->PlaceArrowOnBow();
 		bIsCompleteReload = true;
 	}
 }
 
 void UPlayerCombat::PickWeapon()
 {
+	if (bIsHoldingKatana)
+	{
+		katana->AttachSocket(me->GetMesh(), katana->GetGripSocket(), false);
+		return;
+	}
+	
 	if (holdingWeapon.IsValid())
 	{
-		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetSlotSocket(), false);
+		currentRangedWeapon->AttachSocket(me->GetMesh(), currentRangedWeapon->GetSlotSocket(), false);
 		holdingWeapon = nullptr;
 	}
 	else
 	{
-		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetGripSocket(), true);
-		holdingWeapon = currentWeapon;
+		currentRangedWeapon->AttachSocket(me->GetMesh(), currentRangedWeapon->GetGripSocket(), true);
+		holdingWeapon = currentRangedWeapon;
 	}
 }
 
 void UPlayerCombat::ChangeWeapon(APlayerRangedWeapon* weapon)
 {
-	if (currentWeapon == weapon)
+	if (currentRangedWeapon == weapon)
 	{
 		return;
 	}
 	
-	if (currentWeapon.IsValid())
+	if (currentRangedWeapon.IsValid())
 	{
-		currentWeapon->AttachSocket(me->GetMesh(), currentWeapon->GetSlotSocket(), false);
-		currentWeapon->RevertProjectile();
-		currentWeapon->SetVisibility(false);
+		currentRangedWeapon->AttachSocket(me->GetMesh(), currentRangedWeapon->GetSlotSocket(), false);
+		currentRangedWeapon->RevertProjectile();
+		currentRangedWeapon->SetVisibility(false);
 	}
 
 	anim->weaponType = weapon->GetWeaponType();
 	weapon->SetVisibility(true);
-	currentWeapon = weapon;
+	currentRangedWeapon = weapon;
 	
 	anim->weaponChanged = true;
 	if (holdingWeapon.IsValid())
@@ -338,7 +362,7 @@ void UPlayerCombat::Fire(FVector velocity, float alpha)
 {
 	if (holdingWeapon.IsValid())
 	{
-		bool twice = holdingWeapon->Fire(velocity, alpha);
+		bool twice = currentRangedWeapon->Fire(velocity, alpha);
 		
 		anim->OnFire(twice);
 	}
@@ -346,9 +370,9 @@ void UPlayerCombat::Fire(FVector velocity, float alpha)
 
 void UPlayerCombat::SetVisibleEquippedWeapon(bool visible)
 {
-	if (currentWeapon.IsValid())
+	if (currentRangedWeapon.IsValid())
 	{
-		currentWeapon->SetVisibility(visible);
+		currentRangedWeapon->SetVisibility(visible);
 	}
 }
 

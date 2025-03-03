@@ -18,7 +18,6 @@
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerFocusMode.h"
 #include "Player/Component/PlayerMovement.h"
-#include "Player/Weapon/Katana.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
 

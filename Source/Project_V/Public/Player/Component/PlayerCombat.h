@@ -29,7 +29,9 @@ protected:
 	
 	float elapsedDrawingTime;
 
-	bool bIsCompleteReload = false;// 활 시위 경과 시간
+	bool bIsCompleteReload = false; // 활 시위 경과 시간
+
+	bool bIsHoldingKatana = false;
 
 	FVector CalculateAnimToVector();
 	
@@ -89,14 +91,17 @@ public:
 	void OnReleasedFire(const FInputActionValue& actionValue);
 
 	UFUNCTION()
+	void OnMeleeAttack();
+
+	UFUNCTION()
 	void CheckPutWeaponTimer(bool bComplete);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeWeapon(APlayerRangedWeapon* weapon);
+	void ChangeWeapon(class APlayerRangedWeapon* weapon);
 	
-	TWeakObjectPtr<APlayerRangedWeapon> holdingWeapon;
+	TWeakObjectPtr<class APlayerWeapon> holdingWeapon;
 	
-	TWeakObjectPtr<APlayerRangedWeapon> currentWeapon;
+	TWeakObjectPtr<class APlayerRangedWeapon> currentRangedWeapon;
 
 	void SpawnArrow();
 
@@ -118,7 +123,7 @@ public:
 	{
 		return drawStrength;
 	}
-
+	
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
 
 	virtual void OnChangedCameraMode(EPlayerCameraMode mode) override;

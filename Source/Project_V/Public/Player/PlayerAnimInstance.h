@@ -62,6 +62,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool isAnchoredBow;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isHoldingKatana;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator controlSpineRotation;
 
@@ -102,6 +105,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLargeDamaged(float degrees);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartKatana();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnComboKatana();
 
 	UFUNCTION()
 	void OnDead();
