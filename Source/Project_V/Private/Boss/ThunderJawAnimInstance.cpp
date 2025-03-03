@@ -97,3 +97,12 @@ void UThunderJawAnimInstance::AnimNotify_PlayTailSound()
 		boss->SoundInstance->SetVolumeMultiplier(1.0f);
 	}
 }
+
+void UThunderJawAnimInstance::AnimNotify_MakeRadarEffect()
+{
+	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
+	if (boss)
+	{
+		GetWorld()->SpawnActor<AActor>(boss->GetRadarEffectFactory());
+	}
+}

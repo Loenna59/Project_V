@@ -33,27 +33,29 @@ protected:
 public:
 #pragma region GetFunc
 	UFUNCTION(BlueprintCallable)
-	UThunderJawFSM* GetFSMComponent();
+	UThunderJawFSM* GetFSMComponent() const;
 	UFUNCTION(BlueprintCallable)
-	AThunderJawAIController* GetBossAIController();
+	AThunderJawAIController* GetBossAIController() const;
 	UFUNCTION(BlueprintCallable)
-	class UThunderJawAnimInstance* GetBossAnimInstance();
+	class UThunderJawAnimInstance* GetBossAnimInstance() const;
 	UFUNCTION(BlueprintCallable)
-	class UMaterialInstanceDynamic* GetEyeMatInst();
+	class UMaterialInstanceDynamic* GetEyeMatInst() const;
 	UFUNCTION(BlueprintCallable)
-	APlayCharacter* GetAloy();
+	APlayCharacter* GetAloy() const;
 	UFUNCTION(BlueprintCallable)
-	class AMachineGun* GetLMachineGun();
+	class AMachineGun* GetLMachineGun() const;
 	UFUNCTION(BlueprintCallable)
-	class AMachineGun* GetRMachineGun();
+	class AMachineGun* GetRMachineGun() const;
 	UFUNCTION(BlueprintCallable)
-	class ADiscLauncher* GetLDiscLauncher();
+	class ADiscLauncher* GetLDiscLauncher() const;
 	UFUNCTION(BlueprintCallable)
-	class ADiscLauncher* GetRDiscLauncher();
+	class ADiscLauncher* GetRDiscLauncher() const;
 	UFUNCTION(BlueprintCallable)
-	class UWidgetComponent* GetWidgetComponent();
+	class UWidgetComponent* GetWidgetComponent() const;
 	UFUNCTION(BlueprintCallable)
-	class USplineComponent* GetSplineComponent();	
+	class USplineComponent* GetSplineComponent() const;
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<AActor> GetRadarEffectFactory() const;
 #pragma endregion
 
 #pragma region PartDestructFunc
@@ -96,10 +98,12 @@ protected:
 	APlayCharacter* Aloy;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ThunderJaw Character")
 	class UMaterialInstanceDynamic* EyeMatInst;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
 	class UWidgetComponent* WidgetComp;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
 	class USplineComponent* SplineComp;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
+	TSubclassOf<AActor> RadarEffectFactory;
 #pragma endregion 
 
 #pragma region PartsClass

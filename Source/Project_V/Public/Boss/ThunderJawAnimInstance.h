@@ -42,6 +42,8 @@ public:
 	void OnPlayFallDownMontage();
 	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
 	void OnPlayDieMontage();
+	UFUNCTION(BlueprintImplementableEvent, Category="BossAnim")
+	void OnPlayRadarMontage();
 #pragma endregion 
 
 #pragma region AnimNotify
@@ -57,6 +59,8 @@ public:
 	void AnimNotify_PlayDieSound();
 	UFUNCTION()
 	void AnimNotify_PlayTailSound();
+	UFUNCTION()
+	void AnimNotify_MakeRadarEffect();
 #pragma endregion
 	
 public:

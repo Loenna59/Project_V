@@ -131,6 +131,12 @@ void AThunderJaw::InitConstruct()
 	{
 		FloatingTextFactory = tempFloatingText.Class;
 	}
+
+	ConstructorHelpers::FClassFinder<APawn> tempRadarEffect(TEXT("'/Game/Blueprints/Boss/BP_RadarEffect.BP_RadarEffect_C'"));
+	if (tempRadarEffect.Succeeded())
+	{
+		RadarEffectFactory = tempRadarEffect.Class;
+	}
 }
 
 void AThunderJaw::InitBeginPlay()
@@ -201,59 +207,64 @@ void AThunderJaw::InitBeginPlay()
 	FloatingDamage.AddDynamic(this,&AThunderJaw::SpawnDamageUI);
 }
 
-UThunderJawFSM* AThunderJaw::GetFSMComponent()
+UThunderJawFSM* AThunderJaw::GetFSMComponent() const
 {
 	return FSM;
 }
 
-AThunderJawAIController* AThunderJaw::GetBossAIController()
+AThunderJawAIController* AThunderJaw::GetBossAIController() const
 {
 	return BossAIController;
 }
 
-class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance()
+class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance() const
 {
 	return BossAnimInstance;
 }
 
-class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst()
+class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst() const
 {
 	return EyeMatInst;
 }
 
-APlayCharacter* AThunderJaw::GetAloy()
+APlayCharacter* AThunderJaw::GetAloy() const
 {
 	return Aloy;
 }
 
-class AMachineGun* AThunderJaw::GetLMachineGun()
+class AMachineGun* AThunderJaw::GetLMachineGun() const
 {
 	return LMachineGun;
 }
 
-class AMachineGun* AThunderJaw::GetRMachineGun()
+class AMachineGun* AThunderJaw::GetRMachineGun() const
 {
 	return RMachineGun;
 }
 
-class ADiscLauncher* AThunderJaw::GetLDiscLauncher()
+class ADiscLauncher* AThunderJaw::GetLDiscLauncher() const
 {
 	return LDiscLauncher;
 }
 
-class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
+class ADiscLauncher* AThunderJaw::GetRDiscLauncher() const
 {
 	return RDiscLauncher;
 }
 
-class UWidgetComponent* AThunderJaw::GetWidgetComponent()
+class UWidgetComponent* AThunderJaw::GetWidgetComponent() const
 {
 	return WidgetComp;
 }
 
-class USplineComponent* AThunderJaw::GetSplineComponent()
+class USplineComponent* AThunderJaw::GetSplineComponent() const
 {
 	return SplineComp;
+}
+
+TSubclassOf<AActor> AThunderJaw::GetRadarEffectFactory() const
+{
+	return RadarEffectFactory;
 }
 
 void AThunderJaw::MachineGunBroken(float LeftOrRight)

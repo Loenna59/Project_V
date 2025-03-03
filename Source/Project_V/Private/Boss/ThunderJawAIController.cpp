@@ -98,7 +98,6 @@ void AThunderJawAIController::InitComponent()
 	
 	AIPC->ConfigureSense(*SightConfig);
 	AIPC->SetDominantSense(SightConfig->GetSenseImplementation());
-
 	DetectedTarget = false;
 }
 
@@ -124,16 +123,16 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
-			auto* player = Cast<APlayCharacter>(Actor);
+			auto* player = Boss->GetAloy();
 			if (player)
 			{
+				PRINTLOG(TEXT("%s"),*Stimulus.GetDebugDescription());
 				// 플레이어가 감지됨
 				// 경계모드로 변환 된 상태이면 감지됐던 장소를 저장
 				PRINTLOG(TEXT("Target is in Sight"));
 				DetectedTarget = true;
 				Boss->GetFSMComponent()->bIsArrivedDetectedLocation = false;
 				DetectedLocation = player->GetActorLocation();
-				PRINTLOG(TEXT("DetectedLocation : %f,%f,%f"),DetectedLocation.X,DetectedLocation.Y,DetectedLocation.Z);
 			}
 		}
 	}
@@ -206,6 +205,7 @@ void AThunderJawAIController::CheckTargetThroughStimulus()
 	{
 		if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 		{
+			//PRINTLOG(TEXT("%f"),Stimulus.GetAge());
 			if (Stimulus.GetAge() > SightConfig->GetMaxAge() ||
 				LoseTargetTime > SightConfig->GetMaxAge())
 			{
