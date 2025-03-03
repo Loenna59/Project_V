@@ -262,7 +262,16 @@ void UPlayerCombat::PickWeapon()
 {
 	if (bIsHoldingKatana)
 	{
+		if (holdingWeapon.IsValid())
+		{
+			katana->AttachSocket(me->GetMesh(), katana->GetSlotSocket(), false);
+			holdingWeapon = nullptr;
+			bIsHoldingKatana = false;
+			return;
+		}
+		
 		katana->AttachSocket(me->GetMesh(), katana->GetGripSocket(), false);
+		holdingWeapon = katana;
 		return;
 	}
 	

@@ -80,7 +80,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool weaponChanged;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EWeaponType weaponType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
