@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerWeapon.h"
+#include "PlayerRangedWeapon.h"
 #include "Bow.generated.h"
 
 UCLASS()
-class PROJECT_V_API ABow : public APlayerWeapon
+class PROJECT_V_API ABow : public APlayerRangedWeapon
 {
 	GENERATED_BODY()
 

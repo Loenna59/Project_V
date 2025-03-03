@@ -8,7 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
-#include "Player/Weapon/PlayerWeapon.h"
+#include "Player/Weapon/PlayerRangedWeapon.h"
 #include "UI/CrosshairUI.h"
 #include "UI/PlayerUI.h"
 
@@ -34,14 +34,14 @@ UPlayerCombat::UPlayerCombat()
 		ia_fire = tmp_ia_fire.Object;
 	}
 
-	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
+	ConstructorHelpers::FClassFinder<APlayerRangedWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
 
 	if (tmp_bow.Succeeded())
 	{
 		bowFactory = tmp_bow.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_tripcaster(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Tripcaster.BP_Tripcaster_C'"));
+	ConstructorHelpers::FClassFinder<APlayerRangedWeapon> tmp_tripcaster(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Tripcaster.BP_Tripcaster_C'"));
 
 	if (tmp_tripcaster.Succeeded())
 	{
@@ -57,14 +57,14 @@ void UPlayerCombat::BeginPlay()
 	
 	cameraComp = me->anchoredCameraComp;
 	
-	if ((bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory)))
+	if ((bow = GetWorld()->SpawnActor<APlayerRangedWeapon>(bowFactory)))
 	{
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		bow->SpawnArrowInBow();
 		bow->AttachSocket(me->GetMesh(), TEXT("BowSocket"), false);
 	}
 
-	if ((tripcaster = GetWorld()->SpawnActor<APlayerWeapon>(tripcasterFactory)))
+	if ((tripcaster = GetWorld()->SpawnActor<APlayerRangedWeapon>(tripcasterFactory)))
 	{
 		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		tripcaster->SpawnArrowInBow();
@@ -241,7 +241,7 @@ void UPlayerCombat::PickWeapon()
 	}
 }
 
-void UPlayerCombat::ChangeWeapon(APlayerWeapon* weapon)
+void UPlayerCombat::ChangeWeapon(APlayerRangedWeapon* weapon)
 {
 	if (currentWeapon == weapon)
 	{

@@ -4,74 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Player/PlayerAnimInstance.h"
 #include "PlayerWeapon.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteFire, bool, complete);
 
 UCLASS()
 class PROJECT_V_API APlayerWeapon : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
-	FOnCompleteFire onCompleteFire;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class USkeletalMeshComponent* mesh;
+	// Sets default values for this actor's properties
+	APlayerWeapon();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class USceneComponent* arrowSlot;
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<class APlayerProjectile> projectileFactory;
-	
-	UPROPERTY()
-	TWeakObjectPtr<class APlayerProjectile> projectile;
-
-	UPROPERTY(EditDefaultsOnly, Category=SoundEffect)
-	class USoundBase* fireSfx;
-
-	UAnimInstance* GetAnimInstance();
-
-	virtual void SpawnArrowInBow();
-
-	virtual void SpawnArrow(USceneComponent* parent, FName socketName = NAME_None);
-
-	virtual void PlaceArrowOnBow();
-
-	virtual void PlaceOrSpawnArrow();
-
-	virtual bool Fire(FVector direction, float alpha);
-	
-	virtual void AttachSocket(USceneComponent* comp, FName socketName, bool visibleArrow);
-
-	virtual void SetVisibility(bool visible);
-
-	virtual bool IsBase() const
-	{
-		return false;
-	}
-
-	virtual FName GetSlotSocket() const
-	{
-		return TEXT("BowSocket");
-	}
-
-	virtual FName GetGripSocket() const
-	{
-		return TEXT("BowGripSocket");
-	}
-
-	virtual FName GetPickProjectileSocket() const
-	{
-		return TEXT("PickArrowSocket");
-	}
-
-	virtual EWeaponType GetWeaponType() const
-	{
-		return EWeaponType::Base;
-	}
-
-	virtual void RevertProjectile() {}
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 };

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerWeapon.h"
+#include "PlayerRangedWeapon.h"
 #include "Tripcaster.generated.h"
 
 UCLASS()
-class PROJECT_V_API ATripcaster : public APlayerWeapon
+class PROJECT_V_API ATripcaster : public APlayerRangedWeapon
 {
 	GENERATED_BODY()
 

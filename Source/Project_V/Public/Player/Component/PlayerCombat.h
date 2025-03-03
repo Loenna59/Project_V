@@ -38,16 +38,16 @@ protected:
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class APlayerWeapon* bow;
+	class APlayerRangedWeapon* bow;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class APlayerWeapon* tripcaster;
+	class APlayerRangedWeapon* tripcaster;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class APlayerWeapon> bowFactory;
+	TSubclassOf<class APlayerRangedWeapon> bowFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class APlayerWeapon> tripcasterFactory;
+	TSubclassOf<class APlayerRangedWeapon> tripcasterFactory;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	float targetDrawStrength = 100.0f; // 활시위 최대값
@@ -86,11 +86,11 @@ public:
 	void CheckPutWeaponTimer(bool bComplete);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeWeapon(APlayerWeapon* weapon);
+	void ChangeWeapon(APlayerRangedWeapon* weapon);
 	
-	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
+	TWeakObjectPtr<APlayerRangedWeapon> holdingWeapon;
 	
-	TWeakObjectPtr<APlayerWeapon> currentWeapon;
+	TWeakObjectPtr<APlayerRangedWeapon> currentWeapon;
 
 	void SpawnArrow();
 
