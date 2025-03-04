@@ -10,6 +10,7 @@
 #include "Boss/Weapon/DiscLauncher.h"
 #include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -406,7 +407,7 @@ void AThunderJaw::GameClear()
 void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* arrow = Cast<AArrow>(OtherActor);
-	if (arrow)
+	if (arrow && arrow->hitCollision->IsCollisionEnabled())
 	{
 		if (FSM->GetCurrentState()->BossState != EBossState::Combat && FSM->GetCurrentState()->BossState != EBossState::Damage)
 		{
