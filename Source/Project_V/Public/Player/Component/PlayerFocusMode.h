@@ -23,7 +23,12 @@ protected:
 	UPROPERTY()
 	class UInputAction* ia_focus;
 
+	UPROPERTY()
+	class UInputAction* ia_toggle;
+
 	float focusPressingTime;
+
+	bool bIsTracking;
 
 public:
 	virtual void SetupInputBinding(class UEnhancedInputComponent* input) override;
@@ -47,6 +52,9 @@ public:
 
 	UFUNCTION()
 	void EndFocusOrScan();
+
+	UFUNCTION()
+	void OnToggleTracking();
 
 	void SetVisibleFocusMode(bool visible);
 };

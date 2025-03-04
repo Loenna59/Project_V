@@ -9,7 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/FocusDome.h"
 #include "Player/PlayCharacter.h"
-
+#include "UI/PlayerUI.h"
 
 // Sets default values for this component's properties
 UPlayerFocusMode::UPlayerFocusMode()
@@ -23,6 +23,13 @@ UPlayerFocusMode::UPlayerFocusMode()
 	if (tmp_ia_focus.Succeeded())
 	{
 		ia_focus = tmp_ia_focus.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_toggle(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerToggle.IA_PlayerToggle'"));
+
+	if (tmp_ia_toggle.Succeeded())
+	{
+		ia_toggle = tmp_ia_toggle.Object;
 	}
 
 	ConstructorHelpers::FClassFinder<AFocusDome> tmp_dome(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_FocusDome.BP_FocusDome_C'"));
@@ -59,6 +66,7 @@ void UPlayerFocusMode::SetupInputBinding(class UEnhancedInputComponent* input)
 
 	input->BindAction(ia_focus, ETriggerEvent::Triggered, this, &UPlayerFocusMode::OnFocusOrScan);
 	input->BindAction(ia_focus, ETriggerEvent::Completed, this, &UPlayerFocusMode::EndFocusOrScan);
+	input->BindAction(ia_toggle, ETriggerEvent::Started, this, &UPlayerFocusMode::OnToggleTracking);
 }
 
 void UPlayerFocusMode::OnFocusOrScan(const FInputActionValue& actionValue)
@@ -78,6 +86,14 @@ void UPlayerFocusMode::OnFocusOrScan(const FInputActionValue& actionValue)
 
 	if (focusPressingTime > focusModeThreshold)
 	{
+		if (me)
+		{
+			if (IsValid(me->ui))
+			{
+				me->ui->OnFocusModeToggle(bIsTracking);
+			}
+		}
+		
 		focusDome->Activate();
 		onEventCameraModeChanged.Execute(EPlayerCameraMode::Focus);
 	}
@@ -100,13 +116,26 @@ void UPlayerFocusMode::EndFocusOrScan()
 	SetVisibleFocusMode(currentMode != EPlayerCameraMode::Focus);
 }
 
+void UPlayerFocusMode::OnToggleTracking()
+{
+	bIsTracking = !bIsTracking;
+	
+	if (me)
+	{
+		if (IsValid(me->ui))
+		{
+			me->ui->OnFocusModeToggle(bIsTracking);
+		}
+	}
+}
+
 void UPlayerFocusMode::SetVisibleFocusMode(bool visible)
 {
 	// PrintLogFunc(TEXT("SetVisibleFocusMode %s"), (visible? TEXT("true") : TEXT("false")));
 	if (Boss)
 	{
 		Boss->ChangeToFocusModeMat(visible);
-		Boss->SetVisibilitySpline(visible);
+		Boss->SetVisibilitySpline(bIsTracking || visible);
 	}
 }
 
