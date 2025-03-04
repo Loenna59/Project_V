@@ -227,6 +227,11 @@ bool APlayCharacter::IsNotAnchoredMode()
 
 void APlayCharacter::HitDamage(float damage, FVector forward)
 {
+	if (currentHealth <= 0)
+	{
+		return;
+	}
+	
 	float degrees;	
 
 	TakeDamageInternal(damage, forward, degrees);
@@ -251,6 +256,11 @@ void APlayCharacter::HitDamage(float damage, FVector forward)
 
 void APlayCharacter::HitLargeDamage(float damage, FVector forward)
 {
+	if (currentHealth <= 0)
+	{
+		return;
+	}
+	
 	float degrees;	
 
 	TakeDamageInternal(damage, forward, degrees);
@@ -260,10 +270,7 @@ void APlayCharacter::HitLargeDamage(float damage, FVector forward)
 
 void APlayCharacter::TakeDamageInternal(float damage, FVector forward, float& degrees)
 {
-	if (currentHealth <= 0)
-	{
-		return;
-	}
+	movementComp->EndDodge();
 	
 	currentHealth = FMath::Clamp(currentHealth - damage, 0, maxHealth);
 	ui->SetHealthUI(currentHealth, maxHealth);
