@@ -131,11 +131,13 @@ void AMachineGunBullet::SetBulletActive(bool value) const
 	{
 		//PRINTLOG(TEXT("call bullet"));
 		PMC->SetActive(true);
+		//Root->SetCollisionProfileName("EnemyProjectile");
 		Mesh->SetVisibility(true);
 	}
 	else
 	{
 		PMC->SetActive(false);
+		//Root->SetCollisionProfileName("NoCollision");
 		Mesh->SetVisibility(false);
 	}
 }
@@ -152,6 +154,7 @@ void AMachineGunBullet::BackToMagazine()
 	SetBulletActive(false);
 	if (Boss)
 	{
+		SetActorLocation(FVector(10000));
 		Boss->Magazine.Add(this);
 	}
 }

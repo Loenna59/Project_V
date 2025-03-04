@@ -31,6 +31,7 @@ void AMachineGun::BeginPlay()
 	for (int32 i = 0; i < BulletMaxCount; i++)
 	{
 		auto* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory);
+		bullet->SetActorLocation(FVector(10000));
 		bullet->SetBulletActive(false);
 		Boss->Magazine.Add(bullet);
 	}
