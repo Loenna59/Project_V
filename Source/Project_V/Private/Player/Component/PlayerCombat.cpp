@@ -466,6 +466,14 @@ void UPlayerCombat::SetVisibleEquippedWeapon(bool visible)
 	}
 }
 
+void UPlayerCombat::SetVisibleKatana(bool visible)
+{
+	if (katana->IsValidLowLevel())
+	{
+		katana->SetVisibility(visible);
+	}
+}
+
 void UPlayerCombat::OnStartTraceKatanaChannel()
 {
 	katanaPlayState = KatanaPlayState::Acting;

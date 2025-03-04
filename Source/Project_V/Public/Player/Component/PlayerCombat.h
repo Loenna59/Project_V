@@ -137,6 +137,8 @@ public:
 
 	void SetVisibleEquippedWeapon(bool visible);
 
+	void SetVisibleKatana(bool visible);
+
 	void OnStartTraceKatanaChannel();
 	
 	void OnEndTraceKatanaChannel();

@@ -313,4 +313,6 @@ void APlayCharacter::SetVisible(bool visible)
 {
 	GetMesh()->SetVisibility(visible);
 	combatComp->SetVisibleEquippedWeapon(visible);
+	combatComp->SetVisibleKatana(visible);
+	sheath->SetVisibility(visible);
 }
