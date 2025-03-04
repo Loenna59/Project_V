@@ -132,7 +132,7 @@ void AThunderJaw::InitConstruct()
 		FloatingTextFactory = tempFloatingText.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<APawn> tempRadarEffect(TEXT("'/Game/Blueprints/Boss/BP_RadarEffect.BP_RadarEffect_C'"));
+	ConstructorHelpers::FClassFinder<AActor> tempRadarEffect(TEXT("'/Game/Blueprints/Boss/BP_RadarEffect.BP_RadarEffect_C'"));
 	if (tempRadarEffect.Succeeded())
 	{
 		RadarEffectFactory = tempRadarEffect.Class;

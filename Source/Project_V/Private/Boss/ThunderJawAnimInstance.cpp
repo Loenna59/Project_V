@@ -103,6 +103,9 @@ void UThunderJawAnimInstance::AnimNotify_MakeRadarEffect()
 	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
 	if (boss)
 	{
-		GetWorld()->SpawnActor<AActor>(boss->GetRadarEffectFactory());
+		FTransform t = boss->GetActorTransform();
+		t.SetScale3D(FVector(0.1));
+		
+		GetWorld()->SpawnActor<AActor>(boss->GetRadarEffectFactory(),t);
 	}
 }

@@ -103,7 +103,6 @@ void AThunderJawAIController::InitComponent()
 
 void AThunderJawAIController::MoveToPlayer()
 {
-	PRINT_CALLINFO();
 	if (!Boss->GetAloy())
 	{
 		return;
