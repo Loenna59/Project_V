@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputAction.h"
+#include "Project_V.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Player/PlayCharacter.h"
 #include "Player/PlayerAnimInstance.h"
@@ -205,8 +206,7 @@ void UPlayerMovement::StartDodge()
 	{
 		return;
 	}
-
-	onEventCameraModeChanged.Execute(EPlayerCameraMode::Default);
+	
 	anim->OnStartDodge();
 }
 
