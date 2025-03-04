@@ -49,7 +49,20 @@ void ADisc::InitComponents()
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(0.4));
+		Mesh->SetRelativeScale3D(FVector(0.05));
+		Mesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	}
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/Fab/UFO_Doodle/scene.scene'"));
+	if (tempMesh.Succeeded())
+	{
+		Mesh->SetStaticMesh(tempMesh.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Fab/UFO_Doodle/Ovni.Ovni'"));
+	if (tempMat.Succeeded())
+	{
+		Mesh->SetMaterial(0,tempMat.Object);
 	}
 
 	FirePos = CreateDefaultSubobject<UArrowComponent>(TEXT("FirePos"));

@@ -56,7 +56,7 @@ void AMachineGun::InitComponents()
 	{
 		Mesh->SetupAttachment(Root);
 		Mesh->SetRelativeLocation(FVector(14.701525,0.000000,-6.119322));
-		Mesh->SetRelativeScale3D(FVector(1.500000,2.000000,2.000000));
+		Mesh->SetRelativeScale3D(FVector(2.5));
 		Mesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	}
 
