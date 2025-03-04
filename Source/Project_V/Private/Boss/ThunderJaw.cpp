@@ -124,8 +124,6 @@ void AThunderJaw::InitConstruct()
 		TailSound = tempTailSound.Object;
 	}
 	
-	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
-
 	ConstructorHelpers::FClassFinder<UUserWidget> tempFloatingText(TEXT("'/Game/Blueprints/UI/WBP_DamageUI.WBP_DamageUI_C'"));
 	if (tempFloatingText.Succeeded())
 	{
@@ -137,6 +135,8 @@ void AThunderJaw::InitConstruct()
 	{
 		RadarEffectFactory = tempRadarEffect.Class;
 	}
+	
+	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 }
 
 void AThunderJaw::InitBeginPlay()
