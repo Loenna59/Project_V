@@ -46,7 +46,6 @@ void ABossWeapon::CheckFocusModeAndChangeMat(bool focusMode)
 {
 	if (focusMode)
 	{
-		PRINT_CALLINFO();
 		Mesh->SetOverlayMaterial(WeakPartsMatInst);
 	}
 	else

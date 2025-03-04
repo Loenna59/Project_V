@@ -94,7 +94,7 @@ void UThunderJawAnimInstance::AnimNotify_PlayTailSound()
 		boss->SoundInstance->SetSound(boss->TailSound);
 		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
 		boss->SoundInstance->Play();
-		boss->SoundInstance->SetVolumeMultiplier(1.0f);
+		boss->SoundInstance->SetVolumeMultiplier(2.0f);
 	}
 }
 

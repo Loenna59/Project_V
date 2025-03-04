@@ -129,7 +129,7 @@ protected:
 public:
 #pragma region SettingVariance
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	float MaxHP{1000.0};
+	float MaxHP{5000.0};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float CurrentHP{CurrentHP = MaxHP};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")

@@ -20,12 +20,16 @@ void UBossLookOutState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RadarTimerHandle);
 	}
-	
-	GetWorld()->GetTimerManager().SetTimer(RadarTimerHandle,[this,Boss]()
+
+	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
+	GetWorld()->GetTimerManager().SetTimer(RadarTimerHandle,[this,WeakBoss]()
 	{
-		bUsingRadar = true;
-		Boss->GetBossAnimInstance()->OnPlayRadarMontage();
-		Boss->GetBossAIController()->StopMovement();
+		if (WeakBoss.IsValid())
+		{
+			bUsingRadar = true;
+			WeakBoss->GetBossAnimInstance()->OnPlayRadarMontage();
+			WeakBoss->GetBossAIController()->StopMovement();
+		}
 	},RadarUsingTime,true);
 }
 
