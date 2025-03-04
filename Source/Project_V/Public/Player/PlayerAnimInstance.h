@@ -18,6 +18,15 @@ enum class EWeaponType : uint8
 	Caster
 };
 
+UENUM(BlueprintType)
+enum class EDamageDirection : uint8
+{
+	Front,
+	Back,
+	Left,
+	Right
+};
+
 UCLASS()
 class PROJECT_V_API UPlayerAnimInstance : public UAnimInstance
 {
@@ -83,12 +92,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EWeaponType weaponType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float damagedDegree;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	bool damaged;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool isDead;
 
@@ -101,7 +104,7 @@ public:
 	void OnStartDodge();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamaged(float degrees);
+	void OnDamaged(EDamageDirection direction);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLargeDamaged(float degrees);

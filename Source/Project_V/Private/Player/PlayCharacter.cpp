@@ -230,8 +230,23 @@ void APlayCharacter::HitDamage(float damage, FVector forward)
 	float degrees;	
 
 	TakeDamageInternal(damage, forward, degrees);
+
+	EDamageDirection dir = EDamageDirection::Front;
+
+	if (degrees >= 270)
+	{
+		dir = EDamageDirection::Right;
+	}
+	else if (degrees >= 180)
+	{
+		dir = EDamageDirection::Back;
+	}
+	else if (degrees >= 90)
+	{
+		dir = EDamageDirection::Left;
+	}
 	
-	anim->OnDamaged(degrees);
+	anim->OnDamaged(dir);
 }
 
 void APlayCharacter::HitLargeDamage(float damage, FVector forward)
