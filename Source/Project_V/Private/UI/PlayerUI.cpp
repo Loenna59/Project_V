@@ -25,3 +25,8 @@ void UPlayerUI::ChangeEquippedWeaponUI(bool isBow)
 {
 	EquippedWeaponUI->SetVisible(isBow);
 }
+
+void UPlayerUI::OnFocusModeToggle(bool isTracking)
+{
+	FocusModeUI->OnToggle(isTracking);
+}

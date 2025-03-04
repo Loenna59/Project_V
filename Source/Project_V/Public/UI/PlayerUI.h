@@ -33,4 +33,6 @@ public:
 	void SetHealthUI(float current, float max);
 	
 	void ChangeEquippedWeaponUI(bool isBow);
+
+	void OnFocusModeToggle(bool isTracking);
 };

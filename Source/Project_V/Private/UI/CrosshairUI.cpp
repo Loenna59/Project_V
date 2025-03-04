@@ -8,6 +8,6 @@
 void UCrosshairUI::UpdateCircle(float strength)
 {
 
-	float value = FMath::Lerp(1, 0.15f, strength * 0.01f);
+	float value = FMath::Lerp(1, 0.4f, strength * 0.01f);
 	Circle->SetRenderScale(FVector2D::One() * value);
 }

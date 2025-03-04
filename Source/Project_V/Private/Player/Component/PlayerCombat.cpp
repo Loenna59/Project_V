@@ -186,6 +186,7 @@ void UPlayerCombat::OnAnchor()
 			katanaPlayState = KatanaPlayState::Unequipped;
 			katana->AttachSocket(me->GetMesh(), katana->GetSlotSocket(), false);
 			anim->isHoldingKatana = false;
+			OnEndKatanaCombo();
 		}
 		else
 		{
@@ -283,7 +284,8 @@ void UPlayerCombat::OnMeleeAttack()
 {
 	if (katanaPlayState == KatanaPlayState::Holding)
 	{
-		anim->OnComboKatana();
+		anim->OnComboKatana(comboIndex);
+		comboIndex = (comboIndex + 1) % 4;
 		return;
 	}
     
@@ -466,6 +468,14 @@ void UPlayerCombat::SetVisibleEquippedWeapon(bool visible)
 	}
 }
 
+void UPlayerCombat::SetVisibleKatana(bool visible)
+{
+	if (katana->IsValidLowLevel())
+	{
+		katana->SetVisibility(visible);
+	}
+}
+
 void UPlayerCombat::OnStartTraceKatanaChannel()
 {
 	katanaPlayState = KatanaPlayState::Acting;
@@ -484,5 +494,17 @@ void UPlayerCombat::OnEndTraceKatanaChannel()
 	}
 	StartTimerPutWeapon();
 }
+
+void UPlayerCombat::OnEndKatanaAnimState()
+{
+	anim->isHoldingKatana = false;
+}
+
+void UPlayerCombat::OnEndKatanaCombo()
+{
+	comboIndex = 0;
+}
+
+
 
 
