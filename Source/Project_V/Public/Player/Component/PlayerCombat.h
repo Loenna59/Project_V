@@ -84,6 +84,12 @@ public:
 	class UInputAction* ia_fire;
 
 	UPROPERTY()
+	class UInputAction* ia_quick;
+
+	UPROPERTY()
+	class UInputAction* ia_wheel;
+
+	UPROPERTY()
 	class UCameraComponent* cameraComp;
 
 	UFUNCTION()
@@ -97,6 +103,12 @@ public:
 
 	UFUNCTION()
 	void OnReleasedFire(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void OnSwapWeapon(const FInputActionValue& actionValue);
+
+	UFUNCTION()
+	void OnWheelWeapon(const FInputActionValue& actionValue);
 
 	UFUNCTION()
 	void OnMeleeAttack();

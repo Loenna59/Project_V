@@ -4,6 +4,7 @@
 #include "Player/Component/PlayerCombat.h"
 
 #include "EnhancedInputComponent.h"
+#include "Project_V.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
@@ -35,6 +36,20 @@ UPlayerCombat::UPlayerCombat()
 	if (tmp_ia_fire.Succeeded())
 	{
 		ia_fire = tmp_ia_fire.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_quick(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerQuick.IA_PlayerQuick'"));
+
+	if (tmp_ia_quick.Succeeded())
+	{
+		ia_quick = tmp_ia_quick.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> tmp_ia_wheel(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/IA_PlayerWheel.IA_PlayerWheel'"));
+
+	if (tmp_ia_wheel.Succeeded())
+	{
+		ia_wheel = tmp_ia_wheel.Object;
 	}
 
 	ConstructorHelpers::FClassFinder<AKatana> tmp_katana(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Katana.BP_Katana_C'"));
@@ -74,14 +89,12 @@ void UPlayerCombat::BeginPlay()
 	
 	if ((bow = GetWorld()->SpawnActor<APlayerRangedWeapon>(bowFactory)))
 	{
-		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		bow->SpawnArrowInBow();
 		bow->AttachSocket(me->GetMesh(), TEXT("BowSocket"), false);
 	}
 
 	if ((tripcaster = GetWorld()->SpawnActor<APlayerRangedWeapon>(tripcasterFactory)))
 	{
-		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
 		tripcaster->SpawnArrowInBow();
 		tripcaster->AttachSocket(me->GetMesh(), TEXT("CasterSocket"), false);
 		tripcaster->SetVisibility(false);
@@ -94,7 +107,10 @@ void UPlayerCombat::BeginPlay()
 		anim->SetWeaponAnim(bow->GetAnimInstance());
 	}
 
-	ChangeWeapon(bow);
+	currentRangedWeapon = bow;
+	anim->weaponType = bow->GetWeaponType();
+	bIsCompleteReload = true;
+	anim->weaponChanged = true;
 }
 
 FVector UPlayerCombat::CalculateAnimToVector()
@@ -121,6 +137,8 @@ void UPlayerCombat::SetupInputBinding(class UEnhancedInputComponent* input)
 	input->BindAction(ia_fire, ETriggerEvent::Triggered, this, &UPlayerCombat::OnPressedFire);
 	input->BindAction(ia_fire, ETriggerEvent::Completed, this, &UPlayerCombat::OnReleasedFire);
 	input->BindAction(ia_fire, ETriggerEvent::Started, this, &UPlayerCombat::OnMeleeAttack);
+	input->BindAction(ia_quick, ETriggerEvent::Triggered, this, &UPlayerCombat::OnSwapWeapon);
+	input->BindAction(ia_wheel, ETriggerEvent::Triggered, this, &UPlayerCombat::OnWheelWeapon);
 }
 
 void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
@@ -153,6 +171,11 @@ void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
 
 void UPlayerCombat::OnAnchor()
 {
+	if (katanaPlayState == KatanaPlayState::Acting)
+	{
+		return;
+	}
+	
 	onEventCameraModeChanged.Execute(EPlayerCameraMode::Anchored);
 	
 	if (holdingWeapon.IsValid())
@@ -224,6 +247,36 @@ void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 
 	bIsCompleteReload = false;
 	SetDrawStrength(0);
+}
+
+void UPlayerCombat::OnSwapWeapon(const FInputActionValue& actionValue)
+{
+	float value = actionValue.Get<float>();
+	int32 intValue = FMath::Floor(value);
+
+	switch (intValue)
+	{
+	case 1:
+		ChangeWeapon(bow);
+		break;
+	case 2:
+		ChangeWeapon(tripcaster);
+		break;
+	default:
+		break;
+	}
+}
+
+void UPlayerCombat::OnWheelWeapon(const FInputActionValue& actionValue)
+{
+	if (currentRangedWeapon == bow)
+	{
+		ChangeWeapon(tripcaster);
+	}
+	else
+	{
+		ChangeWeapon(bow);
+	}
 }
 
 void UPlayerCombat::OnMeleeAttack()
@@ -335,7 +388,7 @@ void UPlayerCombat::ChangeWeapon(APlayerRangedWeapon* weapon)
 	
 	bIsCompleteReload = true;
 	
-	// me->ui->ChangeEquippedWeaponUI(weapon->IsBase());
+	me->ui->ChangeEquippedWeaponUI(weapon->GetWeaponType() == EWeaponType::Base);
 
 	if (me->GetPlayerCameraMode() != EPlayerCameraMode::Anchored)
 	{

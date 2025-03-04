@@ -21,7 +21,7 @@ void UPlayerUI::SetHealthUI(float current, float max)
 	HealthUI->SetProgress(current, max);
 }
 
-void UPlayerUI::ChangeEquippedWeaponUI(bool isBase)
+void UPlayerUI::ChangeEquippedWeaponUI(bool isBow)
 {
-	EquippedWeaponUI->SetVisible(isBase);
+	EquippedWeaponUI->SetVisible(isBow);
 }

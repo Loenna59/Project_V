@@ -162,8 +162,6 @@ void APlayCharacter::BeginPlay()
 	movementComp->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
-
-	// voiceComp->SetSound(damagedVoice);
 }
 
 // Called to bind functionality to input
