@@ -59,7 +59,7 @@ void ADisc::InitComponents()
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Game/Fab/UFO_Doodle/Ovni.Ovni'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat(TEXT("'/Game/Fab/UFO_Doodle/Ovni.Ovni'"));
 	if (tempMat.Succeeded())
 	{
 		Mesh->SetMaterial(0,tempMat.Object);

@@ -74,19 +74,19 @@ void AMachineGun::InitComponents()
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun.HandRailGun'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat0(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun.HandRailGun'"));
 	if (tempMat0.Succeeded())
 	{
 		Mesh->SetMaterial(0,tempMat0.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat1(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_glass.HandRailGun_glass'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat1(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_glass.HandRailGun_glass'"));
 	if (tempMat1.Succeeded())
 	{
 		Mesh->SetMaterial(1,tempMat1.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat2(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_screen.HandRailGun_screen'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat2(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_screen.HandRailGun_screen'"));
 	if (tempMat2.Succeeded())
 	{
 		Mesh->SetMaterial(2,tempMat2.Object);

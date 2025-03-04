@@ -57,19 +57,19 @@ void ADiscLauncher::InitComponents()
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_001.Material_001'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat0(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_001.Material_001'"));
 	if (tempMat0.Succeeded())
 	{
 		Mesh->SetMaterial(0,tempMat0.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat1(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_002.Material_002'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat1(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_002.Material_002'"));
 	if (tempMat1.Succeeded())
 	{
 		Mesh->SetMaterial(1,tempMat1.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat2(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_003.Material_003'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempMat2(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_003.Material_003'"));
 	if (tempMat2.Succeeded())
 	{
 		Mesh->SetMaterial(2,tempMat2.Object);
