@@ -113,7 +113,7 @@ public:
 	void OnStartKatana();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnComboKatana();
+	void OnComboKatana(int32 index);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHideKatana();

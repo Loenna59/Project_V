@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NotifyStateKatana.h"
+#include "Player/NotifyStateKatana.h"
 
 #include "Player/Component/PlayerCombat.h"
 

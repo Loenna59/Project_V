@@ -41,6 +41,8 @@ protected:
 
 	bool bIsCompleteReload = false; // 활 시위 경과 시간
 
+	int32 comboIndex = 0;
+
 	FVector CalculateAnimToVector();
 	
 	// Called when the game starts
@@ -142,6 +144,10 @@ public:
 	void OnStartTraceKatanaChannel();
 	
 	void OnEndTraceKatanaChannel();
+
+	void OnEndKatanaAnimState();
+
+	void OnEndKatanaCombo();
 
 	void SetDrawStrength(float strength);
 	
