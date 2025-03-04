@@ -125,7 +125,6 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 			auto* player = Boss->GetAloy();
 			if (player)
 			{
-				PRINTLOG(TEXT("%s"),*Stimulus.GetDebugDescription());
 				// 플레이어가 감지됨
 				// 경계모드로 변환 된 상태이면 감지됐던 장소를 저장
 				PRINTLOG(TEXT("Target is in Sight"));
