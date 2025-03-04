@@ -11,10 +11,17 @@ UCLASS()
 class PROJECT_V_API AArrow : public APlayerProjectile
 {
 	GENERATED_BODY()
+
+protected:
+	bool bStartFire = false;
 	
-public:	
-	// Sets default values for this actor's properties
+public:
+	UPROPERTY(VisibleAnywhere)
+	class USphereComponent* hitCollision;
+	
 	AArrow();
 	
 	virtual void DestroyAfterPlayFX() override;
+
+	virtual void Fire(FVector to, float alpha, bool ortho) override;
 };

@@ -10,6 +10,7 @@
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Player/Weapon/Arrow.h"
 
 
@@ -122,7 +123,7 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	PRINTLOG(TEXT("%s"),*OtherActor->GetName());
 	auto* arrow = Cast<AArrow>(OtherActor);
-	if (arrow)
+	if (arrow && arrow->hitCollision->IsCollisionEnabled())
 	{
 		DamageWeaponHP(100);
 		Boss->BossTakeDamage(150);

@@ -10,6 +10,7 @@
 #include "Boss/Weapon/Disc.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Player/Weapon/Arrow.h"
 
 
@@ -99,7 +100,7 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	PRINTLOG(TEXT("%s"),*OtherActor->GetName());
 	auto* arrow = Cast<AArrow>(OtherActor);
-	if (arrow)
+	if (arrow && arrow->hitCollision->IsCollisionEnabled())
 	{
 		DamageWeaponHP(100);
 		Boss->BossTakeDamage(150);
