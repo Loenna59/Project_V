@@ -15,7 +15,7 @@ void UNotifyStateKatana::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
 	{
 		if (UPlayerCombat* combatComp = Cast<UPlayerCombat>(owner->GetDefaultSubobjectByName("PlayerCombat")))
 		{
-			combatComp->katanaPlayState = KatanaPlayState::Acting;
+			combatComp->OnStartTraceKatanaChannel();
 		}
 	}
 }
@@ -30,8 +30,7 @@ void UNotifyStateKatana::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequen
 	{
 		if (UPlayerCombat* combatComp = Cast<UPlayerCombat>(owner->GetDefaultSubobjectByName("PlayerCombat")))
 		{
-			combatComp->katanaPlayState = KatanaPlayState::Holding;
-			combatComp->StartTimerPutWeapon();
+			combatComp->OnEndTraceKatanaChannel();
 		}
 	}
 }

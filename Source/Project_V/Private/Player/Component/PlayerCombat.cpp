@@ -4,7 +4,6 @@
 #include "Player/Component/PlayerCombat.h"
 
 #include "EnhancedInputComponent.h"
-#include "Project_V.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayCharacter.h"
@@ -466,5 +465,23 @@ void UPlayerCombat::SetVisibleEquippedWeapon(bool visible)
 	}
 }
 
+void UPlayerCombat::OnStartTraceKatanaChannel()
+{
+	katanaPlayState = KatanaPlayState::Acting;
+	if (katana->IsValidLowLevel())
+	{
+		katana->StartTraceChannel();
+	}
+}
+
+void UPlayerCombat::OnEndTraceKatanaChannel()
+{
+	katanaPlayState = KatanaPlayState::Holding;
+	if (katana->IsValidLowLevel())
+	{
+		katana->EndTraceChannel();
+	}
+	StartTimerPutWeapon();
+}
 
 

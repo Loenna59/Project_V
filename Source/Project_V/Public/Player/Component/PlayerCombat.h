@@ -137,6 +137,10 @@ public:
 
 	void SetVisibleEquippedWeapon(bool visible);
 
+	void OnStartTraceKatanaChannel();
+	
+	void OnEndTraceKatanaChannel();
+
 	void SetDrawStrength(float strength);
 	
 	float GetDrawStrength() const
