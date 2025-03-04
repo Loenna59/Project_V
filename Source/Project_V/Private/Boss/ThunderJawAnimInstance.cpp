@@ -94,6 +94,18 @@ void UThunderJawAnimInstance::AnimNotify_PlayTailSound()
 		boss->SoundInstance->SetSound(boss->TailSound);
 		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
 		boss->SoundInstance->Play();
-		boss->SoundInstance->SetVolumeMultiplier(1.0f);
+		boss->SoundInstance->SetVolumeMultiplier(2.0f);
+	}
+}
+
+void UThunderJawAnimInstance::AnimNotify_MakeRadarEffect()
+{
+	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
+	if (boss)
+	{
+		FTransform t = boss->GetActorTransform();
+		t.SetScale3D(FVector(0.1));
+		
+		GetWorld()->SpawnActor<AActor>(boss->GetRadarEffectFactory(),t);
 	}
 }

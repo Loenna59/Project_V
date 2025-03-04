@@ -18,7 +18,7 @@ void UBossCombatState::Enter(AThunderJaw* Boss, UThunderJawFSM* FSM)
 {
 	Super::Enter(Boss, FSM);
 	Boss->ChangeEyeColor(FLinearColor(1,0,0),2000);
-	Boss->WidgetComp->SetVisibility(true);
+	Boss->GetWidgetComponent()->SetVisibility(true);
 	InitComponents(Boss);
 }
 
@@ -141,15 +141,17 @@ void UBossCombatState::MakeTraceBoxAndCheckHit(FVector start, FVector end, FVect
 		BoxColor = FColor::Green;
 	}
 	
-	// 박스 디버깅
-	// int NumSteps = 10;
-	// for (int i = 0; i <= NumSteps; i++)
-	// {
-	// 	float Alpha = (float)i / NumSteps;
-	// 	FVector DebugLocation = FMath::Lerp(start, end, Alpha);
-	//
-	// 	DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
-	// }
+	if (Boss->GetBossAIController()->bDebugMode)
+	{
+		int NumSteps = 10;
+		for (int i = 0; i <= NumSteps; i++)
+		{
+			float Alpha = (float)i / NumSteps;
+			FVector DebugLocation = FMath::Lerp(start, end, Alpha);
+		
+			DrawDebugBox(GetWorld(), DebugLocation, boxHalfSize, FQuat::Identity, BoxColor, false, 0.1f);
+		}
+	}
 }
 
 void UBossCombatState::Attack(AThunderJaw* Boss)
@@ -171,6 +173,9 @@ void UBossCombatState::Attack(AThunderJaw* Boss)
 	case EAttackPattern::MouseLaser:
 		MouseLaser(Boss);
 		break;
+	case EAttackPattern::ChasePlayer:
+		ChasePlayer(Boss);
+		break;
 	default:
 		break;
 	}
@@ -186,30 +191,23 @@ void UBossCombatState::StartChoosingPatternCycle(AThunderJaw* Boss)
 	}
 
 	bIsDelay = true;
-	InitComponents(Boss);
-
 	TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
-	auto callBack = [this,WeakBoss]()
-	{
-		if (WeakBoss.IsValid())
-		{
-			DelayEndBeforeChoosingPattern(WeakBoss.Get());
-		}
-	};
 	GetWorld()->GetTimerManager().SetTimer(PatternTimerHandle,
-		FTimerDelegate::CreateLambda(callBack),PatternDelay,false);
-}
-
-void UBossCombatState::DelayEndBeforeChoosingPattern(AThunderJaw* Boss)
-{
-	PRINTLOG(TEXT("PatternDelayEnd"));
-	bIsDelay = false;
-	ChoosePattern(Boss);
+		[this,WeakBoss]()
+		{
+			if (WeakBoss.IsValid())
+			{
+				ChoosePattern(WeakBoss.Get());
+			}
+		},PatternDelay,false);
 }
 
 void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("ChoosePattern"));
+	bIsDelay = false;
+	InitComponents(Boss);
+	
 	if (Boss->GetFSMComponent()->GetCurrentState()->BossState != EBossState::Combat)
 	{
 		return;
@@ -230,7 +228,8 @@ void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 		Boss->GetBossAIController()->StopMovement();
 
 		// 랜덤 패턴 고를 때 부위파괴 된 패턴이 걸리면 돌진으로 바꿈
-		int32 randomNum = MakeRandomRangeNum(Boss);
+		//int32 randomNum = MakeRandomRangeNum(Boss);
+		int32 randomNum = 2;
 		if (randomNum == 1)
 		{
 			PRINTLOG(TEXT("Using Charge"));
@@ -259,7 +258,9 @@ void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 	}
 	else
 	{
-		Boss->GetBossAIController()->MoveToPlayer();
+		PRINTLOG(TEXT("Using ChasePlayer"));
+		PatternTime = 1;
+		UsingPattern = EAttackPattern::ChasePlayer;
 	}
 }
 
@@ -289,13 +290,12 @@ void UBossCombatState::Charge(AThunderJaw* Boss)
 		PerposeLocation = (Boss->GetAloy()->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
 
 		TWeakObjectPtr<AThunderJaw> WeakBoss = Boss;
-		
 		GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle,[this, WeakBoss]()
 		{
 			if (WeakBoss.IsValid())
 			{
 				ChargeStart = true;
-				WeakBoss.Get()->GetCharacterMovement()->MaxWalkSpeed *= 4.0;
+				WeakBoss->GetCharacterMovement()->MaxWalkSpeed *= 4.0;
 			}
 		},recoilTime,false);
 	}
@@ -330,24 +330,23 @@ void UBossCombatState::Tail(AThunderJaw* Boss)
 
 	FVector TailStart = Boss->GetMesh()->GetSocketLocation(TEXT("tail"));
 	FVector TailEnd = Boss->GetMesh()->GetSocketLocation(TEXT("tail6"));
-	FVector BoxHalfSize = FVector(300,300,200);
+	FVector BoxHalfSize = FVector(400,400,400);
 	MakeTraceBoxAndCheckHit(TailStart,TailEnd,BoxHalfSize,Boss);
 	Boss->GetBossAnimInstance()->OnPlayTailMontage();
 }
 
 void UBossCombatState::MachineGun(AThunderJaw* Boss)
 {
-	// 임시방편 코드
-	// 머신건이 둘 다 부숴졌으면 return
-	// TODO
-	// 머신건이 전부 부숴졌으면 패턴 목록에서 지워라
 	if (!Boss->GetLMachineGun() && !Boss->GetRMachineGun())
 	{
 		PatternTime = 0;
 		return;
 	}
-	
-	//Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
+
+	if (Boss->GetBossAIController()->bDebugMode)
+	{
+		Boss->DrawDebugCircle(GetWorld(),Boss->GetAloy()->GetActorLocation(),300.0f);
+	}
 
 	// 회전하면서 쏠 때 timer에 loop로 처리하면 위치값이 업데이트 안되는 현상발생
 	// timer를 사용하지 않고 직접 time을 받아서 사용하도록 함
@@ -417,3 +416,14 @@ void UBossCombatState::MouseLaser(AThunderJaw* Boss)
 	PRINTLOG(TEXT("Using MouseLaser"));
 }
 
+void UBossCombatState::ChasePlayer(AThunderJaw* Boss)
+{
+	if (Boss->GetBossAIController()->DistanceFromTarget <= Boss->RangeAttackDist)
+	{
+		PatternTime = 0;
+		Boss->GetBossAIController()->StopMovement();
+		return;
+	}
+	
+	Boss->GetBossAIController()->MoveToPlayer();
+}

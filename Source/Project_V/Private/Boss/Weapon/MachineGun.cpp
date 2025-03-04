@@ -9,7 +9,6 @@
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/Weapon/MachineGunBullet.h"
 #include "Components/ArrowComponent.h"
-#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Player/Weapon/Arrow.h"
 
@@ -28,10 +27,17 @@ void AMachineGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MaxHP = 100.0f;
+	
+	for (int32 i = 0; i < BulletMaxCount; i++)
+	{
+		auto* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory);
+		bullet->SetBulletActive(false);
+		Boss->Magazine.Add(bullet);
+	}
+
+	MaxHP = 200.0f;
 	CurrentHP = MaxHP;
 	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGun::OnMachineGunOverlap);
-
 }
 
 void AMachineGun::InitComponents()
@@ -79,10 +85,20 @@ void AMachineGun::InitComponents()
 
 void AMachineGun::CreateBullet(FTransform transform, FVector Target)
 {
-	AMachineGunBullet* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
-	if (bullet)
+	// AMachineGunBullet* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory,transform);
+	// if (bullet)
+	// {
+	// 	bullet->FireToTarget(Target, RandomSprayRadius);
+	// }
+
+	if (Boss->Magazine.Num() > 0)
 	{
-		bullet->FireToTarget(Target, RandomSprayRadius);
+		auto* bullet = Boss->Magazine[0];
+		bullet->SetBulletActive(true);
+		bullet->SetActorTransform(transform);
+		bullet->FireToTarget(Target,RandomSprayRadius);
+		bullet->PlayGunSound();
+		Boss->Magazine.RemoveAt(0);
 	}
 }
 
@@ -93,8 +109,8 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 	auto* arrow = Cast<AArrow>(OtherActor);
 	if (arrow)
 	{
-		DamageWeaponHP(50);
-		Boss->BossTakeDamage(50);
+		DamageWeaponHP(100);
+		Boss->BossTakeDamage(150);
 
 		PRINTLOG(TEXT("%s hit, hp : %f"),*this->GetName(), this->CurrentHP);
 		Boss->GetBossAIController()->DetectedTarget = true;

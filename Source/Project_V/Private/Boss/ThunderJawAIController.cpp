@@ -7,7 +7,6 @@
 #include "Boss/ThunderJaw.h"
 #include "Boss/ThunderJawFSM.h"
 #include "Boss/State/BossBaseState.h"
-#include "Boss/State/BossCombatState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -46,7 +45,7 @@ void AThunderJawAIController::Tick(float DeltaTime)
 		return;
 	}
 
-	if (!Boss->bIsLSEnd || Boss->bDie)
+	if (!Boss->bIsLevelSequenceEnd || Boss->bDie)
 	{
 		return;
 	}
@@ -99,13 +98,11 @@ void AThunderJawAIController::InitComponent()
 	
 	AIPC->ConfigureSense(*SightConfig);
 	AIPC->SetDominantSense(SightConfig->GetSenseImplementation());
-
 	DetectedTarget = false;
 }
 
 void AThunderJawAIController::MoveToPlayer()
 {
-	PRINT_CALLINFO();
 	if (!Boss->GetAloy())
 	{
 		return;
@@ -125,7 +122,7 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
-			auto* player = Cast<APlayCharacter>(Actor);
+			auto* player = Boss->GetAloy();
 			if (player)
 			{
 				// 플레이어가 감지됨
@@ -134,7 +131,6 @@ void AThunderJawAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus
 				DetectedTarget = true;
 				Boss->GetFSMComponent()->bIsArrivedDetectedLocation = false;
 				DetectedLocation = player->GetActorLocation();
-				PRINTLOG(TEXT("DetectedLocation : %f,%f,%f"),DetectedLocation.X,DetectedLocation.Y,DetectedLocation.Z);
 			}
 		}
 	}
@@ -184,7 +180,7 @@ void AThunderJawAIController::EvaluateTargetDistance(float DeltaTime)
 	else if (DistanceFromTarget > CombatDist && DistanceFromTarget < SightConfig->LoseSightRadius)
 	{
 		// Radar Pattern 생기면 실행할 부분
-		PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
+		//PRINTLOG(TEXT("LoseTargetTime %f"), LoseTargetTime);
 		if (bossFSM->GetCurrentState()->BossState != EBossState::Combat)
 		{
 			LoseTargetTime += DeltaTime;
@@ -207,6 +203,7 @@ void AThunderJawAIController::CheckTargetThroughStimulus()
 	{
 		if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 		{
+			//PRINTLOG(TEXT("%f"),Stimulus.GetAge());
 			if (Stimulus.GetAge() > SightConfig->GetMaxAge() ||
 				LoseTargetTime > SightConfig->GetMaxAge())
 			{

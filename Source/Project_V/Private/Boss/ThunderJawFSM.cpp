@@ -35,7 +35,7 @@ void UThunderJawFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!Boss->bIsLSEnd || Boss->bDie)
+	if (!Boss->bIsLevelSequenceEnd || Boss->bDie)
 	{
 		return;
 	}
@@ -107,14 +107,13 @@ bool UThunderJawFSM::GetRandomLocationFromNavMesh(FVector CenterLocation, float 
 	float Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
 
 
-	while (Dist < Radius / 2.0)
+	while (Dist < Radius)
 	{
 		bResult = NavSystem->GetRandomReachablePointInRadius(CenterLocation,Radius,Loc);
 		Dist = FVector::Distance(Boss->GetActorLocation(),Loc.Location);
 	}
 	
 	Dest = Loc.Location;
-	PRINTLOG(TEXT("randomLoc : %f,%f,%f"),Dest.X,Dest.Y,Dest.Z);
 	return bResult;
 }
 

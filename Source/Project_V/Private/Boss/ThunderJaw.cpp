@@ -18,6 +18,7 @@
 #include "Player/PlayCharacter.h"
 #include "Player/Weapon/Arrow.h"
 #include "Player/Weapon/Wire.h"
+#include "UI/DamageUI.h"
 
 
 // Sets default values
@@ -123,9 +124,19 @@ void AThunderJaw::InitConstruct()
 		TailSound = tempTailSound.Object;
 	}
 	
-	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	ConstructorHelpers::FClassFinder<UUserWidget> tempFloatingText(TEXT("'/Game/Blueprints/UI/WBP_DamageUI.WBP_DamageUI_C'"));
+	if (tempFloatingText.Succeeded())
+	{
+		FloatingTextFactory = tempFloatingText.Class;
+	}
 
-	//WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPUI"));
+	ConstructorHelpers::FClassFinder<AActor> tempRadarEffect(TEXT("'/Game/Blueprints/Boss/BP_RadarEffect.BP_RadarEffect_C'"));
+	if (tempRadarEffect.Succeeded())
+	{
+		RadarEffectFactory = tempRadarEffect.Class;
+	}
+	
+	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 }
 
 void AThunderJaw::InitBeginPlay()
@@ -178,7 +189,7 @@ void AThunderJaw::InitBeginPlay()
 	TSubclassOf<AActor> SplineClass = LoadClass<AActor>(nullptr,TEXT("'/Game/Blueprints/Boss/BP_Spline.BP_Spline_C'"));
 	if (SplineClass)
 	{
-		splineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
+		SplineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
 	}
 
 	WidgetComp = GetComponentByClass<UWidgetComponent>();
@@ -192,61 +203,76 @@ void AThunderJaw::InitBeginPlay()
 	BossAnimInstance = Cast<UThunderJawAnimInstance>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = BossSpeed;
 	ChangeEyeColor(FLinearColor(0,0.14,1),500);
+
+	FloatingDamage.AddDynamic(this,&AThunderJaw::SpawnDamageUI);
 }
 
-UThunderJawFSM* AThunderJaw::GetFSMComponent()
+UThunderJawFSM* AThunderJaw::GetFSMComponent() const
 {
 	return FSM;
 }
 
-AThunderJawAIController* AThunderJaw::GetBossAIController()
+AThunderJawAIController* AThunderJaw::GetBossAIController() const
 {
 	return BossAIController;
 }
 
-class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance()
+class UThunderJawAnimInstance* AThunderJaw::GetBossAnimInstance() const
 {
 	return BossAnimInstance;
 }
 
-class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst()
+class UMaterialInstanceDynamic* AThunderJaw::GetEyeMatInst() const
 {
 	return EyeMatInst;
 }
 
-APlayCharacter* AThunderJaw::GetAloy()
+APlayCharacter* AThunderJaw::GetAloy() const
 {
 	return Aloy;
 }
 
-class AMachineGun* AThunderJaw::GetLMachineGun()
+class AMachineGun* AThunderJaw::GetLMachineGun() const
 {
 	return LMachineGun;
 }
 
-class AMachineGun* AThunderJaw::GetRMachineGun()
+class AMachineGun* AThunderJaw::GetRMachineGun() const
 {
 	return RMachineGun;
 }
 
-class ADiscLauncher* AThunderJaw::GetLDiscLauncher()
+class ADiscLauncher* AThunderJaw::GetLDiscLauncher() const
 {
 	return LDiscLauncher;
 }
 
-class ADiscLauncher* AThunderJaw::GetRDiscLauncher()
+class ADiscLauncher* AThunderJaw::GetRDiscLauncher() const
 {
 	return RDiscLauncher;
 }
 
+class UWidgetComponent* AThunderJaw::GetWidgetComponent() const
+{
+	return WidgetComp;
+}
 
+class USplineComponent* AThunderJaw::GetSplineComponent() const
+{
+	return SplineComp;
+}
 
-void AThunderJaw::MachineGunBroken(float LeftorRight)
+TSubclassOf<AActor> AThunderJaw::GetRadarEffectFactory() const
+{
+	return RadarEffectFactory;
+}
+
+void AThunderJaw::MachineGunBroken(float LeftOrRight)
 {
 	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
-	if (LeftorRight == -1)
+	if (LeftOrRight == -1)
 	{
 		LMachineGun = nullptr;
 	}
@@ -256,12 +282,12 @@ void AThunderJaw::MachineGunBroken(float LeftorRight)
 	}
 }
 
-void AThunderJaw::DiscLauncherBroken(float LeftorRight)
+void AThunderJaw::DiscLauncherBroken(float LeftOrRight)
 {
 	bPartBroken = true;
 	FSM->ChangeBossState(EBossState::Damage);
 
-	if (LeftorRight == -1)
+	if (LeftOrRight == -1)
 	{
 		LDiscLauncher = nullptr;
 	}
@@ -271,12 +297,12 @@ void AThunderJaw::DiscLauncherBroken(float LeftorRight)
 	}
 }
 
-void AThunderJaw::ChangeEyeColor(FLinearColor color, float emissivePower)
+void AThunderJaw::ChangeEyeColor(FLinearColor Color, float EmissivePower)
 {
 	if (EyeMatInst)
 	{
-		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),color);
-		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),emissivePower);
+		EyeMatInst->SetVectorParameterValue(FName("EyeColor"),Color);
+		EyeMatInst->SetScalarParameterValue(FName("EmissivePower"),EmissivePower);
 	}
 }
 
@@ -296,7 +322,7 @@ void AThunderJaw::RotateToTarget(FVector TargetLoc, float InterpSpeed)
 
 void AThunderJaw::SetVisibilityBoss()
 {
-	if (bIsLSEnd)
+	if (bIsLevelSequenceEnd)
 	{
 		SetActorHiddenInGame(false);
 		LMachineGun->SetActorHiddenInGame(false);
@@ -315,7 +341,7 @@ void AThunderJaw::SetVisibilityBoss()
 }
 
 
-void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
+void AThunderJaw::DrawDebugCircle(const UWorld* World, const FVector& Center, const float Radius)
 {
 	if (!World) return;
 
@@ -342,12 +368,12 @@ void AThunderJaw::DrawDebugCircle(UWorld* World, FVector Center, float Radius)
 	}
 }
 
-void AThunderJaw::ChangeToFocusModeMat(bool focusMode)
+void AThunderJaw::ChangeToFocusModeMat(const bool bFocusMode)
 {
-	LMachineGun->CheckFocusModeAndChangeMat(focusMode);
-	RMachineGun->CheckFocusModeAndChangeMat(focusMode);
-	LDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
-	RDiscLauncher->CheckFocusModeAndChangeMat(focusMode);
+	LMachineGun->CheckFocusModeAndChangeMat(bFocusMode);
+	RMachineGun->CheckFocusModeAndChangeMat(bFocusMode);
+	LDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
+	RDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
 }
 
 void AThunderJaw::BossTakeDamage(int Damage)
@@ -357,6 +383,18 @@ void AThunderJaw::BossTakeDamage(int Damage)
 	{
 		FSM->ChangeBossState(EBossState::Die);
 		GameClear();
+	}
+	FloatingDamage.Broadcast(Damage);
+}
+
+void AThunderJaw::SpawnDamageUI(const float Damage)
+{
+	DamageUI = Cast<UDamageUI>(CreateWidget(GetWorld(),FloatingTextFactory));
+	if (DamageUI)
+	{
+		DamageUI->SetDamageText(Damage);
+		DamageUI->PlayAnimAndRemoveDamageUI();
+		DamageUI->AddToViewport();
 	}
 }
 

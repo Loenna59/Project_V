@@ -81,18 +81,26 @@ void ADiscMissile::InitComponents()
 	{
 		ExplosionEffect = tempEffect.Class;
 	}
+
+	ConstructorHelpers::FObjectFinder<USoundWave> tempExplosionSound(TEXT("'/Game/Blueprints/Boss/Sounds/ExplosionSound.ExplosionSound'"));
+	if (tempExplosionSound.Succeeded())
+	{
+		ExplosionSound = tempExplosionSound.Object;
+	}
 }
 
 void ADiscMissile::OnDiscMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	GetWorld()->SpawnActor<AActor>(ExplosionEffect,GetActorTransform());
+	
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
 		player->HitDamage(50.0f, PerposeDirection);
 	}
 
+	PlayExplosionSound();
 	PlayCameraShake();
 	
 	Destroy();

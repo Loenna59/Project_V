@@ -19,7 +19,23 @@ public:
 	virtual void Update(AThunderJaw* Boss, UThunderJawFSM* FSM, float DeltaTime) override;
 	virtual void Exit(AThunderJaw* Boss, UThunderJawFSM* FSM) override;
 
+	void PatrolToDetectLocation(AThunderJaw* Boss, UThunderJawFSM* FSM);
+	void Radar(AThunderJaw* Boss, UThunderJawFSM* FSM);
+	void MakeSphereTrace(AThunderJaw* Boss, UThunderJawFSM* FSM);
 public:
 	UPROPERTY()
 	bool bIsArrivedDetectedArea{false};
+	UPROPERTY()
+	FTimerHandle RadarTimerHandle;
+	UPROPERTY()
+	bool bUsingRadar{false};
+	UPROPERTY()
+	float RadarUsingTime{20.0f};
+	UPROPERTY()
+	FTimerHandle SencingTimerHandle;
+	UPROPERTY()
+	float SencingTime{5.0f};
+	UPROPERTY()
+	bool bOnSphereTrace{false};
+	
 };

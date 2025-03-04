@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ThunderJawFSM.generated.h"
 
+
 class UBossBaseState;
 
 UENUM(BlueprintType)
@@ -26,7 +27,7 @@ class PROJECT_V_API UThunderJawFSM : public UActorComponent
 
 public:
 	UThunderJawFSM();
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -56,6 +57,7 @@ protected:
 	TMap<EBossState, UBossBaseState*> StatePool;
 
 public:
+#pragma region PatrolVariance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
 	FVector RandomLocation{FVector::Zero()};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
@@ -64,4 +66,5 @@ public:
 	bool bIsRotateEnd{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
 	bool bIsArrivedDetectedLocation{false};
+#pragma endregion 
 };

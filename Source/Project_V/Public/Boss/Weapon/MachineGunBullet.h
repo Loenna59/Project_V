@@ -15,7 +15,13 @@ public:
 	AMachineGunBullet();
 
 	UFUNCTION()
+	void SetBulletActive(bool value) const;
+	UFUNCTION()
 	void FireToTarget(const FVector& Target, float Radius);
+	UFUNCTION()
+	void BackToMagazine();
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayGunSound();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -42,4 +48,9 @@ protected:
 	float LifeTime{3.0f};
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
+	UPROPERTY(EditAnywhere)
+	class AThunderJaw* Boss;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	class USoundWave* GunSound;
 };

@@ -38,10 +38,15 @@ public:
 	class UProjectileMovementComponent* PMC;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ExplosionEffect;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USoundWave* ExplosionSound;
+
 
 	UPROPERTY()
 	FVector PerposeDirection;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayCameraShake();
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayExplosionSound();
 };

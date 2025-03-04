@@ -3,6 +3,10 @@
 
 #include "Boss/Weapon/BossWeapon.h"
 
+#include "Project_V.h"
+#include "Boss/ThunderJaw.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 ABossWeapon::ABossWeapon()
@@ -22,7 +26,7 @@ ABossWeapon::ABossWeapon()
 void ABossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
 }
 
 // Called every frame
@@ -48,7 +52,14 @@ void ABossWeapon::CheckFocusModeAndChangeMat(bool focusMode)
 	}
 	else
 	{
-		Mesh->SetOverlayMaterial(nullptr);
+		if (!GetWorld()->GetTimerManager().TimerExists(ChangeWeakPartsMatTimerHandle))
+		{
+			PRINT_CALLINFO();
+			GetWorld()->GetTimerManager().SetTimer(ChangeWeakPartsMatTimerHandle,[this]()
+			{
+				Mesh->SetOverlayMaterial(nullptr);
+			},5,false);
+		}
 	}
 }
 
