@@ -46,18 +46,32 @@ void ADiscLauncher::InitComponents()
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(2.5,1.0,1.0));
+		Mesh->SetRelativeRotation(FRotator(0,-90,0));
+		Mesh->SetRelativeScale3D(FVector(8));
+		Mesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	}
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Engine/BasicShapes/Cube.Cube'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/Fab/Sci-Fi_Gun/sci_fi_gun.sci_fi_gun'"));
 	if (tempMesh.Succeeded())
 	{
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Engine/MapTemplates/Materials/BasicAsset02.BasicAsset02'"));
-	if (tempMat.Succeeded())
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_001.Material_001'"));
+	if (tempMat0.Succeeded())
 	{
-		Mesh->SetMaterial(0,tempMat.Object);
+		Mesh->SetMaterial(0,tempMat0.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat1(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_002.Material_002'"));
+	if (tempMat1.Succeeded())
+	{
+		Mesh->SetMaterial(1,tempMat1.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat2(TEXT("'/Game/Fab/Sci-Fi_Gun/Material_003.Material_003'"));
+	if (tempMat2.Succeeded())
+	{
+		Mesh->SetMaterial(2,tempMat2.Object);
 	}
 
 	FirePos = CreateDefaultSubobject<UArrowComponent>(TEXT("FirePos"));

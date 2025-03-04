@@ -228,8 +228,8 @@ void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 		Boss->GetBossAIController()->StopMovement();
 
 		// 랜덤 패턴 고를 때 부위파괴 된 패턴이 걸리면 돌진으로 바꿈
-		//int32 randomNum = MakeRandomRangeNum(Boss);
-		int32 randomNum = 2;
+		int32 randomNum = MakeRandomRangeNum(Boss);
+		//int32 randomNum = 2;
 		if (randomNum == 1)
 		{
 			PRINTLOG(TEXT("Using Charge"));
