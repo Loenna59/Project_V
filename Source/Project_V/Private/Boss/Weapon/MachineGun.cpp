@@ -55,7 +55,9 @@ void AMachineGun::InitComponents()
 	if (Mesh)
 	{
 		Mesh->SetupAttachment(Root);
-		Mesh->SetRelativeScale3D(FVector(0.350000,0.200000,0.200000));
+		Mesh->SetRelativeLocation(FVector(14.701525,0.000000,-6.119322));
+		Mesh->SetRelativeScale3D(FVector(1.500000,2.000000,2.000000));
+		Mesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	}
 
 	FirePos = CreateDefaultSubobject<UArrowComponent>(TEXT("FirePos"));
@@ -65,16 +67,28 @@ void AMachineGun::InitComponents()
 		FirePos->SetRelativeLocation(FVector(30,0,0));
 	}
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Engine/BasicShapes/Cube.Cube'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("'/Game/Fab/Hand_RailGun/hand_railgun.hand_railgun'"));
 	if (tempMesh.Succeeded())
 	{
 		Mesh->SetStaticMesh(tempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> tempMat(TEXT("'/Engine/MapTemplates/Materials/BasicAsset01.BasicAsset01'"));
-	if (tempMat.Succeeded())
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat0(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun.HandRailGun'"));
+	if (tempMat0.Succeeded())
 	{
-		Mesh->SetMaterial(0,tempMat.Object);
+		Mesh->SetMaterial(0,tempMat0.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat1(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_glass.HandRailGun_glass'"));
+	if (tempMat1.Succeeded())
+	{
+		Mesh->SetMaterial(1,tempMat1.Object);
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterial> tempMat2(TEXT("'/Game/Fab/Hand_RailGun/HandRailGun_screen.HandRailGun_screen'"));
+	if (tempMat2.Succeeded())
+	{
+		Mesh->SetMaterial(2,tempMat2.Object);
 	}
 
 	ConstructorHelpers::FClassFinder<AMachineGunBullet> tempBullet(TEXT("'/Game/Blueprints/Boss/BP_MachineGunBullet.BP_MachineGunBullet_C'"));
