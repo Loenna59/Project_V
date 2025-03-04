@@ -98,6 +98,7 @@ void AMachineGunBullet::InitComponents()
 void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
@@ -128,13 +129,15 @@ void AMachineGunBullet::SetBulletActive(bool value) const
 {
 	if (value)
 	{
-		PRINTLOG(TEXT("call bullet"));
+		//PRINTLOG(TEXT("call bullet"));
 		PMC->SetActive(true);
+		//Root->SetCollisionProfileName("EnemyProjectile");
 		Mesh->SetVisibility(true);
 	}
 	else
 	{
 		PMC->SetActive(false);
+		//Root->SetCollisionProfileName("NoCollision");
 		Mesh->SetVisibility(false);
 	}
 }
@@ -151,6 +154,7 @@ void AMachineGunBullet::BackToMagazine()
 	SetBulletActive(false);
 	if (Boss)
 	{
+		SetActorLocation(FVector(10000));
 		Boss->Magazine.Add(this);
 	}
 }
