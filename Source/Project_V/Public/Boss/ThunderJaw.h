@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "Weapon/MachineGunBullet.h"
 #include "ThunderJaw.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFloatingDamage,float,damage);
@@ -134,6 +135,8 @@ public:
 	float CurrentHP{CurrentHP = MaxHP};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float BossSpeed{500.0f};
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
+	TArray<AMachineGunBullet*> Magazine;
 #pragma endregion
 
 #pragma region DistanceVariance

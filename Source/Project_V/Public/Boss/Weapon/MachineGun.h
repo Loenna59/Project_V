@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AMachineGunBullet> BulletFactory;
 
+	UPROPERTY(EditAnywhere)
+	int32 BulletMaxCount{100};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RandomSprayRadius{300.0f};
 

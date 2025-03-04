@@ -4,8 +4,11 @@
 #include "Boss/Weapon/MachineGunBullet.h"
 
 #include "Project_V.h"
+#include "Boss/ThunderJaw.h"
+#include "Boss/Weapon/MachineGun.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/PlayCharacter.h"
 
 
@@ -22,13 +25,17 @@ AMachineGunBullet::AMachineGunBullet()
 void AMachineGunBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGunBullet::OnBulletBeginOverlap);
+
+	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
 
 	FTimerHandle deathTimer;
-	auto dieCallBack = [this]()->void{Destroy();};
-	GetWorldTimerManager().SetTimer(deathTimer, FTimerDelegate::CreateLambda(dieCallBack), LifeTime, false);
+	GetWorldTimerManager().SetTimer(deathTimer, [this]()
+	{
+		BackToMagazine();
+	}, LifeTime, false);
 
-	PlayGunSound();
+
+	Root->OnComponentBeginOverlap.AddDynamic(this,&AMachineGunBullet::OnBulletBeginOverlap);
 }
 
 // Called every frame
@@ -78,6 +85,7 @@ void AMachineGunBullet::InitComponents()
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
 		PMC->ProjectileGravityScale = 1.0f;
+		PMC->bAutoActivate = false;
 	}
 
 	ConstructorHelpers::FObjectFinder<USoundWave> tempGunSound(TEXT("'/Game/Blueprints/Boss/Sounds/GunSound.GunSound'"));
@@ -94,8 +102,9 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 	if (player)
 	{
 		player->HitDamage(10.f, GetActorForwardVector());
-		Destroy();
 	}
+	BackToMagazine();
+
 }
 
 FVector2D AMachineGunBullet::GetRandomPointInCircle(float radius, FVector2D centerPoint)
@@ -115,9 +124,33 @@ FVector AMachineGunBullet::GetRandomPointInCircleXY(float radius, FVector center
 	return FVector(random2D.X,random2D.Y,centerPoint.Z);
 }
 
+void AMachineGunBullet::SetBulletActive(bool value) const
+{
+	if (value)
+	{
+		PRINTLOG(TEXT("call bullet"));
+		PMC->SetActive(true);
+		Mesh->SetVisibility(true);
+	}
+	else
+	{
+		PMC->SetActive(false);
+		Mesh->SetVisibility(false);
+	}
+}
+
 void AMachineGunBullet::FireToTarget(const FVector& Target, float Radius)
 {
 	FVector randomPoint = GetRandomPointInCircleXY(Radius,Target);
 	FVector randomDir = (randomPoint - GetActorLocation()).GetSafeNormal();
 	PMC->Velocity = randomDir * PMC->InitialSpeed;
+}
+
+void AMachineGunBullet::BackToMagazine()
+{
+	SetBulletActive(false);
+	if (Boss)
+	{
+		Boss->Magazine.Add(this);
+	}
 }

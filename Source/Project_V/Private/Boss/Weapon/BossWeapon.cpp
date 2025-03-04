@@ -4,6 +4,8 @@
 #include "Boss/Weapon/BossWeapon.h"
 
 #include "Project_V.h"
+#include "Boss/ThunderJaw.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -24,7 +26,7 @@ ABossWeapon::ABossWeapon()
 void ABossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
 }
 
 // Called every frame
