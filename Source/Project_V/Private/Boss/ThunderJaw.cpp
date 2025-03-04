@@ -1,6 +1,7 @@
 
 #include "Boss/ThunderJaw.h"
 
+#include "EngineUtils.h"
 #include "Project_V.h"
 #include "Boss/Weapon/MachineGun.h"
 #include "Boss/ThunderJawAIController.h"
@@ -192,6 +193,19 @@ void AThunderJaw::InitBeginPlay()
 		SplineComp = UGameplayStatics::GetActorOfClass(GetWorld(),SplineClass)->FindComponentByClass<USplineComponent>();
 	}
 
+	// TActorIterator를 사용하여 특정 클래스의 액터 검색
+	for (TActorIterator<AActor> It(GetWorld(), AActor::StaticClass()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (Actor && Actor->IsA(AActor::StaticClass()) && Actor->GetName().Contains(TEXT("BP_Spline")))
+		{
+			SplineBP = Actor;
+			UE_LOG(LogTemp, Log, TEXT("Found Spline Actor: %s"), *SplineBP->GetName());
+			break; // 첫 번째 찾은 액터 저장 후 루프 종료
+		}
+	}
+	SplineBP->SetHidden(true);
+
 	WidgetComp = GetComponentByClass<UWidgetComponent>();
 	if (WidgetComp)
 	{
@@ -374,6 +388,18 @@ void AThunderJaw::ChangeToFocusModeMat(const bool bFocusMode)
 	RMachineGun->CheckFocusModeAndChangeMat(bFocusMode);
 	LDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
 	RDiscLauncher->CheckFocusModeAndChangeMat(bFocusMode);
+}
+
+void AThunderJaw::SetVisibilitySpline(const bool bFocusMode)
+{
+	if (bFocusMode)
+	{
+		SplineBP->SetHidden(false);
+	}
+	else
+	{
+		SplineBP->SetHidden(true);
+	}
 }
 
 void AThunderJaw::BossTakeDamage(int Damage)

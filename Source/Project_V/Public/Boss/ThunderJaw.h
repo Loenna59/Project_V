@@ -80,6 +80,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeToFocusModeMat(const bool bFocusMode);
 	UFUNCTION(BlueprintCallable)
+	void SetVisibilitySpline(const bool bFocusMode);
+	UFUNCTION(BlueprintCallable)
 	void BossTakeDamage(const int Damage);
 	UFUNCTION(BlueprintCallable)
 	void GameClear();
@@ -103,6 +105,8 @@ protected:
 	class UWidgetComponent* WidgetComp;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
 	class USplineComponent* SplineComp;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
+	class AActor* SplineBP;	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="ThunderJaw Character")
 	TSubclassOf<AActor> RadarEffectFactory;
 #pragma endregion 

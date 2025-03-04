@@ -101,6 +101,7 @@ void AMachineGunBullet::OnBulletBeginOverlap(UPrimitiveComponent* OverlappedComp
 	auto* player = Cast<APlayCharacter>(OtherActor);
 	if (player)
 	{
+		PRINT_CALLINFO();
 		player->HitDamage(10.f, GetActorForwardVector());
 	}
 	BackToMagazine();
@@ -128,7 +129,7 @@ void AMachineGunBullet::SetBulletActive(bool value) const
 {
 	if (value)
 	{
-		PRINTLOG(TEXT("call bullet"));
+		//PRINTLOG(TEXT("call bullet"));
 		PMC->SetActive(true);
 		Mesh->SetVisibility(true);
 	}

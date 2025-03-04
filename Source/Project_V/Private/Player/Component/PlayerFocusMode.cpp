@@ -106,6 +106,7 @@ void UPlayerFocusMode::SetVisibleFocusMode(bool visible)
 	if (Boss)
 	{
 		Boss->ChangeToFocusModeMat(visible);
+		Boss->SetVisibilitySpline(visible);
 	}
 }
 
