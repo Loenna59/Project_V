@@ -153,12 +153,25 @@ void UPlayerCombat::OnChangedCameraMode(EPlayerCameraMode mode)
 
 void UPlayerCombat::OnAnchor()
 {
-	if (!holdingWeapon.IsValid())
-	{
-		anim->OnPlayEquip();
-	}
-	
 	onEventCameraModeChanged.Execute(EPlayerCameraMode::Anchored);
+	
+	if (holdingWeapon.IsValid())
+	{
+		if (katanaPlayState != KatanaPlayState::Unequipped)
+		{
+			holdingWeapon = nullptr;
+			katanaPlayState = KatanaPlayState::Unequipped;
+			katana->AttachSocket(me->GetMesh(), katana->GetSlotSocket(), false);
+			anim->isHoldingKatana = false;
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	anim->weaponType = currentRangedWeapon->GetWeaponType();
+	anim->OnPlayEquip();
 }
 
 void UPlayerCombat::OnAnchorRelease()
@@ -169,6 +182,11 @@ void UPlayerCombat::OnAnchorRelease()
 
 void UPlayerCombat::OnPressedFire(const FInputActionValue& actionValue)
 {
+	if (katanaPlayState != KatanaPlayState::Unequipped)
+	{
+		return;
+	}
+	
 	if (onEventCheckCameraMode.Execute())
 	{
 		return;
@@ -210,16 +228,19 @@ void UPlayerCombat::OnReleasedFire(const FInputActionValue& actionValue)
 
 void UPlayerCombat::OnMeleeAttack()
 {
-	if (bIsHoldingKatana)
-    {
-    	anim->OnComboKatana();
-    	return;
-    }
+	if (katanaPlayState == KatanaPlayState::Holding)
+	{
+		anim->OnComboKatana();
+		return;
+	}
     
-    if (onEventCheckCameraMode.Execute())
+    if (katanaPlayState == KatanaPlayState::Unequipped && onEventCheckCameraMode.Execute())
     {
-    	bIsHoldingKatana = true;
+    	currentRangedWeapon->AttachSocket(me->GetMesh(), currentRangedWeapon->GetSlotSocket(), false);
+		katanaPlayState = KatanaPlayState::Acting;
+    	holdingWeapon = nullptr;
     	anim->OnStartKatana();
+    	StartTimerPutWeapon();
     }
 }
 
@@ -260,13 +281,13 @@ void UPlayerCombat::PlaceArrowOnBow()
 
 void UPlayerCombat::PickWeapon()
 {
-	if (bIsHoldingKatana)
+	if (katanaPlayState != KatanaPlayState::Unequipped)
 	{
 		if (holdingWeapon.IsValid())
 		{
 			katana->AttachSocket(me->GetMesh(), katana->GetSlotSocket(), false);
 			holdingWeapon = nullptr;
-			bIsHoldingKatana = false;
+			katanaPlayState = KatanaPlayState::Unequipped;
 			return;
 		}
 		
@@ -350,7 +371,14 @@ void UPlayerCombat::StartTimerPutWeapon()
 				return;
 			}
 
-			weakThis->anim->OnPlayEquip();
+			if (weakThis->katanaPlayState == KatanaPlayState::Unequipped)
+			{
+				weakThis->anim->OnPlayEquip();
+			}
+			else
+			{
+				weakThis->anim->OnHideKatana();
+			}
 		},
 		idleTimerDuration,
 		false

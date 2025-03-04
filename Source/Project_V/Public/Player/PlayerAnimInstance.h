@@ -112,6 +112,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnComboKatana();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHideKatana();
+
 	UFUNCTION()
 	void OnDead();
 	

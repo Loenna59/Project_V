@@ -6,6 +6,14 @@
 #include "PlayerBaseComponent.h"
 #include "PlayerCombat.generated.h"
 
+UENUM(BlueprintType)
+enum class KatanaPlayState : uint8
+{
+	Unequipped,
+	Holding,
+	Acting
+};
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEventReleased, bool);
 DECLARE_DELEGATE_RetVal(bool, FOnEventCheckCameraMode)
 
@@ -17,6 +25,8 @@ class PROJECT_V_API UPlayerCombat : public UPlayerBaseComponent
 public:
 	// Sets default values for this component's properties
 	UPlayerCombat();
+
+	KatanaPlayState katanaPlayState = KatanaPlayState::Unequipped;
 
 protected:
 	FOnEventReleased onEventReleased;
@@ -30,8 +40,6 @@ protected:
 	float elapsedDrawingTime;
 
 	bool bIsCompleteReload = false; // 활 시위 경과 시간
-
-	bool bIsHoldingKatana = false;
 
 	FVector CalculateAnimToVector();
 	
