@@ -13,6 +13,7 @@
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
+	Melee,
 	Base,
 	Caster
 };
@@ -61,6 +62,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool isAnchoredBow;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isHoldingKatana;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator controlSpineRotation;
 
@@ -76,7 +80,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool weaponChanged;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EWeaponType weaponType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -101,6 +105,15 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLargeDamaged(float degrees);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartKatana();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnComboKatana();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHideKatana();
 
 	UFUNCTION()
 	void OnDead();

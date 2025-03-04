@@ -24,8 +24,6 @@ protected:
 
 	FOnEventCameraModeChanged onEventCameraModeChanged;
 
-	UFUNCTION()
-	void CheckPutWeaponTimer(bool bComplete);
 public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -41,7 +39,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UPlayerMovement* movementComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPlayerCombat* combatComp;
 
 	UPROPERTY(VisibleAnywhere)
@@ -68,45 +66,20 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* transitionCameraComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class APlayerWeapon* bow;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class APlayerWeapon* tripcaster;
-
 	UPROPERTY(VisibleAnywhere)
 	class UAudioComponent* voiceComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* sheath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UPlayerUI* ui;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class APlayerWeapon> bowFactory;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class APlayerWeapon> tripcasterFactory;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
 	double minPinchDegrees = 50;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Settings)
-	float idleTimerDuration = 10;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Status)
 	float maxHealth = 100;
-
-	void SpawnArrow();
-
-	void PlaceArrowOnBow();
-
-	void PickWeapon();
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeWeapon(APlayerWeapon* weapon);
-	
-	TWeakObjectPtr<APlayerWeapon> holdingWeapon;
-	
-	TWeakObjectPtr<APlayerWeapon> currentWeapon;
 
 	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
 	
@@ -117,8 +90,6 @@ private:
 	class UInputMappingContext* imc;
 
 	float currentHealth;
-
-	FTimerHandle timerHandle;
 
 	FTimerHandle voicePlayTimerHandle;
 
@@ -148,17 +119,9 @@ public:
 
 	void SetCurrentHealth(float health);
 
-	void ClearPutWeaponTimer();
-
-	void StartTimerPutWeapon();
-
 	void SetPlayerCameraMode(EPlayerCameraMode mode);
 
 	bool IsNotAnchoredMode();
-
-	void OnAnchoredMode();
-
-	void Fire(FVector velocity, float alpha);
 
 	void HitDamage(float damage, FVector forward);
 

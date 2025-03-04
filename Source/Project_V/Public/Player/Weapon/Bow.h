@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerWeapon.h"
+#include "PlayerRangedWeapon.h"
 #include "Bow.generated.h"
 
 UCLASS()
-class PROJECT_V_API ABow : public APlayerWeapon
+class PROJECT_V_API ABow : public APlayerRangedWeapon
 {
 	GENERATED_BODY()
 
@@ -21,5 +21,19 @@ public:
 	{
 		return true;
 	}
-	
+
+	virtual FName GetSlotSocket() const override
+	{
+		return TEXT("BowSocket");
+	}
+
+	virtual FName GetGripSocket() const override
+	{
+		return TEXT("BowGripSocket");
+	}
+
+	virtual EWeaponType GetWeaponType() const override
+	{
+		return EWeaponType::Base;
+	}
 };

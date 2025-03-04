@@ -3,8 +3,7 @@
 
 #include "Player/NotifySpawnArrow.h"
 
-#include "Project_V.h"
-#include "Player/PlayCharacter.h"
+#include "Player/Component/PlayerCombat.h"
 
 void UNotifySpawnArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -13,9 +12,9 @@ void UNotifySpawnArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	AActor* owner = MeshComp->GetOwner();
 	if (owner)
 	{
-		if (APlayCharacter* player = Cast<APlayCharacter>(owner))
+		if (UPlayerCombat* combatComp = Cast<UPlayerCombat>(owner->GetDefaultSubobjectByName("PlayerCombat")))
 		{
-			player->SpawnArrow();
+			combatComp->SpawnArrow();
 		}
 	}
 }

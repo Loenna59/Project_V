@@ -5,21 +5,19 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/HUD.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "Components/AudioComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/HUD.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCameraMode.h"
-#include "Player/Weapon/PlayerWeapon.h"
 #include "Player/Component/PlayerCameraSwitcher.h"
 #include "Player/Component/PlayerCombat.h"
 #include "Player/Component/PlayerFocusMode.h"
 #include "Player/Component/PlayerMovement.h"
-#include "UI/GameStateUI.h"
 #include "UI/PlayerHUD.h"
 #include "UI/PlayerUI.h"
 
@@ -80,25 +78,21 @@ APlayCharacter::APlayCharacter()
 	voiceComp->bAlwaysPlay = false;
 	voiceComp->bAutoActivate = false;
 
+	sheath = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sheath"));
+	sheath->SetupAttachment(GetMesh(), TEXT("SheathSocket"));
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tmp_sheath(TEXT("/Script/Engine.StaticMesh'/Game/Assets/CyberpunkSamurai/Meshes/SM_Katana_Sheath.SM_Katana_Sheath'"));
+
+	if (tmp_sheath.Succeeded())
+	{
+		sheath->SetStaticMesh(tmp_sheath.Object);
+	}
+
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> tmp_imc(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Player.IMC_Player'"));
 
 	if (tmp_imc.Succeeded())
 	{
 		imc = tmp_imc.Object;
-	}
-
-	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_bow(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_PlayerBow.BP_PlayerBow_C'"));
-
-	if (tmp_bow.Succeeded())
-	{
-		bowFactory = tmp_bow.Class;
-	}
-
-	ConstructorHelpers::FClassFinder<APlayerWeapon> tmp_tripcaster(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Player/BP_Tripcaster.BP_Tripcaster_C'"));
-
-	if (tmp_tripcaster.Succeeded())
-	{
-		tripcasterFactory = tmp_tripcaster.Class;
 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> tmp(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Player/Animation/ABP_Player.ABP_Player_C'"));
@@ -142,23 +136,6 @@ void APlayCharacter::BeginPlay()
 	anchoredCameraComp->SetActive(false);
 	transitionCameraComp->SetActive(false);
 
-	if ((bow = GetWorld()->SpawnActor<APlayerWeapon>(bowFactory)))
-	{
-		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
-		bow->SpawnArrowInBow();
-		bow->AttachSocket(GetMesh(), TEXT("BowSocket"), false);
-	}
-
-	if ((tripcaster = GetWorld()->SpawnActor<APlayerWeapon>(tripcasterFactory)))
-	{
-		//TODO:: 화살을 첨부터 활에 장착할지 말지 고민하고 결정. 지금은 임시
-		tripcaster->SpawnArrowInBow();
-		tripcaster->AttachSocket(GetMesh(), TEXT("CasterSocket"), false);
-		tripcaster->SetVisibility(false);
-		
-		tripcaster->onCompleteFire.AddDynamic(this, &APlayCharacter::CheckPutWeaponTimer);
-	}
-
 	APlayerHUD* hud = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	if (hud)
@@ -170,11 +147,6 @@ void APlayCharacter::BeginPlay()
 
 	anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	if (anim && bow)
-	{
-		anim->SetWeaponAnim(bow->GetAnimInstance());
-	}
-
 	AddEventHandler(movementComp, &UPlayerMovement::OnChangedCameraMode);
 	AddEventHandler(combatComp, &UPlayerCombat::OnChangedCameraMode);
 	AddEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
@@ -184,25 +156,12 @@ void APlayCharacter::BeginPlay()
 
 	combatComp->AddHandler(this, &APlayCharacter::IsNotAnchoredMode);
 	combatComp->AddHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
+	combatComp->AddBaseEventHandler(this, &APlayCharacter::SetPlayerCameraMode);
 
 	movementComp->AddHandler(cameraSwitcher, &UPlayerCameraSwitcher::SetCameraSlowMode);
 	movementComp->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
 
 	focusMode->AddBaseEventHandler(cameraSwitcher, &UPlayerCameraSwitcher::OnChangedCameraMode);
-
-	ChangeWeapon(bow);
-
-	// voiceComp->SetSound(damagedVoice);
-}
-
-void APlayCharacter::CheckPutWeaponTimer(bool bComplete)
-{
-	ClearPutWeaponTimer();
-				
-	if (bComplete)
-	{
-		StartTimerPutWeapon();
-	}
 }
 
 // Called to bind functionality to input
@@ -220,72 +179,6 @@ void APlayCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
-void APlayCharacter::SpawnArrow()
-{
-	if (currentWeapon.IsValid())
-	{
-		currentWeapon->SpawnArrow(GetMesh(), currentWeapon->GetPickProjectileSocket());
-	}
-}
-
-void APlayCharacter::PlaceArrowOnBow()
-{
-	if (currentWeapon.IsValid())
-	{
-		currentWeapon->PlaceArrowOnBow();
-		combatComp->bIsCompleteReload = true;
-	}
-}
-
-void APlayCharacter::PickWeapon()
-{
-	if (holdingWeapon.IsValid())
-	{
-		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetSlotSocket(), false);
-		holdingWeapon = nullptr;
-	}
-	else
-	{
-		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetGripSocket(), true);
-		holdingWeapon = currentWeapon;
-	}
-}
-
-void APlayCharacter::ChangeWeapon(APlayerWeapon* weapon)
-{
-	if (currentWeapon == weapon)
-	{
-		return;
-	}
-	
-	if (currentWeapon.IsValid())
-	{
-		currentWeapon->AttachSocket(GetMesh(), currentWeapon->GetSlotSocket(), false);
-		currentWeapon->RevertProjectile();
-		currentWeapon->SetVisibility(false);
-	}
-
-	anim->weaponType = weapon->GetWeaponType();
-	weapon->SetVisibility(true);
-	currentWeapon = weapon;
-	
-	anim->weaponChanged = true;
-	if (holdingWeapon.IsValid())
-	{
-		holdingWeapon = nullptr;
-		anim->OnPlayEquip();
-	}
-	
-	combatComp->bIsCompleteReload = true;
-
-	ui->ChangeEquippedWeaponUI(weapon->IsBase());
-
-	if (currentCameraMode != EPlayerCameraMode::Anchored)
-	{
-		StartTimerPutWeapon();
-	}
-}
-
 void APlayCharacter::SetPlayingDodge(bool isPlaying)
 {
 	movementComp->bIsPlayingDodge = isPlaying;
@@ -296,8 +189,6 @@ void APlayCharacter::SetPlayingDodge(bool isPlaying)
 	}
 	else
 	{
-		// 강제로 리로드 처리
-		combatComp->bIsCompleteReload = true;
 		movementComp->EndDodge();
 		
 		if (prevCameraMode == EPlayerCameraMode::Focus)
@@ -318,41 +209,6 @@ void APlayCharacter::SetCurrentHealth(float health)
 	}
 }
 
-void APlayCharacter::ClearPutWeaponTimer()
-{
-	if (timerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(timerHandle);
-		timerHandle.Invalidate();
-	}
-}
-
-void APlayCharacter::StartTimerPutWeapon()
-{
-	ClearPutWeaponTimer();
-	
-	TWeakObjectPtr<APlayCharacter> weakThis = this;
-	GetWorldTimerManager().SetTimer(
-		timerHandle,
-		[weakThis] ()
-		{
-			if (!weakThis.IsValid())
-			{
-				return;
-			}
-				
-			if (!weakThis->holdingWeapon.IsValid())
-			{
-				return;
-			}
-
-			weakThis->anim->OnPlayEquip();
-		},
-		idleTimerDuration,
-		false
-	);
-}
-
 void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 {
 	prevCameraMode = currentCameraMode;
@@ -361,60 +217,12 @@ void APlayCharacter::SetPlayerCameraMode(EPlayerCameraMode mode)
 	onEventCameraModeChanged.Broadcast(mode);
 	
 	ui->SetVisibleUI(mode);
-	
-
-	switch (mode)
-	{
-	case EPlayerCameraMode::Default:
-		bUseControllerRotationYaw = false;
-		if (currentWeapon.IsValid())
-		{
-			currentWeapon->PlaceOrSpawnArrow();
-		}
-		StartTimerPutWeapon();
-		break;
-	case EPlayerCameraMode::Anchored:
-		bUseControllerRotationYaw = true;
-		if (timerHandle.IsValid())
-		{
-			GetWorldTimerManager().ClearTimer(timerHandle);
-			timerHandle.Invalidate();
-		}
-		if (currentWeapon.IsValid())
-		{
-			currentWeapon->SpawnArrowInBow();
-		}
-		break;
-	case EPlayerCameraMode::Focus:
-		bUseControllerRotationYaw = true;
-		break;
-	}
-	
+	bUseControllerRotationYaw = mode != EPlayerCameraMode::Default;
 }
 
 bool APlayCharacter::IsNotAnchoredMode()
 {
 	return currentCameraMode != EPlayerCameraMode::Anchored;
-}
-
-void APlayCharacter::OnAnchoredMode()
-{
-	if (!holdingWeapon.IsValid())
-	{
-		anim->OnPlayEquip();
-	}
-	
-	SetPlayerCameraMode(EPlayerCameraMode::Anchored);
-}
-
-void APlayCharacter::Fire(FVector velocity, float alpha)
-{
-	if (holdingWeapon.IsValid())
-	{
-		bool twice = holdingWeapon->Fire(velocity, alpha);
-		
-		anim->OnFire(twice);
-	}
 }
 
 void APlayCharacter::HitDamage(float damage, FVector forward)
@@ -462,7 +270,7 @@ void APlayCharacter::GameOver()
 	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	anim->OnDead();
 	ShowGameStateUI.Broadcast(false);
-	ClearPutWeaponTimer();
+	combatComp->ClearPutWeaponTimer();
 
 	GetCharacterMovement()->Deactivate();
 	
@@ -481,11 +289,6 @@ void APlayCharacter::GameOver()
 
 void APlayCharacter::SetVisible(bool visible)
 {
-	bool hidden = !visible;
-	SetActorHiddenInGame(hidden);
-
-	if (currentWeapon.IsValid())
-	{
-		currentWeapon->SetVisibility(visible);
-	}
+	GetMesh()->SetVisibility(visible);
+	combatComp->SetVisibleEquippedWeapon(visible);
 }
