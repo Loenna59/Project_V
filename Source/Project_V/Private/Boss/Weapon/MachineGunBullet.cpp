@@ -27,6 +27,8 @@ void AMachineGunBullet::BeginPlay()
 	FTimerHandle deathTimer;
 	auto dieCallBack = [this]()->void{Destroy();};
 	GetWorldTimerManager().SetTimer(deathTimer, FTimerDelegate::CreateLambda(dieCallBack), LifeTime, false);
+
+	PlayGunSound();
 }
 
 // Called every frame
@@ -76,6 +78,12 @@ void AMachineGunBullet::InitComponents()
 		PMC->bShouldBounce = true;
 		PMC->Bounciness = 0.3f;
 		PMC->ProjectileGravityScale = 1.0f;
+	}
+
+	ConstructorHelpers::FObjectFinder<USoundWave> tempGunSound(TEXT("'/Game/Blueprints/Boss/Sounds/GunSound.GunSound'"));
+	if (tempGunSound.Succeeded())
+	{
+		GunSound = tempGunSound.Object;
 	}
 }
 
