@@ -53,11 +53,6 @@ void UPlayerFocusMode::BeginPlay()
 	}
 
 	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
-	if (!Boss)
-	{
-		PRINTLOG(TEXT("ㅈ됨"));
-	}
-
 }
 
 void UPlayerFocusMode::SetupInputBinding(class UEnhancedInputComponent* input)
