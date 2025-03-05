@@ -4,6 +4,7 @@
 #include "Boss/ThunderJawAnimInstance.h"
 
 #include "Boss/ThunderJaw.h"
+#include "Boss/ThunderJawAIController.h"
 #include "Components/AudioComponent.h"
 
 void UThunderJawAnimInstance::NativeBeginPlay()
@@ -67,6 +68,7 @@ void UThunderJawAnimInstance::AnimNotify_PlayFallDownSound()
 	auto* boss = Cast<AThunderJaw>(TryGetPawnOwner());
 	if (boss)
 	{
+		boss->GetBossAIController()->StopMovement();
 		boss->SoundInstance->SetSound(boss->FallDownSound);
 		boss->SoundInstance->SetWorldLocation(boss->GetActorLocation());
 		boss->SoundInstance->Play();
