@@ -125,6 +125,7 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 			}
 
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Boss->DestructSound, GetActorLocation());
+			Boss->ShakeCamera();
 		}
 		arrow->Destroy();
 	}

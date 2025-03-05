@@ -149,6 +149,12 @@ void AThunderJaw::InitConstruct()
 	{
 		DestructSound = tempDestructSound.Object;
 	}
+
+	ConstructorHelpers::FClassFinder<UCameraShakeBase> tempCameraShake(TEXT("/Script/Engine.Blueprint'/Game/Assets/CinematicFX/BP/BP_CameraShake.BP_CameraShake_C'"));
+	if (tempCameraShake.Succeeded())
+	{
+		CameraShakeFactory = tempCameraShake.Class;
+	}
 	
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 }
@@ -467,11 +473,20 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		{
 			bTrapped = true;
 			FSM->ChangeBossState(EBossState::Damage);
+
+			BossTakeDamage(200);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestructSound, GetActorLocation());
+			ShakeCamera();
 		
 			PRINTLOG(TEXT("Hit Wire, HP : %f"),CurrentHP);
 			wire->DestroyAfterPlayFX();
 		}
 	}
+}
+
+void AThunderJaw::ShakeCamera()
+{
+	UGameplayStatics::PlayWorldCameraShake(GetWorld(), CameraShakeFactory, GetActorLocation(), 200, 10000);
 }
 
 

@@ -85,6 +85,8 @@ public:
 	void BossTakeDamage(const int Damage);
 	UFUNCTION(BlueprintCallable)
 	void GameClear();
+	UFUNCTION()
+	void ShakeCamera();
 #pragma endregion
 	
 protected:
@@ -184,5 +186,8 @@ public:
 	class USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
 	class USoundBase* DestructSound;
-#pragma endregion 
+#pragma endregion
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=CameraShake)
+	class TSubclassOf<class UCameraShakeBase> CameraShakeFactory;
 };

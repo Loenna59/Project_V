@@ -145,6 +145,7 @@ void AMachineGun::OnMachineGunOverlap(UPrimitiveComponent* OverlappedComponent, 
 				primComp->SetAllMassScale(500.0f);
 			}
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Boss->DestructSound, GetActorLocation());
+			Boss->ShakeCamera();
 		}
 		arrow->Destroy();
 	}
