@@ -180,5 +180,7 @@ public:
 	class USoundWave* MachineGunSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
 	class USoundWave* TailSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundBase* HitSound;
 #pragma endregion 
 };

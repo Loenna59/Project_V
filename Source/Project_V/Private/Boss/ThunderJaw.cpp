@@ -137,6 +137,12 @@ void AThunderJaw::InitConstruct()
 	{
 		RadarEffectFactory = tempRadarEffect.Class;
 	}
+
+	ConstructorHelpers::FObjectFinder<USoundBase> tempHitSound(TEXT("/Script/Engine.SoundCue'/Game/Sounds/Robot_Hit.Robot_Hit'"));
+	if (tempHitSound.Succeeded())
+	{
+		HitSound = tempHitSound.Object;
+	}
 	
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 }
@@ -412,6 +418,7 @@ void AThunderJaw::BossTakeDamage(int Damage)
 		GameClear();
 	}
 	FloatingDamage.Broadcast(Damage);
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 }
 
 void AThunderJaw::SpawnDamageUI(const float Damage)
