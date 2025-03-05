@@ -59,7 +59,7 @@ void AWire::OnCableComponentHit(UPrimitiveComponent* HitComponent, AActor* Other
 
 void AWire::DestroyAfterPlayFX()
 {
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), fx, GetActorLocation(), FRotator::ZeroRotator, FVector(10));
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), fx, cableCollision->GetComponentLocation(), FRotator::ZeroRotator, FVector(25));
 	Destroy();
 }
 
