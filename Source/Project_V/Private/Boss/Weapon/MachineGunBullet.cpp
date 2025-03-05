@@ -26,8 +26,6 @@ void AMachineGunBullet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Boss = Cast<AThunderJaw>(UGameplayStatics::GetActorOfClass(GetWorld(),AThunderJaw::StaticClass()));
-
 	FTimerHandle deathTimer;
 	GetWorldTimerManager().SetTimer(deathTimer, [this]()
 	{
@@ -152,9 +150,9 @@ void AMachineGunBullet::FireToTarget(const FVector& Target, float Radius)
 void AMachineGunBullet::BackToMagazine()
 {
 	SetBulletActive(false);
-	if (Boss)
+	if (MachineGun)
 	{
 		SetActorLocation(FVector(10000));
-		Boss->Magazine.Add(this);
+		MachineGun->Magazine.Add(this);
 	}
 }

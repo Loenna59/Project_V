@@ -39,6 +39,9 @@ protected:
 	UFUNCTION()
 	FVector GetRandomPointInCircleXY(float radius, FVector centerPoint);
 
+public:
+	UPROPERTY(EditAnywhere)
+	class AMachineGun* MachineGun;
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings")
 	class UBoxComponent* Root;
@@ -48,9 +51,7 @@ protected:
 	float LifeTime{3.0f};
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* PMC;
-	UPROPERTY(EditAnywhere)
-	class AThunderJaw* Boss;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	class USoundWave* GunSound;
 };

@@ -39,4 +39,7 @@ public:
 
 	UPROPERTY()
 	float LeftorRight;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TArray<AMachineGunBullet*> Magazine;
 };

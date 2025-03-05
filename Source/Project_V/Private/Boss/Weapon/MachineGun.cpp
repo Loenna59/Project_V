@@ -35,7 +35,7 @@ void AMachineGun::BeginPlay()
 		auto* bullet = GetWorld()->SpawnActor<AMachineGunBullet>(BulletFactory);
 		bullet->SetActorLocation(FVector(10000));
 		bullet->SetBulletActive(false);
-		Boss->Magazine.Add(bullet);
+		Magazine.Add(bullet);
 	}
 
 	MaxHP = 200.0f;
@@ -108,14 +108,15 @@ void AMachineGun::CreateBullet(FTransform transform, FVector Target)
 	// 	bullet->FireToTarget(Target, RandomSprayRadius);
 	// }
 
-	if (Boss->Magazine.Num() > 0)
+	if (Magazine.Num() > 0)
 	{
-		auto* bullet = Boss->Magazine[0];
+		auto* bullet = Magazine[0];
+		bullet->MachineGun = this;
 		bullet->SetBulletActive(true);
 		bullet->SetActorTransform(transform);
 		bullet->FireToTarget(Target,RandomSprayRadius);
 		bullet->PlayGunSound();
-		Boss->Magazine.RemoveAt(0);
+		Magazine.RemoveAt(0);
 	}
 }
 

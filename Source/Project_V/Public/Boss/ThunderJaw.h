@@ -141,8 +141,7 @@ public:
 	float CurrentHP{CurrentHP = MaxHP};
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
 	float BossSpeed{500.0f};
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="Settings")
-	TArray<AMachineGunBullet*> Magazine;
+	
 #pragma endregion
 
 #pragma region DistanceVariance
