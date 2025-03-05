@@ -11,6 +11,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/Weapon/Arrow.h"
 
 
@@ -122,6 +123,8 @@ void ADiscLauncher::OnDiscLauncherOverlap(UPrimitiveComponent* OverlappedCompone
 				primComp->SetSimulatePhysics(true);
 				primComp->SetAllMassScale(500.0f);
 			}
+
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Boss->DestructSound, GetActorLocation());
 		}
 		arrow->Destroy();
 	}

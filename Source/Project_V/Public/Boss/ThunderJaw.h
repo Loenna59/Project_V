@@ -182,5 +182,7 @@ public:
 	class USoundWave* TailSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
 	class USoundBase* HitSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	class USoundBase* DestructSound;
 #pragma endregion 
 };

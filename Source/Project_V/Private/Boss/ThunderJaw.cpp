@@ -143,6 +143,12 @@ void AThunderJaw::InitConstruct()
 	{
 		HitSound = tempHitSound.Object;
 	}
+
+	ConstructorHelpers::FObjectFinder<USoundBase> tempDestructSound(TEXT("/Script/Engine.SoundWave'/Game/Sounds/robot_fall.robot_fall'"));
+	if (tempDestructSound.Succeeded())
+	{
+		DestructSound = tempDestructSound.Object;
+	}
 	
 	EyeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
 }
