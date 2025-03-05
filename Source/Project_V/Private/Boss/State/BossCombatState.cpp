@@ -206,6 +206,11 @@ void UBossCombatState::ChoosePattern(AThunderJaw* Boss)
 {
 	PRINTLOG(TEXT("ChoosePattern"));
 	bIsDelay = false;
+	if (bIsRotateBody)
+	{
+		PRINTLOG(TEXT("still Rotating"));
+		return;
+	}
 	InitComponents(Boss);
 	
 	if (Boss->GetFSMComponent()->GetCurrentState()->BossState != EBossState::Combat)

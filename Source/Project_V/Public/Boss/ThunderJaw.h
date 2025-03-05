@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
-#include "Weapon/MachineGunBullet.h"
 #include "ThunderJaw.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFloatingDamage,float,damage);
@@ -13,6 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFloatingDamage,float,damage);
 class APlayCharacter;
 class UThunderJawFSM;
 class AThunderJawAIController;
+class AMachineGunBullet;
 
 UCLASS()
 class PROJECT_V_API AThunderJaw : public ACharacter

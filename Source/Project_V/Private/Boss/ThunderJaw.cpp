@@ -474,7 +474,7 @@ void AThunderJaw::OnBossBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 			bTrapped = true;
 			FSM->ChangeBossState(EBossState::Damage);
 
-			BossTakeDamage(200);
+			BossTakeDamage(300);
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DestructSound, GetActorLocation());
 			ShakeCamera();
 		
