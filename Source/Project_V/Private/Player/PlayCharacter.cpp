@@ -289,6 +289,7 @@ void APlayCharacter::TakeDamageInternal(float damage, FVector forward, float& de
 
 void APlayCharacter::GameOver()
 {
+	movementComp->EndDodge();
 	SetPlayerCameraMode(EPlayerCameraMode::Default);
 	anim->OnDead();
 	ShowGameStateUI.Broadcast(false);

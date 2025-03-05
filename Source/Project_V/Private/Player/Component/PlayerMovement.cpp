@@ -123,6 +123,11 @@ void UPlayerMovement::OnChangedCameraMode(EPlayerCameraMode mode)
 
 void UPlayerMovement::Move(const FInputActionValue& actionValue)
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	FVector2D value = actionValue.Get<FVector2D>();
 	me->AddMovementInput(FTransform(me->GetControlRotation()).TransformVector(FVector(value.X, value.Y, 0)));
 }
@@ -156,11 +161,21 @@ void UPlayerMovement::Rotate(const FInputActionValue& actionValue)
 
 void UPlayerMovement::ActionJump(const FInputActionValue& actionValue)
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	me->Jump();
 }
 
 void UPlayerMovement::OnTriggerShift(const FInputActionValue& actionValue)
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	bool value = actionValue.Get<bool>();
 
 	EPlayerCameraMode currentCameraMode = me->GetPlayerCameraMode();
@@ -186,6 +201,11 @@ void UPlayerMovement::OnTriggerShift(const FInputActionValue& actionValue)
 
 void UPlayerMovement::BeginDodge(const FInputActionValue& actionValue)
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	if (bIsPlayingDodge)
 	{
 		return;
@@ -196,6 +216,11 @@ void UPlayerMovement::BeginDodge(const FInputActionValue& actionValue)
 
 void UPlayerMovement::StartDodge()
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	if (bIsPlayingDodge)
 	{
 		return;

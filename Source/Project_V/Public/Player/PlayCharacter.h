@@ -84,6 +84,8 @@ public:
 	EPlayerCameraMode prevCameraMode = EPlayerCameraMode::Default;
 	
 	EPlayerCameraMode currentCameraMode = EPlayerCameraMode::Default;
+
+	bool bIsBlockControl = false;
 	
 private:
 	UPROPERTY()

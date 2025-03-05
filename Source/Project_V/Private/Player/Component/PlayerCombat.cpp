@@ -282,6 +282,11 @@ void UPlayerCombat::OnWheelWeapon(const FInputActionValue& actionValue)
 
 void UPlayerCombat::OnMeleeAttack()
 {
+	if (me->bIsBlockControl)
+	{
+		return;
+	}
+	
 	if (katanaPlayState == KatanaPlayState::Holding)
 	{
 		anim->OnComboKatana(comboIndex);
