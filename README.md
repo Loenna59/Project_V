@@ -58,7 +58,7 @@
 
 ### 6. 구르기 시스템
 
-![스크린샷 2025-02-20 112946.png](/Resources/Image%204.png)
+![image 4.png](/Resources/image%204.png)
 
 - `Enhanced Input`의 `Combo Key Trigger`를 활용해 빠르게 두 번 입력 시 회피 동작을 트리거
 - `Combo Actions` 배열 내에 `IA_PlayerDodge` 액션을 2회 연속 등록
